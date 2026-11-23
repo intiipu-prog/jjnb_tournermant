@@ -151,7 +151,7 @@ h2.pg .sp{flex:1}
 .chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:99px;padding:4px 10px;font-size:15px}
 .chip.gold{border-color:#f0c35a;background:#fffaf0}
 
-.ttabs{display:flex;gap:6px;overflow-x:auto;margin:0 0 14px;padding-bottom:2px;scrollbar-width:none}
+.ttabs{display:flex;gap:6px;align-items:center;overflow-x:auto;margin:0 0 14px;padding-bottom:2px;scrollbar-width:none}
 .ttabs::-webkit-scrollbar{display:none}
 .ttabs button{border:1px solid var(--line);background:#fff;border-radius:99px;padding:8px 14px;font-weight:700;font-size:15px;white-space:nowrap;color:var(--sub)}
 .ttabs button.on{background:var(--dark);border-color:var(--dark);color:#fff}
@@ -598,6 +598,7 @@ function render(fromData){
   drawQRs(app);
   if(r==='players')applyPlayerFilter();
   if(r==='hof')applyHofFilter();
+  if(r==='tours')applyTourFilter();
   if((r==='players'||r==='tours')&&canEdit()&&!window.XLSX)needXLSX().catch(()=>{});
 }
 function drawQRs(root){
@@ -657,9 +658,9 @@ function vTours(){
   const f=S.tab.tourFilter||'all';
   const all=sortedTours().filter(t=>f==='all'||t.status===f);
   let h=`<h2 class="pg">대회 결과<span class="sp"></span>${canEdit()?`<button class="btn sm" data-act="expResults">⬇ 결과 내보내기</button><button class="btn sm" data-act="impResults">⬆ 결과 가져오기</button><button class="btn sm dark" data-act="resText">✎ 텍스트로 결과 입력</button><button class="btn sm red" data-act="resetAll">⚠ 전체 리셋</button><button class="btn pri sm" data-act="nav" data-h="new">+ 대회 개최</button>`:''}</h2>`;
-  h+=`<div class="ttabs">${[['all','전체'],['active','진행중'],['done','종료'],['cancelled','취소']].map(x=>`<button class="${f===x[0]?'on':''}" data-act="tourFilter" data-v="${x[0]}">${x[1]}</button>`).join('')}</div>`;
+  h+=`<div class="ttabs">${[['all','전체'],['active','진행중'],['done','종료'],['cancelled','취소']].map(x=>`<button class="${f===x[0]?'on':''}" data-act="tourFilter" data-v="${x[0]}">${x[1]}</button>`).join('')}<input id="tr-q" value="${esc(S.tab.trq||'')}" placeholder="🔍 대회명·선수·날짜 검색" style="border:1px solid #d5d9df;border-radius:99px;padding:8px 14px;font-size:15px;min-width:200px;flex:1;max-width:320px"></div><div id="tr-none" class="card empty" style="display:none">검색 결과가 없습니다.</div>`;
   if(!all.length)return h+'<div class="card empty">대회가 없습니다.</div>';
-  h+='<div class="tgrid">'+all.map(t=>`<div class="card" style="margin:0"><div class="row">${typeBadge(t)} ${statusBadge(t)}<span class="sp"></span><span class="small muted">${esc(t.date||'')}</span></div>
+  h+='<div class="tgrid">'+all.map(t=>`<div class="card trc" style="margin:0" data-s="${esc([t.name,t.date,(t.date||'').replace(/-/g,'.'),kindLabel(tKind(t)),...(t.result||[]).filter(o=>o.rank&&o.rank<=4).map(o=>o.name+' '+o.nick),...activeList(t).map(p=>(t.people[p]||{}).name||'')].join(' ').toLowerCase())}"><div class="row">${typeBadge(t)} ${statusBadge(t)}<span class="sp"></span><span class="small muted">${esc(t.date||'')}</span></div>
     <div class="row" style="margin-top:6px"><div style="flex:1;min-width:200px"><div style="font-size:18px;font-weight:900">${esc(t.name)}</div><div class="small muted">참가 ${activeList(t).length}명 · ${esc(progressText(t))}</div>${t.status==='done'?podiumHTML(t,4):''}</div>
     <div class="row"><button class="btn sm dark" data-act="nav" data-h="t-${t.id}">열기</button>${canEdit()&&t.type==='record'?`<button class="btn sm" data-act="editTour" data-t="${t.id}">✎ 수정</button>`:''}${canEdit()?`<button class="btn sm red" data-act="delTour" data-t="${t.id}">삭제</button>`:''}</div></div></div>`).join('')+'</div>';
   return h;
@@ -701,6 +702,7 @@ document.addEventListener('input',e=>{
   if(id==='nf-date-p'||id==='et-date-p'){const tx=$('#'+id.slice(0,-2));if(tx&&e.target.value)tx.value=e.target.value;}
   if(S.newForm&&(id==='nf-date'||id==='nf-date-p')){const v=normDate(($('#nf-date')||{}).value);if(v){S.newForm.date=v;const pk=$('#nf-date-p');if(pk)pk.value=v;}if(S.newForm.nameAuto){S.newForm.name=autoTourName(S.newForm);const i=$('#nf-name');if(i)i.value=S.newForm.name;}}
   if(id==='nf-q'){const q=e.target.value.trim().toLowerCase();document.querySelectorAll('#nf-pick label').forEach(l=>{l.style.display=!q||l.dataset.s.indexOf(q)>=0?'':'none';});}
+  if(id==='tr-q'){S.tab.trq=e.target.value;applyTourFilter();}
   if(id==='hof-q'){S.tab.hofq=e.target.value;applyHofFilter();}
   if(id==='pl-q'){S.tab.plq=e.target.value;applyPlayerFilter();}
   if(id==='pm-q'){const q=e.target.value.trim().toLowerCase();document.querySelectorAll('#pm-add .pmr').forEach(l=>{l.style.display=!q||l.dataset.s.indexOf(q)>=0?'':'none';});}
@@ -946,6 +948,7 @@ function vPlayers(){
     </div><div class="small muted" style="margin-top:8px">닉네임이 이름과 같으면 <span class="nk same">회색</span>, 다르면 <span class="nk blue">파란색</span>으로 표시됩니다.</div></div>`;
   return h;
 }
+function applyTourFilter(){const q=(S.tab.trq||'').trim().toLowerCase();let n=0,all=0;document.querySelectorAll('.trc').forEach(c=>{all++;const ok=!q||c.dataset.s.indexOf(q)>=0;c.style.display=ok?'':'none';if(ok)n++;});const e=document.getElementById('tr-none');if(e)e.style.display=all&&!n?'':'none';}
 function applyHofFilter(){const q=(S.tab.hofq||'').trim().toLowerCase();document.querySelectorAll('tr.hofr').forEach(r=>{r.style.display=!q||r.dataset.s.indexOf(q)>=0?'':'none';});}
 function applyPlayerFilter(){const q=(S.tab.plq||'').trim().toLowerCase();document.querySelectorAll('#pl-tb .plc[data-s]').forEach(r=>{r.style.display=!q||r.dataset.s.indexOf(q)>=0?'':'none';});}
 
