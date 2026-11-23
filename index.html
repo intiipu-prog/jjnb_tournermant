@@ -594,6 +594,7 @@ function render(fromData){
   $('#hstats').innerHTML=`<div><b>${S.players.length}</b><span>등록 선수</span></div><div><b>${all.filter(t=>t.status!=='cancelled').length}</b><span>전체 대회</span></div><div class="lv"><b>${all.filter(t=>t.status==='active').length}</b><span>진행중</span></div>`;
   drawQRs(app);
   if(r==='players')applyPlayerFilter();
+  if((r==='players'||r==='tours')&&canEdit()&&!window.XLSX)needXLSX().catch(()=>{});
 }
 function drawQRs(root){
   root.querySelectorAll('[data-qr]').forEach(el=>{
@@ -933,7 +934,7 @@ function vPlayers(){
   let h=`<h2 class="pg">선수 명단 <span class="badge">${list.length}명</span><span class="sp"></span>${ed?`<button class="btn sm dark" data-act="bulkText">✎ 텍스트로 일괄 입력</button><button class="btn pri sm" data-act="editPlayer">+ 선수 등록</button>`:''}</h2>`;
   if(ed)h+=`<div class="card"><h3>스프레드시트 <small>Excel·Google 스프레드시트 호환 (.xlsx / .csv)</small></h3><div class="row">
     <button class="btn sm" data-act="expPlayers" data-v="xlsx">⬇ 엑셀(.xlsx) 다운로드</button><button class="btn sm" data-act="expPlayers" data-v="csv">⬇ CSV 다운로드</button><button class="btn sm dark" data-act="impPlayers">⬆ 스프레드시트 가져오기</button></div>
-    <div class="small muted" style="margin-top:8px">열 이름: 선수이름 · 닉네임 · 소속 · 메모. 구글 시트는 [파일 → 다운로드 → .xlsx 또는 .csv]로 받은 파일을 가져오세요.</div></div>`;
+    <div class="small muted" style="margin-top:8px">열 이름: 선수이름 · 닉네임 · 소속 · 메모. 구글 시트는 [파일 → 다운로드 → .xlsx 또는 .csv]로 받은 파일을 가져오세요.<br>PC 크롬·엣지에서는 내보낼 때 저장 위치(폴더)와 파일 이름을 직접 고를 수 있습니다.</div></div>`;
   h+=`<div class="card"><div class="row" style="margin-bottom:10px"><span class="small muted">정렬</span><select id="pl-sort" style="border:1px solid #d5d9df;border-radius:10px;padding:8px 10px;background:#fff">${[['name','이름순'],['nick','닉네임순'],['team','소속순'],['memo','메모순'],['reg','등록순']].map(o=>`<option value="${o[0]}" ${so.k===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select><button class="btn sm" data-act="plSortDir">${so.dir>0?'▲ 오름차순':'▼ 내림차순'}</button><input id="pl-q" value="${esc(S.tab.plq||'')}" placeholder="이름·닉네임·소속 검색" style="flex:1;border:1px solid #d5d9df;border-radius:10px;padding:9px 12px"></div>
     <div class="plgrid" id="pl-tb">
     ${list.length?list.map(p=>`<div class="plc" data-s="${esc((p.name+' '+p.nick+' '+p.team+' '+(p.memo||'')).toLowerCase())}"><div class="plm"><div class="pln"><b>${esc(p.name)}</b> <span class="nk ${p.nick&&p.nick!==p.name?'blue':'same'}" style="font-weight:700">/ ${esc(p.nick||'')}</span></div><div class="small muted">${p.team?`<span class="badge">${esc(p.team)}</span> `:''}${esc(p.memo||'')}</div></div>${ed?`<div class="row" style="gap:4px;flex-shrink:0"><button class="btn sm" data-act="editPlayer" data-p="${p.id}">수정</button><button class="btn sm red" data-act="delPlayer" data-p="${p.id}">삭제</button></div>`:''}</div>`).join(''):`<div class="empty" style="grid-column:1/-1">등록된 선수가 없습니다.</div>`}
@@ -992,8 +993,21 @@ function closeModal(silent){const m=$('#modal');m.classList.remove('on');m.inner
 function ask(msg,okText,danger){return new Promise(res=>{openModal(`<p class="ask">${esc(msg)}</p><div class="mact"><button class="btn" data-act="__no">아니오</button><button class="btn ${danger?'red':'pri'}" data-act="__yes">${esc(okText||'확인')}</button></div>`);S._ask=res;});}
 $('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal();});
 function pickFile(accept,handler){let inp=$('#file-in');if(!inp){inp=document.createElement('input');inp.type='file';inp.id='file-in';inp.style.display='none';document.body.appendChild(inp);}inp.accept=accept;S._fileHandler=handler;inp.click();}
-async function saveFile(name,data){
-  const dl=await getCap('downloads');
+const MIME={xlsx:['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','엑셀 파일'],csv:['text/csv','CSV 파일'],png:['image/png','PNG 이미지']};
+/* 저장 위치 선택 (PC 크롬·엣지): 클릭 직후 호출해야 함. 반환: handle | 'cancel' | null(미지원) */
+async function pickSave(name){
+  if(S.mode==='db'||typeof window.showSaveFilePicker!=='function')return null;
+  const ext=(name.split('.').pop()||'').toLowerCase();const m=MIME[ext];
+  try{return await window.showSaveFilePicker({suggestedName:name,types:m?[{description:m[1],accept:{[m[0]]:['.'+ext]}}]:undefined});}
+  catch(e){if(e&&e.name==='AbortError')return 'cancel';return null;}
+}
+async function saveFile(name,data,handle){
+  if(handle==='cancel')return;
+  if(handle&&handle.createWritable){
+    try{const w=await handle.createWritable();await w.write(data instanceof Blob?data:new Blob([data]));await w.close();toast(`저장했습니다: ${handle.name}`);return;}
+    catch(e){toast('지정한 위치에 저장하지 못해 기본 다운로드로 저장합니다');}
+  }
+  const dl=S.mode==='db'?await getCap('downloads'):null;
   if(!dl){
     try{const blob=data instanceof Blob?data:new Blob([data]);const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000);toast('파일을 저장했습니다');}
     catch(e){toast('이 화면에서는 파일 저장이 지원되지 않습니다');}
@@ -1334,7 +1348,8 @@ ACT.saveQR=async d=>{
   const pad=24,sz=src?src.width:(img&&img.naturalWidth)||240;
   const out=document.createElement('canvas');out.width=sz+pad*2;out.height=sz+pad*2;const g=out.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,out.width,out.height);
   try{if(src)g.drawImage(src,pad,pad);else if(img)g.drawImage(img,pad,pad,sz,sz);else throw new Error('no qr');}catch(e){toast('QR 이미지를 만들 수 없습니다');return;}
-  out.toBlob(b=>{if(b)saveFile((d.n||'QR').replace(/[\\/:*?"<>|]/g,'_')+'.png',b);else toast('QR 이미지를 만들 수 없습니다');},'image/png');
+  const qn=(d.n||'QR').replace(/[\\/:*?"<>|]/g,'_')+'.png';const hd=await pickSave(qn);if(hd==='cancel')return;
+  out.toBlob(b=>{if(b)saveFile(hd&&hd.name||qn,b,hd);else toast('QR 이미지를 만들 수 없습니다');},'image/png');
 };
 ACT.copyUrl=async d=>{try{await navigator.clipboard.writeText(d.u);toast('링크를 복사했습니다');}catch(e){toast('복사가 안되면 주소 칸을 길게 눌러 복사하세요');}};
 
@@ -1459,11 +1474,13 @@ ACT.savePlayer=d=>{
 };
 ACT.delPlayer=async d=>{const p=S.players.find(x=>x.id===d.p);if(!p)return;if(!(await ask(`'${p.name}' 선수를 명단에서 삭제할까요?\n(지난 대회 기록은 유지됩니다)`,'삭제',true)))return;savePlayers(S.players.filter(x=>x.id!==d.p));};
 ACT.expPlayers=async d=>{
+  const fname=`JJNB_선수명단_${today()}.${d.v==='csv'?'csv':'xlsx'}`;
+  const hd=await pickSave(fname);if(hd==='cancel')return;
   const rows=S.players.slice().sort((a,b)=>a.name.localeCompare(b.name,'ko')).map(p=>({'선수이름':p.name,'닉네임':p.nick||'','소속':p.team||'','메모':p.memo||''}));
   try{
     const X=await needXLSX();const ws=X.utils.json_to_sheet(rows,{header:['선수이름','닉네임','소속','메모']});
-    if(d.v==='csv'){await saveFile(`JJNB_선수명단_${today()}.csv`,'﻿'+X.utils.sheet_to_csv(ws));}
-    else{const wb=X.utils.book_new();ws['!cols']=[{wch:12},{wch:14},{wch:14},{wch:30}];X.utils.book_append_sheet(wb,ws,'선수명단');await saveFile(`JJNB_선수명단_${today()}.xlsx`,new Uint8Array(X.write(wb,{bookType:'xlsx',type:'array'})));}
+    if(d.v==='csv'){await saveFile(hd&&hd.name||fname,'﻿'+X.utils.sheet_to_csv(ws),hd);}
+    else{const wb=X.utils.book_new();ws['!cols']=[{wch:12},{wch:14},{wch:14},{wch:30}];X.utils.book_append_sheet(wb,ws,'선수명단');await saveFile(hd&&hd.name||fname,new Uint8Array(X.write(wb,{bookType:'xlsx',type:'array'})),hd);}
   }catch(e){toast('내보내기 실패: '+e.message);}
 };
 async function readSheetFile(file){
@@ -1526,6 +1543,8 @@ ACT.impDone=()=>{
 
 /* 대회 결과 내보내기/가져오기 */
 ACT.expResults=async()=>{
+  const fname=`JJNB_대회결과_${today()}.xlsx`;
+  const hd=await pickSave(fname);if(hd==='cancel')return;
   try{
     const X=await needXLSX();
     const tours=sortedTours();
@@ -1535,7 +1554,7 @@ ACT.expResults=async()=>{
     X.utils.book_append_sheet(wb,ws,'대회결과');
     const data=[];tours.forEach(t=>{const j=JSON.stringify(t);for(let i=0,k=0;i<j.length;i+=30000,k++)data.push({id:t.id,part:k,data:j.slice(i,i+30000)});});
     X.utils.book_append_sheet(wb,X.utils.json_to_sheet(data),'_data');
-    await saveFile(`JJNB_대회결과_${today()}.xlsx`,new Uint8Array(X.write(wb,{bookType:'xlsx',type:'array'})));
+    await saveFile(hd&&hd.name||fname,new Uint8Array(X.write(wb,{bookType:'xlsx',type:'array'})),hd);
   }catch(e){toast('내보내기 실패: '+e.message);}
 };
 function dateField(id,v){return `<div class="row" style="gap:6px;flex-wrap:nowrap"><input id="${id}" value="${esc(v||'')}" placeholder="2026-11-22" inputmode="numeric" autocomplete="off" style="flex:1;min-width:0"><input type="date" id="${id}-p" value="${esc(normDate(v)||'')}" title="달력에서 선택" style="width:46px;flex-shrink:0;padding:8px 4px;color:transparent"></div><div class="small muted" style="margin-top:3px">직접 입력 (예: 2026-11-22, 20261122, 11/22) 또는 오른쪽 달력에서 선택</div>`;}
