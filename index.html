@@ -965,8 +965,8 @@ function vHof(){
 function vConfig(){
   const st=S.settings;
   return `<h2 class="pg">설정</h2>
-  <div class="cfgrow"><div class="cfcol"><div class="card" style="margin:0"><h3>배너 로고</h3><div class="row"><div style="background:var(--dark);padding:10px;border-radius:10px">${st.logo?`<img src="${esc(st.logo)}" style="max-height:64px;display:block">`:DEFAULT_LOGO}</div></div>
-    <div class="row" style="margin-top:10px"><label class="btn sm dark">로고 이미지 업로드<input type="file" id="logo-in" accept="image/*" style="display:none"></label>${st.logo?'<button class="btn sm red" data-act="rmLogo">기본 로고로</button>':''}</div>
+  <div class="cfgrow"><div class="cfcol"><div class="card" style="margin:0"><h3>배너 로고</h3><div class="row" style="align-items:center;gap:12px;flex-wrap:nowrap"><div style="background:var(--dark);padding:10px;border-radius:10px;flex-shrink:0">${st.logo?`<img src="${esc(st.logo)}" style="max-height:64px;max-width:160px;display:block">`:DEFAULT_LOGO}</div>
+    <div style="display:flex;flex-direction:column;gap:6px;align-items:stretch"><label class="btn sm dark" style="justify-content:center">로고 이미지 업로드<input type="file" id="logo-in" accept="image/*" style="display:none"></label>${st.logo?'<button class="btn sm red" style="justify-content:center" data-act="rmLogo">기본 로고로</button>':''}</div></div>
     <div class="small muted" style="margin-top:6px">PNG(투명 배경)를 권장합니다. 자동으로 축소되어 저장됩니다.</div></div>
   <div class="card" style="margin:0"><h3>화면</h3><div class="row"><button class="btn" data-act="viewOnly">${S.viewOnly?'진행자 모드로 전환':'관람 모드 (진행 버튼 숨기기)'}</button></div><div class="small muted" style="margin-top:6px">대형 화면에 띄울 때 관람 모드를 사용하세요. 이 기기에서만 적용됩니다.</div></div></div>
   <div class="card" style="margin:0"><h3>QR 링크</h3>
