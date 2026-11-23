@@ -108,6 +108,7 @@ h2.pg .sp{flex:1}
 .plc .small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
 .rgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 @media (max-width:860px){.rgrid{grid-template-columns:1fr}}
+.emptypic{margin-top:10px;opacity:.95}
 .rc{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fff;position:relative}
 .rc .tt{font-size:18px;font-weight:900;margin:2px 0 4px}
 .podium{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;margin-top:8px;font-size:16px;align-items:center}
@@ -619,11 +620,17 @@ function drawQRs(root){
 function sortedTours(){return Object.values(S.tours).sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.createdAt||0)-(a.createdAt||0));}
 function progressText(t){
   if(t.status==='cancelled')return '취소된 대회';
-  if(t.status==='planned')return `예정 대회 · 참가 예정 ${activeList(t).length}명`;
+  if(t.status==='planned')return '예정 대회';
   if(t.type==='record')return '기록';
   if(t.type==='points'){const P=t.pts;if(!P.seeds)return `리그 ${playedMatches(t)}/${totalMatches(t)} 경기`;if(P.final&&!resolved(t,P.final))return '결승 진행중';return `본선 서바이벌 진행중 (잔여 ${svRemaining(t).length}명)`;}
   if(t.finals)return '결승라운드 진행중';
   const n=t.rounds.length;return n?`${n}라운드 진행중 / 총 ${t.opt.rounds}라운드`:'준비중';
+}
+const EMPTY_SVG=`<svg viewBox="0 0 320 120" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:300px;height:auto;display:block;margin:0 auto"><defs><pattern id="ck" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#d6dae0"/><rect x="6" y="6" width="6" height="6" fill="#d6dae0"/></pattern></defs><rect x="0" y="92" width="320" height="10" rx="5" fill="#eef0f3"/><rect x="246" y="20" width="3" height="74" fill="#c3c8cf"/><rect x="249" y="20" width="44" height="30" fill="url(#ck)" stroke="#c3c8cf"/><g transform="translate(40 52)"><path d="M10 34h120l-10-16h-26l-14-12H54L30 18H14z" fill="#e10600"/><rect x="58" y="10" width="26" height="8" rx="2" fill="#ffc400"/><path d="M0 34h140" stroke="#14161b" stroke-width="3"/><circle cx="32" cy="36" r="10" fill="#14161b"/><circle cx="32" cy="36" r="4" fill="#9aa0a9"/><circle cx="108" cy="36" r="10" fill="#14161b"/><circle cx="108" cy="36" r="4" fill="#9aa0a9"/><path d="M-30 20h22M-36 28h26M-26 12h16" stroke="#c3c8cf" stroke-width="3" stroke-linecap="round"/></g></svg>`;
+function emptyPic(t){
+  const msg=t.status==='planned'?'대회 준비중':t.status==='cancelled'?'취소된 대회':t.status==='active'?'경기 진행중':'결과 없음';
+  const img=S.settings.emptyImg?`<img src="${esc(S.settings.emptyImg)}" alt="" style="max-width:100%;max-height:130px;display:block;margin:0 auto;border-radius:10px">`:EMPTY_SVG;
+  return `<div class="emptypic">${img}<div class="small muted" style="text-align:center;margin-top:6px">${msg}</div></div>`;
 }
 function podiumHTML(t,max){
   const r=(t.result||[]).filter(o=>o.rank).slice(0,max||4);
@@ -640,7 +647,7 @@ function vDash(){
       <div class="row">${typeBadge(t)} ${statusBadge(t)}<span class="sp"></span><span class="small muted">${esc(t.date||'')}</span></div>
       <div class="tt">${tName(t)}</div>
       <div class="small muted">참가 ${activeList(t).length}명 · ${esc(progressText(t))}</div>
-      ${t.status==='done'?podiumHTML(t,4):''}
+      ${t.status==='done'&&(t.result||[]).some(o=>o.rank)?podiumHTML(t,4):emptyPic(t)}
       <div class="row" style="margin-top:10px"><button class="btn sm dark" data-act="nav" data-h="t-${t.id}">${t.type==='record'||isPlanned(t)?'열기':'대진표 보기'}</button>${t.status==='active'&&tourUrl(t.id)?`<button class="btn sm" data-act="qr" data-t="${t.id}">QR</button>`:''}</div>
     </div>`).join('')}</div>`;
   h+='</div>';
@@ -666,7 +673,7 @@ function vTours(){
   h+=`<div class="ttabs">${[['all','전체'],['planned','예정'],['active','진행중'],['done','종료'],['cancelled','취소']].map(x=>`<button class="${f===x[0]?'on':''}" data-act="tourFilter" data-v="${x[0]}">${x[1]}</button>`).join('')}<input id="tr-q" value="${esc(S.tab.trq||'')}" placeholder="🔍 대회명·선수·날짜 검색" style="border:1px solid #d5d9df;border-radius:99px;padding:8px 14px;font-size:15px;min-width:200px;flex:1;max-width:320px"></div><div id="tr-none" class="card empty" style="display:none">검색 결과가 없습니다.</div>`;
   if(!all.length)return h+'<div class="card empty">대회가 없습니다.</div>';
   h+='<div class="tgrid">'+all.map(t=>`<div class="card trc" style="margin:0" data-s="${esc([t.name,t.date,(t.date||'').replace(/-/g,'.'),kindLabel(tKind(t)),...(t.result||[]).filter(o=>o.rank&&o.rank<=4).map(o=>o.name+' '+o.nick),...activeList(t).map(p=>(t.people[p]||{}).name||'')].join(' ').toLowerCase())}"><div class="row">${typeBadge(t)} ${statusBadge(t)}<span class="sp"></span><span class="small muted">${esc(t.date||'')}</span></div>
-    <div class="row" style="margin-top:6px"><div style="flex:1;min-width:200px"><div style="font-size:18px;font-weight:900">${tName(t)}</div><div class="small muted">참가 ${activeList(t).length}명 · ${esc(progressText(t))}</div>${t.status==='done'?podiumHTML(t,4):''}</div>
+    <div class="row" style="margin-top:6px"><div style="flex:1;min-width:200px"><div style="font-size:18px;font-weight:900">${tName(t)}</div><div class="small muted">참가 ${activeList(t).length}명 · ${esc(progressText(t))}</div>${t.status==='done'&&(t.result||[]).some(o=>o.rank)?podiumHTML(t,4):emptyPic(t)}</div>
     <div class="row"><button class="btn sm dark" data-act="nav" data-h="t-${t.id}">열기</button>${canEdit()&&t.type==='record'?`<button class="btn sm" data-act="editTour" data-t="${t.id}">✎ 수정</button>`:''}${canEdit()?`<button class="btn sm red" data-act="delTour" data-t="${t.id}">삭제</button>`:''}</div></div></div>`).join('')+'</div>';
   return h;
 }
@@ -727,6 +734,7 @@ document.addEventListener('change',e=>{
   if(e.target.id==='nf-plan'&&S.newForm){S.newForm.planned=e.target.checked;render();}
   if(e.target.id==='pl-sort'){const so=S.tab.plSort||{k:'name',dir:1};S.tab.plSort={k:e.target.value,dir:so.dir};render();}
   if(e.target.id==='logo-in'&&e.target.files[0]){uploadLogo(e.target.files[0]);e.target.value='';}
+  if(e.target.id==='empty-in'&&e.target.files[0]){uploadLogo(e.target.files[0],'emptyImg');e.target.value='';}
 });
 
 /* ================= 대회 화면 ================= */
@@ -987,7 +995,10 @@ function vConfig(){
   return `<h2 class="pg">설정</h2>
   <div class="cfgrow"><div class="cfcol"><div class="card" style="margin:0"><h3>배너 로고</h3><div class="row" style="align-items:center;gap:12px;flex-wrap:nowrap"><div style="background:var(--dark);padding:10px;border-radius:10px;flex-shrink:0">${st.logo?`<img src="${esc(st.logo)}" style="max-height:64px;max-width:160px;display:block">`:DEFAULT_LOGO}</div>
     <div style="display:flex;flex-direction:column;gap:6px;align-items:stretch"><label class="btn sm dark" style="justify-content:center">로고 이미지 업로드<input type="file" id="logo-in" accept="image/*" style="display:none"></label>${st.logo?'<button class="btn sm red" style="justify-content:center" data-act="rmLogo">기본 로고로</button>':''}</div></div>
-    <div class="small muted" style="margin-top:6px">PNG(투명 배경)를 권장합니다. 자동으로 축소되어 저장됩니다.</div></div>
+    <div class="small muted" style="margin-top:6px">PNG(투명 배경)를 권장합니다. 자동으로 축소되어 저장됩니다.</div>
+    <h3 style="margin-top:16px">결과 없는 대회 그림 <small>대시보드·대회 결과의 빈칸</small></h3>
+    <div class="row" style="align-items:center;gap:12px;flex-wrap:nowrap"><div style="width:160px;flex-shrink:0;border:1px solid var(--line);border-radius:10px;padding:6px;background:#fff">${st.emptyImg?`<img src="${esc(st.emptyImg)}" style="max-width:100%;max-height:90px;display:block;margin:0 auto">`:EMPTY_SVG}</div>
+    <div style="display:flex;flex-direction:column;gap:6px"><label class="btn sm dark" style="justify-content:center">그림 업로드<input type="file" id="empty-in" accept="image/*" style="display:none"></label>${st.emptyImg?'<button class="btn sm red" style="justify-content:center" data-act="rmEmpty">기본 그림으로</button>':''}</div></div></div>
   <div class="card" style="margin:0"><h3>화면</h3><div class="row"><button class="btn" data-act="viewOnly">${S.viewOnly?'진행자 모드로 전환':'관람 모드 (진행 버튼 숨기기)'}</button></div><div class="small muted" style="margin-top:6px">대형 화면에 띄울 때 관람 모드를 사용하세요. 이 기기에서만 적용됩니다.</div></div></div>
   <div class="card" style="margin:0"><h3>QR 링크</h3>
     <div class="fld"><label>대진표 페이지 주소 (참가자 QR에 사용)</label><input id="cf-url" value="${esc(st.appUrl||appUrl())}" placeholder="https://claude.ai/..."></div>
@@ -998,14 +1009,15 @@ function vConfig(){
   <div class="card"><h3>저장소</h3><div class="small">${S.mode==='fb'?'✅ Firebase(Firestore)에 저장 · 모든 기기에서 실시간 동기화':S.mode==='db'?'✅ 서버(백엔드 DB)에 저장 · 모든 기기에서 실시간 동기화':'⚠️ 로컬 모드: 이 브라우저에만 저장됩니다'}</div>
     ${S.mode==='fb'?`<div class="row" style="margin-top:10px"><button class="btn sm" data-act="ghPlayers">GitHub 백업에서 선수 명단 불러오기</button><button class="btn sm" data-act="ghResults">GitHub 백업에서 대회 결과 불러오기</button></div><div class="small muted" style="margin-top:6px">저장소 data/ 폴더의 백업 파일을 불러옵니다. 조별 대진까지 옮기려면 기존 페이지에서 [결과 내보내기] 엑셀을 받아 [대회 결과 → 결과 가져오기]를 쓰세요.</div>`:''}</div>`;
 }
-function uploadLogo(file){
+function uploadLogo(file,key){
+  key=key||'logo';
   const img=new Image();const url=URL.createObjectURL(file);
   img.onload=()=>{
     const maxW=640,maxH=200;let w=img.width,h=img.height;const sc=Math.min(1,maxW/w,maxH/h);w=Math.round(w*sc);h=Math.round(h*sc);
     const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
     let d=c.toDataURL('image/png');if(d.length>180000)d=c.toDataURL('image/jpeg',0.85);
     URL.revokeObjectURL(url);
-    saveSettings(Object.assign({},S.settings,{logo:d}));render();toast('로고를 저장했습니다');
+    saveSettings(Object.assign({},S.settings,{[key]:d}));render();toast(key==='logo'?'로고를 저장했습니다':'그림을 저장했습니다');
   };
   img.onerror=()=>toast('이미지를 읽을 수 없습니다');
   img.src=url;
@@ -1831,6 +1843,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target&&e.target.i
 
 /* 설정 */
 ACT.saveCfg=()=>{saveSettings(Object.assign({},S.settings,{appUrl:$('#cf-url').value.trim(),band:$('#cf-band').value.trim()||BAND_URL,kakao:$('#cf-kakao').value.trim()||KAKAO_URL}));render();toast('저장했습니다');};
+ACT.rmEmpty=()=>{const s=Object.assign({},S.settings);delete s.emptyImg;saveSettings(s);render();};
 ACT.rmLogo=()=>{const s=Object.assign({},S.settings);delete s.logo;saveSettings(s);render();};
 
 /* 시작 */
