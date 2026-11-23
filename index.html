@@ -594,7 +594,7 @@ function render(fromData){
   }catch(e){console.error(e);html=`<div class="card">화면 오류: ${esc(e.message)}</div>`;}
   app.innerHTML=html;
   const all=Object.values(S.tours);
-  $('#hstats').innerHTML=`<div><b>${S.players.length}</b><span>등록 선수</span></div><div><b>${all.filter(t=>t.status!=='cancelled').length}</b><span>전체 대회</span></div><div class="lv"><b>${all.filter(t=>t.status==='active').length}</b><span>진행중</span></div>`;
+  $('#hstats').innerHTML=`<div class="lv"><b>${all.filter(t=>t.status==='active').length}</b><span>진행중</span></div><div><b>${all.filter(t=>t.status!=='cancelled').length}</b><span>전체 대회</span></div><div><b>${S.players.length}</b><span>등록 선수</span></div>`;
   drawQRs(app);
   if(r==='players')applyPlayerFilter();
   if((r==='players'||r==='tours')&&canEdit()&&!window.XLSX)needXLSX().catch(()=>{});
