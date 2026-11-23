@@ -1345,7 +1345,7 @@ function pmRender(tid){
   const act=activeList(t),rm=t.removed||[];
   const others=S.players.filter(p=>!t.active.includes(p.id)).sort((a,b)=>a.name.localeCompare(b.name,'ko'));
   const q=($('#pm-q')||{}).value||'';
-  openModal(`<h3>참가자 추가 / 제외</h3>
+  openModal(`<h3 class="row">참가자 추가 / 제외<span class="sp"></span><button class="btn sm dark" data-act="pmText" data-t="${tid}">✎ 텍스트로 입력</button></h3>
     <div class="small muted" style="margin-bottom:8px">제외된 선수는 남은 경기·다음 라운드·결승에서 빠집니다. 추가된 선수는 진행 중인 예선(또는 다음 라운드)에 편성됩니다.</div>
     <div style="font-weight:900;margin:8px 0 4px">참가 중 (${act.length})</div>
     <div class="pick" style="max-height:220px">${act.map(p=>`<div class="row" style="padding:8px 12px;border-bottom:1px solid #f0f1f3">${tn(t,p)}<span class="sp"></span><button class="btn sm red" data-act="pmRemove" data-t="${tid}" data-p="${p}">제외</button></div>`).join('')}</div>
@@ -1377,6 +1377,61 @@ function addToTour(t,pid){
 ACT.pmAdd=d=>{const t=T(d);addToTour(t,d.p);autoProgress(t);saveTour(t);pmRender(d.t);};
 ACT.pmRemove=d=>{const t=T(d);t.removed=(t.removed||[]).filter(x=>x!==d.p);t.removed.push(d.p);autoProgress(t);saveTour(t);pmRender(d.t);toast('제외했습니다');};
 ACT.pmRestore=d=>{const t=T(d);t.removed=(t.removed||[]).filter(x=>x!==d.p);autoProgress(t);saveTour(t);pmRender(d.t);toast('복귀했습니다');};
+ACT.pmText=d=>{
+  const t=S.tours[d.t];if(!t)return;
+  const mode=S._pmMode||'add';
+  openModal(`<h3>참가자 텍스트로 ${mode==='add'?'추가':'제외'}</h3>
+    <div class="opt" style="margin-bottom:10px"><button class="${mode==='add'?'on':''}" data-act="pmTextMode" data-t="${t.id}" data-v="add">추가</button><button class="${mode==='rm'?'on':''}" data-act="pmTextMode" data-t="${t.id}" data-v="rm">제외</button></div>
+    <div class="small muted" style="margin-bottom:8px">이름 또는 닉네임을 줄바꿈이나 쉼표(,)로 구분해 입력하세요. 동명이인은 <b>이름/닉네임</b>으로 쓰면 정확히 찾습니다.${mode==='add'?'<br>추가된 선수는 진행 중인 예선(또는 다음 라운드)에 편성됩니다.':'<br>제외된 선수는 남은 경기·다음 라운드·결승에서 빠집니다.'}</div>
+    <textarea id="pt-ta" rows="7" style="width:100%;border:1px solid #d5d9df;border-radius:10px;padding:10px 12px;font-size:16px;line-height:1.6" placeholder="이정채, 홍길동\n규아빠">${esc(S._ptTxt||'')}</textarea>
+    <div class="small muted" id="pt-cnt" style="margin-top:4px"></div>
+    <div class="mact"><button class="btn" data-act="pm" data-t="${t.id}">← 돌아가기</button><button class="btn pri" data-act="pmTextGo" data-t="${t.id}">${mode==='add'?'추가':'제외'}</button></div>`);
+  const ta=$('#pt-ta');
+  const upd=()=>{S._ptTxt=ta.value;const es=parseEntrants(ta.value);const tt=S.tours[d.t];
+    if(mode==='add'){const miss=es.filter(e=>!matchEntrant(e)).length;$('#pt-cnt').textContent=`${es.length}명 인식 · 명단에 있음 ${es.length-miss}명${miss?` · 명단에 없음 ${miss}명`:''}`;}
+    else{const f=es.filter(e=>matchInTour(tt,e)).length;$('#pt-cnt').textContent=`${es.length}명 인식 · 대회 참가자 중 찾음 ${f}명`;}};
+  ta.addEventListener('input',upd);upd();setTimeout(()=>ta.focus(),50);
+};
+function matchInTour(t,e){
+  const ids=t.active.filter(p=>t.people[p]);
+  const P=p=>t.people[p];
+  if(e.nick)return ids.find(p=>P(p).name===e.name&&P(p).nick===e.nick)||ids.find(p=>P(p).nick===e.nick)||null;
+  return ids.find(p=>P(p).name===e.name)||ids.find(p=>P(p).nick===e.name)||null;
+}
+ACT.pmTextMode=d=>{S._pmMode=d.v;ACT.pmText(d);};
+ACT.pmTextGo=d=>{
+  const es=parseEntrants($('#pt-ta').value);if(!es.length){toast('입력된 선수가 없습니다');return;}
+  if((S._pmMode||'add')==='rm'){
+    const t=T(d);const hit=[],miss=[];
+    es.forEach(e=>{const p=matchInTour(t,e);if(p){if(!hit.includes(p))hit.push(p);}else miss.push(e.raw);});
+    if(!hit.length){toast('대회 참가자 중 일치하는 선수가 없습니다');return;}
+    hit.forEach(p=>{t.removed=(t.removed||[]).filter(x=>x!==p);t.removed.push(p);});
+    autoProgress(t);saveTour(t);S._ptTxt='';pmRender(d.t);
+    toast(`${hit.length}명을 제외했습니다${miss.length?` · 못 찾음: ${miss.join(', ')}`:''}`);
+    return;
+  }
+  const found=[],miss=[];es.forEach(e=>{const p=matchEntrant(e);if(p){if(!found.includes(p.id))found.push(p.id);}else miss.push(e);});
+  S._ptFound=found;S._ptMiss=miss;
+  if(!miss.length){pmTextApply(d.t,false);return;}
+  openModal(`<h3>명단에 없는 선수 ${miss.length}명</h3>
+    <div>선수 명단에 없는 인원이 있습니다. <b>선수 명단에도 추가하고</b> 대회에 참가시킬까요?</div>
+    <div class="pick" style="max-height:220px;margin:10px 0">${miss.map(e=>`<div style="padding:8px 12px;border-bottom:1px solid #f0f1f3">${nmHTML({name:e.name,nick:e.nick||e.name})}</div>`).join('')}</div>
+    <div class="small muted">명단에 있는 ${found.length}명은 그대로 추가됩니다.</div>
+    <div class="mact"><button class="btn" data-act="pmText" data-t="${d.t}">← 다시 입력</button><button class="btn" data-act="pmTextApply" data-t="${d.t}" data-v="0">추가 안 함 (명단에 있는 선수만)</button><button class="btn pri" data-act="pmTextApply" data-t="${d.t}" data-v="1">선수 추가하고 참가</button></div>`);
+};
+function pmTextApply(tid,addMissing){
+  const ids=S._ptFound.slice();
+  if(addMissing&&S._ptMiss.length){
+    const list=S.players.slice();
+    S._ptMiss.forEach(e=>{const nick=e.nick||e.name;let p=list.find(x=>x.name===e.name&&x.nick===nick);if(!p){p={id:uid(),name:e.name,nick,team:'',memo:''};list.push(p);}if(!ids.includes(p.id))ids.push(p.id);});
+    savePlayers(list);
+  }
+  const t=clone(S.tours[tid]);let n=0;
+  ids.forEach(id=>{if(t.active.includes(id)&&isActive(t,id))return;addToTour(t,id);n++;});
+  autoProgress(t);saveTour(t);S._ptTxt='';S._ptFound=S._ptMiss=null;pmRender(tid);
+  toast(n?`${n}명을 참가자로 추가했습니다`:'이미 참가 중인 선수입니다');
+}
+ACT.pmTextApply=d=>pmTextApply(d.t,d.v==='1');
 ACT.pmNew=d=>playerModal(null,p=>{const t=clone(S.tours[d.t]);addToTour(t,p.id);autoProgress(t);saveTour(t);pmRender(d.t);});
 
 /* 선수 */
