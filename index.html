@@ -597,6 +597,7 @@ function render(fromData){
   $('#hstats').innerHTML=`<div class="lv"><b>${all.filter(t=>t.status==='active').length}</b><span>진행중</span></div><div><b>${all.filter(t=>t.status!=='cancelled').length}</b><span>전체 대회</span></div><div><b>${S.players.length}</b><span>등록 선수</span></div>`;
   drawQRs(app);
   if(r==='players')applyPlayerFilter();
+  if(r==='hof')applyHofFilter();
   if((r==='players'||r==='tours')&&canEdit()&&!window.XLSX)needXLSX().catch(()=>{});
 }
 function drawQRs(root){
@@ -700,6 +701,7 @@ document.addEventListener('input',e=>{
   if(id==='nf-date-p'||id==='et-date-p'){const tx=$('#'+id.slice(0,-2));if(tx&&e.target.value)tx.value=e.target.value;}
   if(S.newForm&&(id==='nf-date'||id==='nf-date-p')){const v=normDate(($('#nf-date')||{}).value);if(v){S.newForm.date=v;const pk=$('#nf-date-p');if(pk)pk.value=v;}if(S.newForm.nameAuto){S.newForm.name=autoTourName(S.newForm);const i=$('#nf-name');if(i)i.value=S.newForm.name;}}
   if(id==='nf-q'){const q=e.target.value.trim().toLowerCase();document.querySelectorAll('#nf-pick label').forEach(l=>{l.style.display=!q||l.dataset.s.indexOf(q)>=0?'':'none';});}
+  if(id==='hof-q'){S.tab.hofq=e.target.value;applyHofFilter();}
   if(id==='pl-q'){S.tab.plq=e.target.value;applyPlayerFilter();}
   if(id==='pm-q'){const q=e.target.value.trim().toLowerCase();document.querySelectorAll('#pm-add .pmr').forEach(l=>{l.style.display=!q||l.dataset.s.indexOf(q)>=0?'':'none';});}
 });
@@ -944,6 +946,7 @@ function vPlayers(){
     </div><div class="small muted" style="margin-top:8px">닉네임이 이름과 같으면 <span class="nk same">회색</span>, 다르면 <span class="nk blue">파란색</span>으로 표시됩니다.</div></div>`;
   return h;
 }
+function applyHofFilter(){const q=(S.tab.hofq||'').trim().toLowerCase();document.querySelectorAll('tr.hofr').forEach(r=>{r.style.display=!q||r.dataset.s.indexOf(q)>=0?'':'none';});}
 function applyPlayerFilter(){const q=(S.tab.plq||'').trim().toLowerCase();document.querySelectorAll('#pl-tb .plc[data-s]').forEach(r=>{r.style.display=!q||r.dataset.s.indexOf(q)>=0?'':'none';});}
 
 /* ================= 명예의 전당 ================= */
@@ -952,12 +955,12 @@ function vHof(){
   const m={};
   done.forEach(t=>t.result.forEach(o=>{if(!o.rank||o.rank>4)return;const k=o.name+'|'+o.nick;if(!m[k])m[k]={name:o.name,nick:o.nick,c:[0,0,0,0]};m[k].c[o.rank-1]++;}));
   const rows=Object.values(m).sort((a,b)=>b.c[0]-a.c[0]||b.c[1]-a.c[1]||b.c[2]-a.c[2]||b.c[3]-a.c[3]||a.name.localeCompare(b.name,'ko'));
-  let h=`<h2 class="pg">🏆 JJNB 명예의 전당<span class="sp"></span>${canEdit()?'<button class="btn sm dark" data-act="hofRefresh">↻ 대회결과 재반영</button>':''}</h2><div class="card"><h3>선수별 입상 기록 <small>종료된 대회 ${done.length}개 기준 · 취소·삭제된 대회 제외</small></h3>`;
+  let h=`<h2 class="pg">🏆 JJNB 명예의 전당<span class="sp"></span><input id="hof-q" value="${esc(S.tab.hofq||'')}" placeholder="🔍 선수 이름·닉네임 검색" style="border:1px solid #d5d9df;border-radius:10px;padding:8px 12px;font-size:15px;font-weight:500;width:220px;max-width:100%">${canEdit()?'<button class="btn sm dark" data-act="hofRefresh">↻ 대회결과 재반영</button>':''}</h2><div class="card"><h3>선수별 입상 기록 <small>종료된 대회 ${done.length}개 기준 · 취소·삭제된 대회 제외</small></h3>`;
   h+=rows.length?`<div class="tbwrap"><table class="tb"><thead><tr><th class="num">#</th><th>선수</th><th class="num">${medal(1)}</th><th class="num">${medal(2)}</th><th class="num">${medal(3)}</th><th class="num">${medal(4)}</th><th class="num">입상</th></tr></thead><tbody>
-    ${rows.map((r,i)=>`<tr><td class="num"><b>${i+1}</b></td><td>${nmHTML(r)}</td>${r.c.map(c=>`<td class="num" style="font-weight:${c?900:400};color:${c?'inherit':'#c3c7cd'}">${c}</td>`).join('')}<td class="num"><b>${r.c.reduce((a,b)=>a+b,0)}</b></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">아직 종료된 대회가 없습니다.</div>';
+    ${rows.map((r,i)=>`<tr class="hofr" data-s="${esc((r.name+' '+r.nick).toLowerCase())}"><td class="num"><b>${i+1}</b></td><td>${nmHTML(r)}</td>${r.c.map(c=>`<td class="num" style="font-weight:${c?900:400};color:${c?'inherit':'#c3c7cd'}">${c}</td>`).join('')}<td class="num"><b>${r.c.reduce((a,b)=>a+b,0)}</b></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">아직 종료된 대회가 없습니다.</div>';
   h+='</div>';
   if(done.length)h+=`<div class="card"><h3>역대 대회 입상자</h3><div class="tbwrap"><table class="tb"><thead><tr><th>일자</th><th>방식</th><th>대회</th><th>1위</th><th>2위</th><th>3위</th><th>4위</th></tr></thead><tbody>
-    ${done.map(t=>{const g=r=>{const o=t.result.find(x=>x.rank===r);return o?nmHTML(o):'<span class="muted">-</span>';};return `<tr><td class="small" style="white-space:nowrap">${esc(t.date)}</td><td>${kindLabel(tKind(t))?`<span class="badge ${tKind(t)==='points'?'pts':'tour'}">${kindLabel(tKind(t))}</span>`:'-'}</td><td><a href="#t-${t.id}">${esc(t.name)}</a></td><td>${g(1)}</td><td>${g(2)}</td><td>${g(3)}</td><td>${g(4)}</td></tr>`;}).join('')}</tbody></table></div></div>`;
+    ${done.map(t=>{const g=r=>{const o=t.result.find(x=>x.rank===r);return o?nmHTML(o):'<span class="muted">-</span>';};return `<tr class="hofr" data-s="${esc(t.result.filter(o=>o.rank&&o.rank<=4).map(o=>o.name+' '+o.nick).join(' ').toLowerCase())}"><td class="small" style="white-space:nowrap">${esc(t.date)}</td><td>${kindLabel(tKind(t))?`<span class="badge ${tKind(t)==='points'?'pts':'tour'}">${kindLabel(tKind(t))}</span>`:'-'}</td><td><a href="#t-${t.id}">${esc(t.name)}</a></td><td>${g(1)}</td><td>${g(2)}</td><td>${g(3)}</td><td>${g(4)}</td></tr>`;}).join('')}</tbody></table></div></div>`;
   return h;
 }
 
