@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>진주 놀방 대진표</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{
+  --bg:#f3f4f6; --card:#fff; --ink:#15171c; --sub:#5d636e; --gray:#9aa0a9; --line:#e3e6ea;
+  --red:#e10600; --red2:#b80500; --yel:#ffc400; --blue:#1d6fe0; --green:#12a150; --dark:#14161b;
+  --r:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:'Noto Sans KR',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.45;-webkit-text-size-adjust:100%}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:16px}
+a{color:var(--blue)}
+.wrap{max-width:1100px;margin:0 auto;padding:0 14px}
+
+/* header */
+header.top{background:var(--dark);color:#fff;position:relative;overflow:hidden}
+.banner{display:flex;align-items:center;gap:14px;padding:14px 0 18px}
+.banner .logo{height:64px;max-width:46%;display:flex;align-items:center}
+.banner .logo img,.banner .logo svg{max-height:64px;max-width:100%;display:block;border-radius:8px}
+.banner h1{margin:0;color:#fff;font-size:26px;font-weight:900;letter-spacing:-.5px}
+.banner .en{font-size:15px;letter-spacing:2px;color:var(--yel);font-weight:700}
+.hstats{margin-left:auto;display:flex;gap:6px;align-self:flex-start;margin-top:2px}
+.hstats div{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:4px 9px;text-align:center;min-width:54px}
+.hstats b{display:block;font-size:16px;font-weight:900;color:#fff;line-height:1.2}
+.hstats span{font-size:10.5px;color:#aeb4bd;white-space:nowrap}
+.hstats .lv b{color:#ff6b63}
+@media (max-width:520px){.hstats{gap:4px}.hstats div{padding:3px 6px;min-width:44px}.hstats b{font-size:14px}.hstats span{font-size:9.5px}}
+.stripe{height:4px;background:linear-gradient(90deg,var(--red) 0 60%,var(--yel) 60% 80%,var(--blue) 80%)}
+nav.tabs{background:#1d2027;position:sticky;top:0;z-index:20;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+nav.tabs .wrap{display:flex;align-items:center;gap:8px}
+nav.tabs .navs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0}
+nav.tabs .navs::-webkit-scrollbar{display:none}
+nav.tabs a.newbtn{flex-shrink:0;background:var(--red);color:#fff;border:0;border-radius:9px;padding:8px 14px;margin:6px 0;font-size:14.5px}
+nav.tabs a.newbtn:hover,nav.tabs a.newbtn.on{background:var(--red2);color:#fff}
+@media (max-width:520px){nav.tabs a.newbtn{padding:7px 10px;font-size:13.5px}}
+nav.tabs a{color:#c9cdd4;text-decoration:none;padding:12px 12px;font-weight:700;font-size:15px;white-space:nowrap;border-bottom:3px solid transparent}
+nav.tabs a.on{color:#fff;border-bottom-color:var(--red)}
+.modebar{font-size:12.5px;padding:6px 14px;text-align:center;background:#fff4cc;color:#6b5300}
+.modebar.ro{background:#e7f0ff;color:#1d4b99}
+
+main{padding:16px 0 60px}
+h2.pg{font-size:22px;margin:4px 0 14px;font-weight:900;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+h2.pg .sp{flex:1}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:14px}
+.card h3{margin:0 0 10px;font-size:17px;font-weight:900;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card h3 small{font-weight:500;color:var(--sub);font-size:13px}
+.card h3 .sp{flex:1}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}.grid3{grid-template-columns:repeat(3,1fr)}}
+.muted{color:var(--sub)} .small{font-size:13px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sp{flex:1}
+
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:10px;padding:9px 14px;font-weight:700;font-size:15px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{border-color:#c4c9d0}
+.btn.pri{background:var(--red);border-color:var(--red);color:#fff}
+.btn.pri:hover{background:var(--red2)}
+.btn.dark{background:var(--dark);border-color:var(--dark);color:#fff}
+.btn.blue{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.red{background:#fff;border-color:#f3b4b2;color:var(--red)}
+.btn.sm{padding:6px 10px;font-size:13.5px;border-radius:8px}
+.btn.big{padding:13px 20px;font-size:17px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+.badge{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;background:#eef0f3;color:var(--sub);white-space:nowrap}
+.badge.live{background:#ffe7e6;color:var(--red)}
+.badge.done{background:#e3f6ec;color:var(--green)}
+.badge.cxl{background:#eceef1;color:#7a808a;text-decoration:line-through}
+.badge.tour{background:#e7f0ff;color:var(--blue)}
+.badge.pts{background:#fff4cc;color:#8a6a00}
+
+/* names */
+.nm{white-space:nowrap}
+.pn{font-weight:700}
+.nk{color:var(--gray);font-weight:500}
+.nk.blue{color:var(--blue)}
+.nk.same{color:var(--gray)}
+
+/* stat tiles */
+.tile{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+.tile b{display:block;font-size:26px;font-weight:900}
+.tile span{font-size:13px;color:var(--sub)}
+
+/* recent cards */
+.dashq{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:14px;margin-bottom:14px;align-items:stretch}
+.dashq.one{grid-template-columns:1fr}
+@media (max-width:760px){.dashq{grid-template-columns:1fr}}
+.tgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:760px){.tgrid{grid-template-columns:1fr}}
+.plgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+@media (max-width:900px){.plgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.plgrid{grid-template-columns:1fr}}
+.plc{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff;min-width:0}
+.plc .plm{flex:1;min-width:0}
+.plc .pln{font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.plc .small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.rgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:860px){.rgrid{grid-template-columns:1fr}}
+.rc{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fff;position:relative}
+.rc .tt{font-size:18px;font-weight:900;margin:2px 0 4px}
+.podium{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;margin-top:8px;font-size:16px;align-items:center}
+.medal{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:#fff}
+.m1{background:linear-gradient(135deg,#f7c600,#d99a00)} .m2{background:linear-gradient(135deg,#c5ccd6,#8d96a3)} .m3{background:linear-gradient(135deg,#d99561,#a5622f)} .m4{background:#6b7380}
+.mx{background:#c9ced6;color:#333}
+
+/* heats */
+.sec{margin-bottom:18px}
+.sec>h4{margin:0 0 8px;font-size:17px;font-weight:900;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sec>h4 small{font-weight:500;color:var(--sub);font-size:13px}
+.heat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.grid2 .heat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:760px){.heat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.heat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 10px 6px;min-width:0}
+.heat.ok{border-color:#9fdcb9;box-shadow:inset 0 3px 0 var(--green)}
+.heat.blue,.heat.blue.ok{background:#f2f7ff;border-color:#8db6f2;box-shadow:inset 0 3px 0 var(--blue)}
+.heat.blue .hh>span:first-child{color:var(--blue)}
+.heat.final{border-color:#f0c35a;box-shadow:inset 0 3px 0 var(--yel)}
+.heat .hh{display:flex;align-items:center;justify-content:space-between;gap:6px;font-weight:900;font-size:15px;margin-bottom:4px}
+.hp{padding:7px 0;border-top:1px dashed #eceef1;min-width:0}
+.hp:first-of-type{border-top:0}
+.hp .nmline{display:flex;align-items:center;gap:6px;min-width:0}
+.hp .nm{font-size:clamp(16px,4.6vw,20px);overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+.hp.win .pn{color:var(--green)}
+.hp.out{opacity:.55}
+.hp.rm .nm{text-decoration:line-through;opacity:.5}
+.rtag{font-size:12.5px;font-weight:900;padding:2px 7px;border-radius:6px;white-space:nowrap}
+.rtag.W{background:#e3f6ec;color:var(--green)} .rtag.L{background:#eef0f3;color:#6b7280} .rtag.D{background:#ffe7e6;color:var(--red)}
+.rtag.R{background:#fff4cc;color:#7a5c00}
+.dqall{border:1px solid #f3b4b2;background:#fff;color:var(--red);border-radius:7px;padding:3px 7px;font-size:12px;font-weight:700}
+.dqall.on{background:var(--red);color:#fff;border-color:var(--red)}
+.seg{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap}
+.seg button{flex:1;min-width:0;border:1px solid var(--line);background:#f8f9fa;border-radius:7px;padding:5px 2px;font-size:13px;font-weight:700;color:#4b515b}
+.seg button.on.W{background:var(--green);border-color:var(--green);color:#fff}
+.seg button.on.L{background:#6b7280;border-color:#6b7280;color:#fff}
+.seg button.on.D{background:var(--red);border-color:var(--red);color:#fff}
+.seg button.on.R{background:var(--yel);border-color:#e0ab00;color:#222}
+.seg button.on.E{background:var(--red);border-color:var(--red);color:#fff}
+.flow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:#f8f9fb;border:1px dashed #cfd4da;border-radius:12px;padding:12px;margin:6px 0 18px}
+.flow .msg{flex:1;min-width:200px;font-weight:700}
+.fin-list{display:flex;gap:6px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:99px;padding:4px 10px;font-size:15px}
+.chip.gold{border-color:#f0c35a;background:#fffaf0}
+
+.ttabs{display:flex;gap:6px;overflow-x:auto;margin:0 0 14px;padding-bottom:2px;scrollbar-width:none}
+.ttabs::-webkit-scrollbar{display:none}
+.ttabs button{border:1px solid var(--line);background:#fff;border-radius:99px;padding:8px 14px;font-weight:700;font-size:15px;white-space:nowrap;color:var(--sub)}
+.ttabs button.on{background:var(--dark);border-color:var(--dark);color:#fff}
+.ttabs button .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);margin-left:5px;vertical-align:middle}
+
+/* tables */
+table.tb{width:100%;border-collapse:collapse;font-size:15px}
+table.tb th{font-size:13px;color:var(--sub);font-weight:700;text-align:left;padding:8px 6px;border-bottom:2px solid var(--line);white-space:nowrap}
+table.tb th.sth{cursor:pointer;user-select:none}
+table.tb th.sth:hover,table.tb th.sth.on{color:var(--ink)}
+table.tb th.sth .arw{font-size:10px;margin-left:4px;opacity:.7}
+table.tb td{padding:9px 6px;border-bottom:1px solid #eef0f2;vertical-align:middle}
+table.tb td.num,table.tb th.num{text-align:center}
+.tbwrap{overflow-x:auto}
+
+/* matrix */
+.mx-wrap{overflow:auto;max-width:100%;border:1px solid var(--line);border-radius:12px;background:#fff}
+table.mtx{border-collapse:separate;border-spacing:0;font-size:14px}
+table.mtx th,table.mtx td{border-right:1px solid #eef0f2;border-bottom:1px solid #eef0f2;text-align:center;padding:0;min-width:46px;height:40px}
+table.mtx th{background:#f6f7f9;font-weight:900;color:var(--sub);position:sticky;top:0;z-index:2}
+table.mtx th.rh,table.mtx td.rh{position:sticky;left:0;background:#fff;z-index:1;text-align:left;padding:0 10px;min-width:150px;white-space:nowrap}
+table.mtx th.rh{z-index:3;background:#f6f7f9}
+table.mtx td.rh .nm{font-size:16px}
+table.mtx td.c{cursor:default;font-weight:900}
+table.mtx td.c.ed{cursor:pointer}
+table.mtx td.c.ed:hover{outline:2px solid var(--blue);outline-offset:-2px}
+table.mtx td.self{background:repeating-linear-gradient(45deg,#f1f2f4 0 6px,#e7e9ec 6px 12px)}
+td.W{background:#e3f6ec;color:var(--green)} td.L{background:#f3f4f6;color:#6b7280} td.D{background:#ffe7e6;color:var(--red)} td.DD{background:#ffd6d4;color:var(--red2)} td.N{color:#c3c7cd}
+td.tot{font-weight:900;background:#fffaf0}
+
+/* forms */
+.fld{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.fld label{font-size:13px;font-weight:700;color:var(--sub)}
+.fld input,.fld select,.fld textarea{border:1px solid #d5d9df;border-radius:10px;padding:10px 12px;background:#fff;width:100%}
+.opt{display:flex;gap:6px;flex-wrap:wrap}
+.opt button{border:1px solid #d5d9df;background:#fff;border-radius:10px;padding:9px 14px;font-weight:700;font-size:15px;color:var(--sub)}
+.opt button.on{background:var(--dark);border-color:var(--dark);color:#fff}
+.setrow{display:flex;gap:14px;align-items:flex-start}
+.setrow .fld{flex-shrink:0;margin-bottom:10px}
+.setrow .opt{flex-wrap:nowrap;gap:4px}
+.setrow .opt button{padding:7px 10px;font-size:14px}
+@media (max-width:520px){.setrow{gap:8px}.setrow .opt button{padding:6px 7px;font-size:13px}.setrow .lg{display:none}.setrow .fld label{font-size:12px}}
+.dtrow{display:flex;gap:10px;align-items:flex-start}
+.dtrow .opt{flex-wrap:nowrap}
+@media (max-width:420px){.dtrow{gap:6px}.dtrow .opt button{padding:9px 9px;font-size:14px}}
+.pick{max-height:420px;overflow:auto;border:1px solid var(--line);border-radius:12px;background:#fff}
+.pick label{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid #f0f1f3;cursor:pointer;font-size:18px}
+#nf-pick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start}
+#nf-pick label{border-right:1px solid #f0f1f3;min-width:0;padding:10px 10px;font-size:17px}
+#nf-pick label:last-child{border-bottom:1px solid #f0f1f3}
+#nf-pick label .nm{overflow:hidden;text-overflow:ellipsis;min-width:0}
+#nf-pick .empty{grid-column:1/-1}
+.pick label:last-child{border-bottom:0}
+.pick input{width:20px;height:20px;accent-color:var(--red)}
+.pick label.sel{background:#fff7f6}
+
+/* QR */
+.qrbox{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.qr{background:#fff;padding:8px;border-radius:10px;border:1px solid var(--line);line-height:0}
+.qr img,.qr canvas{display:block}
+.comm{display:flex;gap:18px;justify-content:center;flex-wrap:wrap}
+.comm .qrbox b{font-size:15px}
+
+/* modal */
+#modal{position:fixed;inset:0;background:rgba(10,12,16,.55);display:none;align-items:flex-start;justify-content:center;z-index:100;padding:5vh 12px;overflow:auto}
+#modal.on{display:flex}
+.mbox{background:#fff;border-radius:16px;padding:18px;width:100%;max-width:560px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.mbox h3{margin:0 0 12px;font-size:19px;font-weight:900}
+.mact{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
+.ask{font-size:17px;font-weight:500;margin:4px 0 0;white-space:pre-line}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(30px);background:#1b1e24;color:#fff;padding:11px 18px;border-radius:12px;font-weight:700;font-size:15px;opacity:0;transition:.25s;z-index:200;max-width:90vw;text-align:center;pointer-events:none}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.banner-cxl{background:#eceef1;border-radius:12px;padding:12px 14px;font-weight:700;color:#5b616b;margin-bottom:14px}
+.empty{text-align:center;color:var(--sub);padding:28px 10px}
+.rgrid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:8px}
+.rg{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:12px;padding:9px 10px;background:#fff;min-width:0}
+.rg .nmw{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.rg .nm{font-size:clamp(14px,3.8vw,17px)}
+.rg.top{flex-direction:column;text-align:center;padding:14px 8px;gap:6px}
+.rg.top .medal{width:40px;height:40px;font-size:18px}
+.rg.top .nm{font-size:clamp(17px,5vw,24px);white-space:normal}
+.rg.top .nk{display:block}
+.rg.t1{background:linear-gradient(180deg,#fff7d6,#fff);border-color:#f0c35a}
+.rg.t2{background:linear-gradient(180deg,#f1f3f6,#fff);border-color:#c5ccd6}
+.rg.t3{background:linear-gradient(180deg,#fbeee3,#fff);border-color:#d99561}
+.topgrid{margin-bottom:12px}
+@media (max-width:520px){.rg{padding:7px 6px;gap:5px}.rg .medal{width:24px;height:24px;font-size:11px}.rg.top .medal{width:34px;height:34px;font-size:15px}}
+.rank-list .ri{display:flex;align-items:center;gap:12px;padding:10px 6px;border-bottom:1px solid #eef0f2}
+.rank-list .ri .rk{width:44px;text-align:center;font-weight:900;font-size:18px}
+.rank-list .ri .nm{font-size:20px}
+.rank-list .ri.top{background:linear-gradient(90deg,#fffaf0,transparent)}
+.mv{display:inline-flex;gap:2px}
+.mv button{border:1px solid var(--line);background:#fff;border-radius:6px;width:28px;height:26px;font-size:12px;color:var(--sub)}
+@media (max-width:520px){
+  .banner h1{font-size:21px}
+  .banner .logo{height:50px}
+  .banner .logo img,.banner .logo svg{max-height:50px}
+  .heat-grid{gap:7px}
+  .heat{padding:8px 7px 5px}
+  .seg button{font-size:12px;padding:5px 1px}
+  .card{padding:13px}
+  h2.pg{font-size:20px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap banner">
+    <div class="logo" id="logo"></div>
+    <div>
+      <h1>진주 놀방 대진표</h1>
+    </div>
+    <div class="hstats" id="hstats"></div>
+  </div>
+</header>
+<div class="stripe"></div>
+<nav class="tabs"><div class="wrap" id="nav"></div></nav>
+<div id="modebar"></div>
+<main><div class="wrap" id="app"><div class="empty">불러오는 중…</div></div></main>
+<div id="modal"></div>
+<div id="toast"></div>
+
+<script>
+/* ================= 기본 설정 ================= */
+const DEFAULT_APP_URL = "https://claude.ai/artifact/LGx4SbSjHoPNYNhAGWWMUJ";
+const BAND_URL = "https://band.us/@sip";
+const KAKAO_URL = "https://open.kakao.com/o/gQQFAi1g";
+
+const S = {
+  players: [], settings: {}, tours: {},
+  loaded: { players:false, settings:false, tours:false },
+  mode: 'init', canWrite: true, viewOnly: false,
+  tab: {}, newForm: null, _ask: null
+};
+
+/* ================= 유틸 ================= */
+const $ = s => document.querySelector(s);
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+function today(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function chunk(a,n){const r=[];for(let i=0;i<a.length;i+=n)r.push(a.slice(i,i+n));return r;}
+function clone(o){return JSON.parse(JSON.stringify(o));}
+function parseJ(s,d){try{return JSON.parse(s);}catch(e){return d;}}
+let toastT=null;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2600);}
+function canEdit(){return S.canWrite && !S.viewOnly;}
+function getCap(name){try{if(typeof claude!=='undefined'&&claude&&claude.use)return claude.use(name);}catch(e){}return Promise.resolve(null);}
+function loadScript(src){return new Promise((res,rej)=>{if(document.querySelector('script[src="'+src+'"]')){res();return;}const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
+async function needXLSX(){if(window.XLSX)return window.XLSX;await loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');return window.XLSX;}
+function appUrl(){const u=(S.settings.appUrl||DEFAULT_APP_URL||'').trim();return u.indexOf('%%')>=0?'':u.split('#')[0];}
+function tourUrl(id,host){const b=appUrl();return b?b+(host?'#t-':'#v-')+id:'';}
+function watchUrl(){const b=appUrl();return b?b+'#watch':'';}
+
+/* ================= 저장소 (백엔드 DB / 로컬 대체) ================= */
+let DB=null;
+const pend={}, infl={};
+function queueWrite(path,data){pend[path]={data};if(!infl[path])flush(path);}
+function queueDelete(path){pend[path]={del:true};if(!infl[path])flush(path);}
+async function flush(path){
+  infl[path]=true;
+  while(pend[path]){
+    const job=pend[path];delete pend[path];
+    try{
+      if(DB){
+        const ref=DB.doc(path);
+        if(job.del) await ref.delete(); else await ref.set(job.data);
+      }else{
+        const k='jjnb:'+path;
+        try{ if(job.del) localStorage.removeItem(k); else localStorage.setItem(k,JSON.stringify(job.data)); }catch(e){}
+      }
+    }catch(e){ writeError(e); }
+  }
+  infl[path]=false;
+}
+function writeError(e){
+  const code=e&&e.code;
+  if(code==='invalid_argument'){S.canWrite=false;renderShell();render();toast('편집 권한이 없어 저장되지 않았습니다 (보기 전용)');}
+  else if(code==='quota_exceeded'){toast('저장 공간이 가득 찼습니다. 오래된 대회를 정리해 주세요.');}
+  else if(code==='unavailable'){toast('서버 연결이 불안정합니다. 잠시 후 다시 시도하세요.');}
+  else toast('저장 실패: '+((e&&e.message)||code||'알 수 없는 오류'));
+}
+function savePlayers(list){S.players=list;render(true);queueWrite('app/players',{json:JSON.stringify(list),updatedAt:Date.now()});}
+function saveSettings(s){S.settings=s;renderShell();render(true);queueWrite('app/settings',{json:JSON.stringify(s),updatedAt:Date.now()});}
+function saveTour(t){t.updatedAt=Date.now();S.tours[t.id]=t;render(true);queueWrite('tournaments/'+t.id,{json:JSON.stringify(t),updatedAt:t.updatedAt});}
+function delTour(id){delete S.tours[id];render(true);queueDelete('tournaments/'+id);}
+
+async function initStore(){
+  let db=null;
+  try{ db=await getCap('db'); }catch(e){ db=null; }
+  if(db){
+    DB=db; S.mode='db';
+    try{const u=await getCap('user'); if(u&&u.can){const c=await u.can('data.write'); if(c===false) S.canWrite=false;}}catch(e){}
+    const slow=setTimeout(()=>{if(!S.loaded.tours){toast('서버 응답이 늦습니다. 연결을 확인 중…');}},10000);
+    DB.doc('app/players').onSnapshot(s=>{S.players=s.exists?parseJ(s.data().json,[]):[];S.loaded.players=true;render(true);},onSnapErr);
+    DB.doc('app/settings').onSnapshot(s=>{S.settings=s.exists?parseJ(s.data().json,{}):{};S.loaded.settings=true;renderShell();render(true);},onSnapErr);
+    DB.collection('tournaments').onSnapshot(qs=>{
+      clearTimeout(slow);
+      const m={};qs.docs.forEach(d=>{const t=parseJ((d.data()||{}).json,null);if(t&&t.id)m[d.id]=t;});
+      S.tours=m;S.loaded.tours=true;render(true);
+    },onSnapErr);
+  }else{
+    S.mode='local';
+    const g=k=>{try{const v=localStorage.getItem('jjnb:'+k);return v?JSON.parse(v):null;}catch(e){return null;}};
+    const p=g('app/players');S.players=p?parseJ(p.json,[]):[];
+    const st=g('app/settings');S.settings=st?parseJ(st.json,{}):{};
+    try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('jjnb:tournaments/')===0){const v=JSON.parse(localStorage.getItem(k));const t=parseJ(v.json,null);if(t)S.tours[t.id]=t;}}}catch(e){}
+    S.loaded={players:true,settings:true,tours:true};
+  }
+  renderShell();render();
+}
+function onSnapErr(e){
+  if(e&&e.code==='revoked'){S.canWrite=false;toast('접근 권한이 변경되었습니다');}
+  else toast('데이터 연결 오류: '+((e&&e.message)||(e&&e.code)||''));
+}
+
+/* ================= 대진 엔진 공통 ================= */
+function newHeat(players){return {id:uid(),players:players.slice(),res:{}};}
+function isActive(t,p){return !(t.removed||[]).includes(p);}
+function activeList(t){return t.active.filter(p=>isActive(t,p));}
+function act(t,h){return h.players.filter(p=>isActive(t,p));}
+function resolved(t,h){return act(t,h).every(p=>h.res[p]!=null);}
+function winners(t,h){return act(t,h).filter(p=>h.res[p]==='W');}
+function losers(t,h){return act(t,h).filter(p=>h.res[p]==='L'||h.res[p]==='D');}
+function rankOrder(t,h){const a=act(t,h);return {ranked:a.filter(p=>typeof h.res[p]==='number').sort((x,y)=>h.res[x]-h.res[y]),dq:a.filter(p=>h.res[p]==='D')};}
+function stageDone(t,st){return st.heats.every(h=>resolved(t,h));}
+function hasRes(h){return h&&Object.keys(h.res||{}).length>0;}
+function makeGroups(ids,size){
+  ids=shuffle(ids);const n=ids.length;if(!n)return [];
+  if(size===2){const g=chunk(ids,2);if(g.length>1&&g[g.length-1].length===1){const l=g.pop();g[g.length-1].push(l[0]);}return g;}
+  const g=chunk(ids,3);
+  if(g.length>1&&g[g.length-1].length===1){const l=g.pop(),p=g.pop();const f=p.concat(l);g.push(f.slice(0,2),f.slice(2));}
+  return g;
+}
+/* 체인: 조별(adv) 단계 → 3명 이하가 되면 순위전(rank) */
+function chainStart(t,pool,size,N){
+  pool=pool.filter(p=>isActive(t,p));
+  const ch={size,N:N||null,stages:[],done:false,result:[]};
+  if(!pool.length){ch.done=true;return ch;}
+  if(N&&pool.length<=N){ch.done=true;ch.result=pool.slice();return ch;}
+  if(pool.length<=3)ch.stages.push({kind:'rank',heats:[newHeat(pool)]});
+  else ch.stages.push({kind:'adv',heats:makeGroups(pool,size).map(newHeat)});
+  return ch;
+}
+function chainAdvance(t,ch){
+  if(!ch||ch.done)return;
+  const last=ch.stages[ch.stages.length-1];if(!last||!stageDone(t,last))return;
+  if(last.kind==='rank'){ch.done=true;ch.result=rankOrder(t,last.heats[0]).ranked;return;}
+  const w=last.heats.flatMap(h=>winners(t,h));
+  if(!w.length){ch.done=true;ch.result=[];return;}
+  if(ch.N&&w.length<=ch.N){ch.done=true;ch.result=w;return;}
+  if(w.length<=3){ch.stages.push({kind:'rank',heats:[newHeat(w)]});return;}
+  ch.stages.push({kind:'adv',heats:makeGroups(w,ch.size).map(newHeat)});
+}
+function chainHasRes(ch){return !!ch&&ch.stages.some(s=>s.heats.some(hasRes));}
+
+/* ================= 토너먼트 ================= */
+function roundFinalists(t,r){
+  const m=r.main;if(!m||!m.done)return [];
+  const last=m.stages[m.stages.length-1];let res;
+  if(last&&last.kind==='rank')res=rankOrder(t,last.heats[0]).ranked.slice(0,m.N||2);else res=m.result||[];
+  return res.filter(p=>isActive(t,p));
+}
+function allFinalists(t){const o=[];(t.rounds||[]).forEach(r=>roundFinalists(t,r).forEach(p=>{if(!o.includes(p))o.push(p);}));return o;}
+function nextPool(t){const f=allFinalists(t);return activeList(t).filter(p=>!f.includes(p));}
+function startRound(t){
+  const pool=nextPool(t);
+  if(!pool.length){toast('다음 라운드에 참가할 선수가 없습니다');return false;}
+  const prev=t.rounds[t.rounds.length-1]||{};
+  const size=prev.size||t.opt.qualSize||3,repSize=prev.repSize||size,mainSize=prev.mainSize||t.opt.mainSize||3;
+  t.rounds.push({no:t.rounds.length+1,size,repSize,mainSize,qual:{heats:makeGroups(pool,size).map(newHeat)},rep:null,main:null,qualCount:t.opt.qualCount||2});
+  return true;
+}
+function qualWinners(t,r){return r.qual.heats.flatMap(h=>winners(t,h));}
+function qualLosers(t,r){return r.qual.heats.flatMap(h=>losers(t,h));}
+function finalsUpperHeat(f){const u=f&&f.upper;if(!u)return null;const l=u.stages[u.stages.length-1];return l&&l.kind==='rank'?l.heats[0]:null;}
+function finalsProgress(t){
+  const f=t.finals;if(!f)return false;
+  if(f.stage1&&!f.upper&&stageDone(t,f.stage1)){
+    const w=f.stage1.heats.flatMap(h=>winners(t,h)),l=f.stage1.heats.flatMap(h=>losers(t,h));
+    f.upper=chainStart(t,w,f.size,null);f.lower=l.length?chainStart(t,l,f.size,null):null;
+  }
+  if(f.upper)chainAdvance(t,f.upper);
+  if(f.lower)chainAdvance(t,f.lower);
+  return !!(f.upper&&f.upper.done&&(!f.lower||f.lower.done));
+}
+function finalRanking(t){
+  const f=t.finals;const out=[];let rk=1;
+  const take=ch=>{if(!ch)return;const l=ch.stages[ch.stages.length-1];if(!l||l.kind!=='rank')return;const h=l.heats[0];const ro=rankOrder(t,h);ro.ranked.concat(ro.dq).forEach(p=>out.push({pid:p,rank:rk++,dq:h.res[p]==='D'}));};
+  take(f.upper);take(f.lower);
+  const seen=new Set(out.map(o=>o.pid));
+  allFinalists(t).forEach(p=>{if(!seen.has(p)&&isActive(t,p))out.push({pid:p,rank:null});});
+  return out;
+}
+function snapResult(t,list){return list.map(o=>({pid:o.pid,rank:o.rank,dq:!!o.dq,name:(t.people[o.pid]||{}).name||'',nick:(t.people[o.pid]||{}).nick||''}));}
+function autoProgress(t){
+  if(t.type==='tournament'){
+    const R=t.rounds[t.rounds.length-1];
+    if(R&&R.main&&!R.main.done)chainAdvance(t,R.main);
+    if(t.finals){
+      const done=finalsProgress(t);
+      if(done){t.result=snapResult(t,finalRanking(t));if(t.status==='active')t.status='done';}
+      else{if(t.status==='done')t.status='active';t.result=null;}
+    }
+  }else if(t.type==='points'){
+    svProgress(t);
+  }
+}
+
+/* ================= 포인트전 ================= */
+const PTS={W:2,L:1,D:0};
+function mkey(a,b){return a<b?a+'|'+b:b+'|'+a;}
+function standings(t){
+  const P=t.pts,ps=activeList(t);
+  const st={};ps.forEach(p=>st[p]={pid:p,pts:0,w:0,l:0,d:0,g:0});
+  Object.keys(P.res).forEach(k=>{const r=P.res[k];const [a,b]=k.split('|');if(!st[a]||!st[b])return;[a,b].forEach(p=>{const v=r[p];if(!v)return;st[p].g++;st[p].pts+=PTS[v];if(v==='W')st[p].w++;else if(v==='L')st[p].l++;else st[p].d++;});});
+  const mo=P.tie||[];
+  return Object.values(st).sort((x,y)=>{
+    if(y.pts!==x.pts)return y.pts-x.pts;
+    const ix=mo.indexOf(x.pid),iy=mo.indexOf(y.pid);
+    if(ix>=0&&iy>=0&&ix!==iy)return ix-iy;
+    if(ix>=0&&iy<0)return -1; if(iy>=0&&ix<0)return 1;
+    if(y.w!==x.w)return y.w-x.w;
+    return ((t.people[x.pid]||{}).name||'').localeCompare((t.people[y.pid]||{}).name||'','ko');
+  });
+}
+function totalMatches(t){const n=activeList(t).length;return n*(n-1)/2;}
+function playedMatches(t){const ps=new Set(activeList(t));return Object.keys(t.pts.res).filter(k=>{const [a,b]=k.split('|');return ps.has(a)&&ps.has(b);}).length;}
+function svRemaining(t){const P=t.pts;const el=new Set(P.heats.flatMap(h=>h.elim));return (P.seeds||[]).filter(p=>isActive(t,p)&&!el.has(p));}
+function svNeed(t,h){return Math.min(h.elimCount,Math.max(0,act(t,h).length-1));}
+function svHeatDone(t,h){const e=h.elim.filter(p=>isActive(t,p)).length;return e>=svNeed(t,h);}
+function svProgress(t){
+  const P=t.pts;if(!P||!P.seeds)return;
+  if(!P.final){
+    const last=P.heats[P.heats.length-1];
+    if(!last||svHeatDone(t,last)){
+      const rem=svRemaining(t);
+      if(rem.length<=3){if(rem.length)P.final={id:uid(),players:rem,res:{}};}
+      else P.heats.push({id:uid(),players:rem.slice(-3),R:rem.length,elimCount:1,elim:[]});
+    }
+  }
+  if(P.final&&resolved(t,P.final)){t.result=snapResult(t,svRanking(t));if(t.status==='active')t.status='done';}
+  else{if(t.status==='done')t.status='active';t.result=null;}
+}
+function svRanking(t){
+  const P=t.pts;const out=[];
+  if(P.final){const ro=rankOrder(t,P.final);let rk=1;ro.ranked.concat(ro.dq).forEach(p=>out.push({pid:p,rank:rk++,dq:P.final.res[p]==='D'}));}
+  const el=[];P.heats.forEach(h=>h.elim.forEach((p,i)=>{if(isActive(t,p))el.push({pid:p,rank:h.R-i});}));
+  el.sort((a,b)=>a.rank-b.rank);
+  return out.concat(el);
+}
+
+/* ================= 라우팅 ================= */
+function rawHash(){return (location.hash||'').replace(/^#/,'');}
+function isWatchHash(h){return h==='watch'||h.indexOf('v-')===0;}
+function route(){const h=rawHash();if(h==='watch')return 'dash';if(h.indexOf('v-')===0)return 't-'+h.slice(2);return h||'dash';}
+if(isWatchHash(rawHash()))S.viewOnly=true;
+function go(h){if(location.hash==='#'+h)render();else location.hash=h;window.scrollTo(0,0);}
+window.addEventListener('hashchange',()=>{if(isWatchHash(rawHash()))S.viewOnly=true;closeModal(true);renderShell();render();window.scrollTo(0,0);});
+
+/* ================= 이름 표기 ================= */
+function nmHTML(p){if(!p)return '<span class="nm"><span class="pn">?</span></span>';return `<span class="nm"><span class="pn">${esc(p.name)}</span>${p.nick?`<span class="nk"> / ${esc(p.nick)}</span>`:''}</span>`;}
+function tn(t,pid){return nmHTML(t.people[pid]);}
+function nameTxt(p){return p?(p.name+(p.nick?' / '+p.nick:'')):'';}
+function medal(r){if(!r)return '<span class="medal mx">-</span>';return `<span class="medal ${r<=4?'m'+r:'mx'}">${r}</span>`;}
+function tKind(t){return t.type==='record'?(t.kind||''):t.type;}
+function kindLabel(k){return k==='points'?'포인트전':k==='tournament'?'토너먼트':'';}
+function typeBadge(t){const k=tKind(t);const b=k==='points'?'<span class="badge pts">포인트전</span>':k==='tournament'?'<span class="badge tour">토너먼트</span>':'';return t.type==='record'?(b+' <span class="badge">기록</span>'):b;}
+function statusBadge(t){return t.status==='done'?'<span class="badge done">종료</span>':t.status==='cancelled'?'<span class="badge cxl">취소</span>':'<span class="badge live">진행중</span>';}
+
+/* ================= 로고 ================= */
+const DEFAULT_LOGO=`<svg viewBox="0 0 220 64" xmlns="http://www.w3.org/2000/svg" height="64"><rect width="220" height="64" rx="10" fill="#e10600"/><g fill="#fff"><rect x="8" y="8" width="8" height="8"/><rect x="24" y="8" width="8" height="8"/><rect x="16" y="16" width="8" height="8"/><rect x="8" y="24" width="8" height="8"/><rect x="24" y="24" width="8" height="8"/><rect x="16" y="32" width="8" height="8"/><rect x="8" y="40" width="8" height="8"/><rect x="24" y="40" width="8" height="8"/><rect x="16" y="48" width="8" height="8"/></g><text x="44" y="38" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="30" fill="#fff" font-style="italic">JJNB</text><text x="45" y="54" font-family="Arial,sans-serif" font-weight="700" font-size="11" fill="#ffc400" letter-spacing="1.5">MINI 4WD</text><path d="M150 44h56l-6-10h-14l-8-8h-16l-12 8z" fill="#fff"/><circle cx="162" cy="46" r="6" fill="#14161b" stroke="#fff" stroke-width="2"/><circle cx="194" cy="46" r="6" fill="#14161b" stroke="#fff" stroke-width="2"/></svg>`;
+
+/* ================= 셸 렌더 ================= */
+const NAV=[['dash','대시보드'],['tours','대회 결과'],['players','선수 명단'],['hof','명예의 전당'],['config','설정']];
+function renderShell(){
+  $('#logo').innerHTML=S.settings.logo?`<img src="${esc(S.settings.logo)}" alt="JJNB 로고">`:DEFAULT_LOGO;
+  const r=route();const base=r.indexOf('t-')===0?'tours':r;
+  $('#nav').innerHTML=`<div class="navs">${NAV.filter(n=>canEdit()||n[0]!=='config').map(n=>`<a href="#${n[0]}" class="${base===n[0]?'on':''}">${n[1]}</a>`).join('')}</div>`+(canEdit()?`<a href="#new" class="newbtn ${base==='new'?'on':''}">+ 대회 개최</a>`:'');
+  let mb='';
+  if(S.mode==='local')mb='<div class="modebar">로컬 모드: 이 기기 브라우저에만 저장됩니다 (게시된 페이지에서 열면 서버에 저장됩니다)</div>';
+  else if(!S.canWrite)mb='<div class="modebar ro">보기 전용 · 실시간으로 대진 현황이 업데이트됩니다</div>';
+  else if(S.viewOnly)mb='<div class="modebar ro">관람 모드 (진행 버튼 숨김) · <a href="#" data-act="viewOnly">진행자 모드로 전환</a></div>';
+  $('#modebar').innerHTML=mb;
+}
+function render(fromData){
+  const r=route();
+  if(fromData&&(r==='new'||r==='config'))return;
+  if(S.mode==='init')return;
+  const app=$('#app');
+  let html='';
+  try{
+    if(r==='dash')html=vDash();
+    else if(r==='tours')html=vTours();
+    else if(r==='new')html=canEdit()?vNew():vDash();
+    else if(r==='players')html=vPlayers();
+    else if(r==='hof')html=vHof();
+    else if(r==='config')html=vConfig();
+    else if(r.indexOf('t-')===0)html=vTour(r.slice(2));
+    else html=vDash();
+  }catch(e){console.error(e);html=`<div class="card">화면 오류: ${esc(e.message)}</div>`;}
+  app.innerHTML=html;
+  const all=Object.values(S.tours);
+  $('#hstats').innerHTML=`<div><b>${S.players.length}</b><span>등록 선수</span></div><div><b>${all.filter(t=>t.status!=='cancelled').length}</b><span>전체 대회</span></div><div class="lv"><b>${all.filter(t=>t.status==='active').length}</b><span>진행중</span></div>`;
+  drawQRs(app);
+  if(r==='players')applyPlayerFilter();
+}
+function drawQRs(root){
+  root.querySelectorAll('[data-qr]').forEach(el=>{
+    const txt=el.getAttribute('data-qr');const sz=+el.getAttribute('data-sz')||120;
+    if(!txt){el.innerHTML='<span class="small muted">링크 미설정</span>';return;}
+    el.innerHTML='';
+    if(window.QRCode){try{new QRCode(el,{text:txt,width:sz,height:sz,correctLevel:QRCode.CorrectLevel.M});}catch(e){el.textContent='QR 오류';}}
+    else el.innerHTML='<span class="small muted">QR 로딩 실패</span>';
+  });
+}
+
+/* ================= 대시보드 ================= */
+function sortedTours(){return Object.values(S.tours).sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.createdAt||0)-(a.createdAt||0));}
+function progressText(t){
+  if(t.status==='cancelled')return '취소된 대회';
+  if(t.type==='record')return '기록';
+  if(t.type==='points'){const P=t.pts;if(!P.seeds)return `리그 ${playedMatches(t)}/${totalMatches(t)} 경기`;if(P.final&&!resolved(t,P.final))return '결승 진행중';return `본선 서바이벌 진행중 (잔여 ${svRemaining(t).length}명)`;}
+  if(t.finals)return '결승라운드 진행중';
+  const n=t.rounds.length;return n?`${n}라운드 진행중 / 총 ${t.opt.rounds}라운드`:'준비중';
+}
+function podiumHTML(t,max){
+  const r=(t.result||[]).filter(o=>o.rank).slice(0,max||4);
+  if(!r.length)return '';
+  return `<div class="podium">${r.map(o=>`${medal(o.rank)}<div>${nmHTML(o)}</div>`).join('')}</div>`;
+}
+function vDash(){
+  const all=sortedTours();const rec=all.slice(0,3);
+  const live=all.filter(t=>t.status==='active').length;
+  let h='';
+  h+=`<div class="card"><h3>최근 대회 <small>최근 3개</small><span class="sp"></span>${canEdit()?'<button class="btn pri sm" data-act="nav" data-h="new">+ 대회 개최</button>':''}</h3>`;
+  if(!rec.length)h+=`<div class="empty">아직 대회가 없습니다.${canEdit()?'<br>선수 명단을 등록한 뒤 대회를 개최해 보세요.':''}</div>`;
+  else h+=`<div class="rgrid">${rec.map(t=>`<div class="rc">
+      <div class="row">${typeBadge(t)} ${statusBadge(t)}<span class="sp"></span><span class="small muted">${esc(t.date||'')}</span></div>
+      <div class="tt">${esc(t.name)}</div>
+      <div class="small muted">참가 ${activeList(t).length}명 · ${esc(progressText(t))}</div>
+      ${t.status==='done'?podiumHTML(t,4):''}
+      <div class="row" style="margin-top:10px"><button class="btn sm dark" data-act="nav" data-h="t-${t.id}">${t.type==='record'?'열기':'대진표 보기'}</button>${t.status==='active'&&tourUrl(t.id)?`<button class="btn sm" data-act="qr" data-t="${t.id}">QR</button>`:''}</div>
+    </div>`).join('')}</div>`;
+  h+='</div>';
+  let qc='';
+  if(watchUrl()){const wu=watchUrl();qc=`<div class="card" style="margin:0"><h3>대진표 QR <small>관람모드</small></h3>
+    <div class="qrbox"><div class="qr" id="qr-watch" data-qr="${esc(wu)}" data-sz="120"></div><div class="small muted">스캔하면 관람모드로 실시간 대진표를 봅니다</div>
+    <div class="row" style="justify-content:center"><button class="btn sm" data-act="copyUrl" data-u="${esc(wu)}">링크 복사</button><button class="btn sm dark" data-act="saveQR" data-q="qr-watch" data-n="JJNB_대진표_QR">QR 저장</button></div></div></div>`;}
+  h+=`<div class="dashq ${qc?'':'one'}">${qc}${communityCard().replace('<div class="card">','<div class="card" style="margin:0">')}</div>`;
+  return h;
+}
+function communityCard(){
+  return `<div class="card"><h3>JJNB 커뮤니티</h3><div class="comm">
+    <div class="qrbox"><div class="qr" data-qr="${esc(S.settings.band||BAND_URL)}" data-sz="120"></div><b>밴드</b><a class="small" href="${esc(S.settings.band||BAND_URL)}" target="_blank" rel="noopener">${esc(S.settings.band||BAND_URL)}</a></div>
+    <div class="qrbox"><div class="qr" data-qr="${esc(S.settings.kakao||KAKAO_URL)}" data-sz="120"></div><b>카카오톡 오픈채팅</b><a class="small" href="${esc(S.settings.kakao||KAKAO_URL)}" target="_blank" rel="noopener">${esc(S.settings.kakao||KAKAO_URL)}</a></div>
+  </div></div>`;
+}
+
+/* ================= 대회 목록 ================= */
+function vTours(){
+  const f=S.tab.tourFilter||'all';
+  const all=sortedTours().filter(t=>f==='all'||t.status===f);
+  let h=`<h2 class="pg">대회 결과<span class="sp"></span>${canEdit()?`<button class="btn sm" data-act="expResults">⬇ 결과 내보내기</button><button class="btn sm" data-act="impResults">⬆ 결과 가져오기</button><button class="btn sm dark" data-act="resText">✎ 텍스트로 결과 입력</button><button class="btn sm red" data-act="resetAll">⚠ 전체 리셋</button><button class="btn pri sm" data-act="nav" data-h="new">+ 대회 개최</button>`:''}</h2>`;
+  h+=`<div class="ttabs">${[['all','전체'],['active','진행중'],['done','종료'],['cancelled','취소']].map(x=>`<button class="${f===x[0]?'on':''}" data-act="tourFilter" data-v="${x[0]}">${x[1]}</button>`).join('')}</div>`;
+  if(!all.length)return h+'<div class="card empty">대회가 없습니다.</div>';
+  h+='<div class="tgrid">'+all.map(t=>`<div class="card" style="margin:0"><div class="row">${typeBadge(t)} ${statusBadge(t)}<span class="sp"></span><span class="small muted">${esc(t.date||'')}</span></div>
+    <div class="row" style="margin-top:6px"><div style="flex:1;min-width:200px"><div style="font-size:18px;font-weight:900">${esc(t.name)}</div><div class="small muted">참가 ${activeList(t).length}명 · ${esc(progressText(t))}</div>${t.status==='done'?podiumHTML(t,4):''}</div>
+    <div class="row"><button class="btn sm dark" data-act="nav" data-h="t-${t.id}">열기</button>${canEdit()&&t.type==='record'?`<button class="btn sm" data-act="editTour" data-t="${t.id}">✎ 수정</button>`:''}${canEdit()?`<button class="btn sm red" data-act="delTour" data-t="${t.id}">삭제</button>`:''}</div></div></div>`).join('')+'</div>';
+  return h;
+}
+
+/* ================= 대회 개최 ================= */
+function vNew(){
+  if(!S.newForm)S.newForm={name:'',nameAuto:true,date:today(),type:'tournament',rounds:3,qualCount:2,size:3,sel:[]};
+  if(S.newForm.nameAuto)S.newForm.name=autoTourName(S.newForm);
+  const F=S.newForm;
+  const players=S.players.slice().sort((a,b)=>a.name.localeCompare(b.name,'ko'));
+  const opt=(k,vals)=>`<div class="opt">${vals.map(v=>`<button class="${F[k]===v[0]?'on':''}" data-act="nf" data-k="${k}" data-v="${v[0]}">${v[1]}</button>`).join('')}</div>`;
+  let h=`<h2 class="pg">대회 개최</h2><div class="grid2"><div>
+  <div class="card"><h3>기본 정보</h3>
+    <div class="fld"><label>대회명</label><input id="nf-name" value="${esc(F.name)}" placeholder="진주놀방 11월 1차 (토너먼트)"></div>
+    <div class="dtrow"><div class="fld" style="flex:1;min-width:0"><label>일자</label>${dateField('nf-date',F.date)}</div>
+    <div class="fld" style="flex-shrink:0"><label>진행 방식</label>${opt('type',[['tournament','토너먼트'],['points','포인트전']])}</div></div>
+  </div>`;
+  if(F.type==='tournament'){
+    h+=`<div class="card"><h3>토너먼트 설정</h3>
+      <div class="setrow">
+        <div class="fld"><label>라운드 수</label>${opt('rounds',[[2,'2회'],[3,'3회'],[4,'4회'],[5,'5회']])}</div>
+        <div class="fld"><label>결승 진출 인원</label>${opt('qualCount',[[1,'1명'],[2,'2명']])}</div>
+        <div class="fld"><label>조 구성</label>${opt('size',[[3,'3인<span class="lg"> 1조</span>'],[2,'2인<span class="lg"> 1조</span>']])}</div>
+      </div>
+      <div class="small muted">예선·패자부활전·본선·결승라운드에 모두 적용되며, 대회 진행 중 라운드마다 바꿀 수 있습니다.</div></div>`;
+  }else{
+    h+=`<div class="card"><h3>포인트전 규칙</h3><div class="small">· 1단계: 전원 1:1 리그 (승 2점 · 패 1점 · 실격 0점)<br>· 2단계: 하위 순위부터 3명씩 서바이벌, 기본 1명 탈락 (6위 이하 결정 경기는 2명 탈락 선택 가능)<br>· 3명이 남으면 결승</div></div>`;
+  }
+  h+=`<button class="btn pri big" style="width:100%" data-act="createTour">대회 생성 (${F.sel.length}명)</button></div>`;
+  h+=`<div class="card"><h3>참가 선수 선택 <small id="nf-cnt">${F.sel.length}명 선택</small><span class="sp"></span><button class="btn sm dark" data-act="selText">✎ 텍스트로 선택</button><button class="btn sm" data-act="quickAdd">+ 새 선수</button></h3>
+    <div class="row" style="margin-bottom:8px"><input id="nf-q" placeholder="이름·닉네임 검색" style="flex:1;border:1px solid #d5d9df;border-radius:10px;padding:9px 12px"><button class="btn sm" data-act="selAll">전체</button><button class="btn sm" data-act="selNone">해제</button></div>
+    <div class="pick" id="nf-pick">${players.length?players.map(p=>`<label class="${F.sel.includes(p.id)?'sel':''}" data-s="${esc((p.name+' '+p.nick).toLowerCase())}"><input type="checkbox" data-pid="${p.id}" ${F.sel.includes(p.id)?'checked':''}>${nmHTML(p)}</label>`).join(''):'<div class="empty">선수 명단이 비어 있습니다. 먼저 선수를 등록하세요.</div>'}</div></div></div>`;
+  return h;
+}
+document.addEventListener('input',e=>{
+  const id=e.target.id;
+  if(S.newForm&&id==='nf-name'){S.newForm.name=e.target.value;S.newForm.nameAuto=!e.target.value.trim();}
+  if(id==='nf-date-p'||id==='et-date-p'){const tx=$('#'+id.slice(0,-2));if(tx&&e.target.value)tx.value=e.target.value;}
+  if(S.newForm&&(id==='nf-date'||id==='nf-date-p')){const v=normDate(($('#nf-date')||{}).value);if(v){S.newForm.date=v;const pk=$('#nf-date-p');if(pk)pk.value=v;}if(S.newForm.nameAuto){S.newForm.name=autoTourName(S.newForm);const i=$('#nf-name');if(i)i.value=S.newForm.name;}}
+  if(id==='nf-q'){const q=e.target.value.trim().toLowerCase();document.querySelectorAll('#nf-pick label').forEach(l=>{l.style.display=!q||l.dataset.s.indexOf(q)>=0?'':'none';});}
+  if(id==='pl-q'){S.tab.plq=e.target.value;applyPlayerFilter();}
+  if(id==='pm-q'){const q=e.target.value.trim().toLowerCase();document.querySelectorAll('#pm-add .pmr').forEach(l=>{l.style.display=!q||l.dataset.s.indexOf(q)>=0?'':'none';});}
+});
+document.addEventListener('change',e=>{
+  const pid=e.target.dataset&&e.target.dataset.pid;
+  if(pid&&S.newForm&&e.target.closest('#nf-pick')){
+    const s=S.newForm.sel;const i=s.indexOf(pid);
+    if(e.target.checked&&i<0)s.push(pid);if(!e.target.checked&&i>=0)s.splice(i,1);
+    e.target.closest('label').classList.toggle('sel',e.target.checked);
+    $('#nf-cnt').textContent=s.length+'명 선택';
+    const b=document.querySelector('[data-act="createTour"]');if(b)b.textContent=`대회 생성 (${s.length}명)`;
+  }
+  if(e.target.id==='file-in'&&e.target.files[0]){const f=e.target.files[0];const h=S._fileHandler;e.target.value='';h&&h(f);}
+  if((e.target.id==='nf-date'||e.target.id==='et-date')){const v=normDate(e.target.value);if(v){e.target.value=v;const pk=$('#'+e.target.id+'-p');if(pk)pk.value=v;}else if(e.target.value.trim())toast('날짜 형식을 확인하세요 (예: 2026-11-22)');}
+  if(e.target.id==='pl-sort'){const so=S.tab.plSort||{k:'name',dir:1};S.tab.plSort={k:e.target.value,dir:so.dir};render();}
+  if(e.target.id==='logo-in'&&e.target.files[0]){uploadLogo(e.target.files[0]);e.target.value='';}
+});
+
+/* ================= 대회 화면 ================= */
+function vTour(id){
+  const t=S.tours[id];
+  if(!t)return S.loaded.tours?'<div class="card empty">대회를 찾을 수 없습니다. 삭제되었을 수 있습니다.</div>':'<div class="empty">불러오는 중…</div>';
+  const ed=canEdit()&&t.status!=='cancelled';
+  let h=`<div class="card"><div class="row">${typeBadge(t)} ${statusBadge(t)}<span class="sp"></span><span class="small muted">${esc(t.date||'')}</span></div>
+    <div class="row" style="margin-top:6px"><div style="flex:1;min-width:180px"><div style="font-size:22px;font-weight:900">${esc(t.name)}</div>
+    <div class="small muted">참가 ${activeList(t).length}명${(t.removed||[]).length?` (제외 ${(t.removed||[]).length}명)`:''} · ${esc(progressText(t))}</div></div>
+    <div class="row">${tourUrl(t.id)?`<button class="btn sm" data-act="qr" data-t="${t.id}">QR 공유</button>`:''}
+    ${canEdit()?`<button class="btn sm" data-act="editTour" data-t="${t.id}">✎ 대회수정</button>`:''}
+    ${ed?`<button class="btn sm" data-act="pm" data-t="${t.id}">참가자 추가/제외</button>`:''}
+    ${canEdit()&&t.status==='active'?`<button class="btn sm red" data-act="cancelTour" data-t="${t.id}">대회 취소</button>`:''}
+    ${canEdit()&&t.status==='cancelled'?`<button class="btn sm" data-act="restoreTour" data-t="${t.id}">취소 철회</button>`:''}
+    ${canEdit()?`<button class="btn sm red" data-act="delTour" data-t="${t.id}">삭제</button>`:''}</div></div></div>`;
+  if(t.status==='cancelled')h+='<div class="banner-cxl">이 대회는 취소되었습니다. 명예의 전당에 반영되지 않습니다.</div>';
+  if(t.type==='record')return h+`<div class="card"><h3>🏁 최종 결과 <small>대진 상세 없이 입력된 기록</small></h3>${rankGridHTML(t,t.result||[])}${canEdit()?`<div class="row" style="margin-top:10px"><button class="btn sm" data-act="editTour" data-t="${t.id}">✎ 대회수정 (입상자 변경)</button></div>`:''}</div>`;
+  return h+(t.type==='points'?vPoints(t,ed):vTournament(t,ed));
+}
+function segBtns(list,cur,attrs){return `<div class="seg">${list.map(o=>`<button class="${o[2]||o[0]} ${cur===o[0]?'on':''}" data-v="${o[0]}" ${attrs}>${o[1]}</button>`).join('')}</div>`;}
+function heatCard(t,h,title,o){
+  // o: {kind:'adv'|'rank', ed, offset, ctx(attr string), cls}
+  const isRank=o.kind==='rank';const done=resolved(t,h);
+  const n=act(t,h).length;const off=o.offset||1;
+  const rows=h.players.map(pid=>{
+    const rm=!isActive(t,pid);const v=h.res[pid];
+    let right='',cls='';
+    if(rm){cls='rm';right='<span class="rtag L">제외</span>';}
+    else if(!isRank){
+      cls=v==='W'?'win':(v?'out':'');
+      if(!o.ed&&v)right=`<span class="rtag ${v}">${v==='W'?'진출':v==='L'?'탈락':'실격'}</span>`;
+    }else{
+      cls=v===1?'win':'';
+      if(!o.ed&&v!=null)right=v==='D'?'<span class="rtag D">실격</span>':`<span class="rtag R">${v+off-1}위</span>`;
+    }
+    let ctrl='';
+    if(o.ed&&!rm){
+      const at=`data-act="res" data-h="${h.id}" data-p="${pid}" ${o.ctx}`;
+      if(!isRank)ctrl=segBtns([['W','진출'],['L','탈락'],['D','실격']],v,at);
+      else{const l=[];for(let i=1;i<=n;i++)l.push([i,(i+off-1)+'위','R']);l.push(['D','실격']);ctrl=segBtns(l,v,at);}
+    }
+    return `<div class="hp ${cls}"><div class="nmline">${tn(t,pid)}${right}</div>${ctrl}</div>`;
+  }).join('');
+  const allD=n>0&&act(t,h).every(p=>h.res[p]==='D');
+  const dqBtn=o.ed&&n?`<button class="dqall ${allD?'on':''}" data-act="res" data-h="${h.id}" data-p="*" data-v="D" ${o.ctx}>${allD?'전체실격 ✓':'전체실격'}</button>`:'';
+  return `<div class="heat ${o.cls||''} ${done&&n?'ok':''}"><div class="hh"><span>${title}</span><span class="row" style="gap:4px">${dqBtn}${done&&n?(allD?'<span class="badge" style="background:#ffe7e6;color:var(--red)">전원실격</span>':'<span class="badge done">완료</span>'):'<span class="badge">진행</span>'}</span></div>${rows}</div>`;
+}
+function vTournament(t,ed){
+  const tabs=t.rounds.map((r,i)=>['r'+i,`${r.no}라운드`]);
+  if(t.finals||(t.rounds.length&&t.rounds.length>=t.opt.rounds&&roundDone(t,t.rounds[t.rounds.length-1])))tabs.push(['fin','결승라운드']);
+  if(t.result)tabs.push(['res','최종 결과']);
+  let cur=S.tab[t.id];
+  if(!cur||!tabs.some(x=>x[0]===cur))cur=t.result?'res':(t.finals?'fin':(tabs.length?tabs[tabs.length-1][0]:''));
+  const live=t.result?'res':t.finals?'fin':'r'+(t.rounds.length-1);
+  let h=`<div class="ttabs">${tabs.map(x=>`<button class="${cur===x[0]?'on':''}" data-act="ttab" data-t="${t.id}" data-v="${x[0]}">${x[1]}${x[0]===live&&t.status==='active'?'<span class="dot"></span>':''}</button>`).join('')}</div>`;
+  if(cur==='res')return h+`<div class="card"><h3>🏁 최종 결과</h3>${rankGridHTML(t,t.result)}${otherParticipants(t)}</div>`;
+  if(cur==='fin')return h+vFinals(t,ed);
+  const ri=+cur.slice(1);return h+vRound(t,ri,ed);
+}
+function roundDone(t,r){return !!(r&&r.main&&r.main.done);}
+function rctx(t,ri,kind,si){return `data-t="${t.id}" data-r="${ri}" data-k="${kind}"${si!=null?` data-s="${si}"`:''}`;}
+function vRound(t,ri,ed){
+  const r=t.rounds[ri];if(!r)return '';
+  const isCur=ri===t.rounds.length-1&&!t.finals;const e=ed&&isCur;
+  const szSel=(k,cur)=>`<span class="opt">${[3,2].map(n=>`<button class="${cur===n?'on':''}" style="padding:5px 10px;font-size:13px" data-act="setSize" ${rctx(t,ri,k)} data-v="${n}">${n}인 1조</button>`).join('')}</span>`;
+  const qs=r.size||3,rs=r.repSize||qs,ms=(r.main&&r.main.size)||r.mainSize||t.opt.mainSize||3;
+  let h=`<div class="sec"><h4>예선 <small>${qs}인 1조 · 각 조 1위 본선 진출</small><span class="sp"></span>${e&&!r.rep&&!r.main?szSel('qual',qs):''}${e?`<button class="btn sm" data-act="reshuffle" ${rctx(t,ri,'qual')}>↻ 재편성</button>`:''}</h4>
+    <div class="heat-grid">${r.qual.heats.map((hh,i)=>heatCard(t,hh,`${i+1}조`,{kind:'adv',ed:e,ctx:rctx(t,ri,'qual')})).join('')}</div></div>`;
+  const qd=stageDone(t,r.qual);
+  if(r.rep){
+    h+=`<div class="sec"><h4>패자부활전 <small>예선 탈락·실격자 · ${rs}인 1조</small><span class="sp"></span>${e&&!r.main?szSel('rep',rs):''}${e&&!r.main?`<button class="btn sm" data-act="reshuffle" ${rctx(t,ri,'rep')}>↻ 재편성</button><button class="btn sm red" data-act="cancelRep" ${rctx(t,ri,'rep')}>패자부활전 취소</button>`:''}</h4>
+      <div class="heat-grid">${r.rep.heats.map((hh,i)=>heatCard(t,hh,`부활 ${i+1}조`,{kind:'adv',ed:e,ctx:rctx(t,ri,'rep')})).join('')}</div></div>`;
+  }
+  if(e&&qd&&!r.main){
+    const repOk=!r.rep||stageDone(t,r.rep);
+    const pool=qualWinners(t,r).concat(r.rep?r.rep.heats.flatMap(x=>winners(t,x)):[]);
+    h+=`<div class="flow"><div class="msg">${r.rep&&!repOk?'패자부활전 결과를 입력하세요.':`본선 진출자 ${pool.length}명`}</div>
+      ${!r.rep&&qualLosers(t,r).length?`<span class="small muted">패자부활전</span>${szSel('repPre',rs)}<button class="btn" data-act="startRep" ${rctx(t,ri)}>패자부활전 진행</button>`:''}
+      <span class="small muted">본선</span>${szSel('mainPre',ms)}<button class="btn pri" data-act="startMain" ${rctx(t,ri)} ${repOk?'':'disabled'}>본선 시작</button></div>`;
+  }
+  if(r.main){
+    const m=r.main;
+    h+=`<div class="sec"><h4>본선 <small>${ms}인 1조 · 결승라운드 진출 ${m.N||2}명</small><span class="sp"></span>${e&&!m.done&&m.stages.length&&m.stages[m.stages.length-1].kind==='adv'?szSel('main',ms):''}${e&&!m.done?`<span class="opt">${[1,2].map(n=>`<button class="${(m.N||2)===n?'on':''}" style="padding:5px 10px;font-size:13px" data-act="setQC" ${rctx(t,ri)} data-v="${n}">${n}명</button>`).join('')}</span>`:''}</h4>`;
+    if(!m.stages.length)h+=`<div class="small muted">본선 인원이 ${m.N||2}명 이하라 경기 없이 결승라운드에 진출합니다.</div>`;
+    m.stages.forEach((st,si)=>{
+      const lastSt=si===m.stages.length-1;
+      const title=st.kind==='rank'?`본선 최종전 <small>상위 ${m.N||2}명 결승라운드 진출</small>`:`본선 ${si+1}단계 <small>각 조 1위 진출</small>`;
+      h+=`<div class="sec"><h4>${title}<span class="sp"></span>${e&&st.kind==='adv'&&lastSt?`<button class="btn sm" data-act="reshuffle" ${rctx(t,ri,'main',si)}>↻ 재편성</button>`:''}</h4>`;
+      if(st.kind==='rank')h+=`<div class="heat-grid" style="grid-template-columns:1fr">${heatCard(t,st.heats[0],'최종전',{kind:'rank',ed:e,ctx:rctx(t,ri,'main',si),cls:'final'})}</div>`;
+      else h+=`<div class="heat-grid">${st.heats.map((hh,i)=>heatCard(t,hh,`${i+1}조`,{kind:'adv',ed:e,ctx:rctx(t,ri,'main',si)})).join('')}</div>`;
+      h+='</div>';
+    });
+    if(m.done){
+      const fl=roundFinalists(t,r);
+      h+=`<div class="flow"><div class="msg">🏆 ${r.no}라운드 결승라운드 진출: <div class="fin-list" style="margin-top:6px">${fl.length?fl.map(p=>`<span class="chip gold">${tn(t,p)}</span>`).join(''):'<span class="muted">진출자 없음</span>'}</div></div>
+        ${e?(t.rounds.length<t.opt.rounds?`<button class="btn pri" data-act="nextRound" data-t="${t.id}">${t.rounds.length+1}라운드 시작</button><button class="btn" data-act="toFinals" data-t="${t.id}">결승라운드로 이동</button>`:`<button class="btn pri" data-act="toFinals" data-t="${t.id}">결승라운드 구성</button>`):''}</div>`;
+    }
+  }
+  return h;
+}
+function fszSel(t,part,si,cur){return `<span class="opt">${[3,2].map(n=>`<button class="${cur===n?'on':''}" style="padding:5px 10px;font-size:13px" data-act="setFSize" ${fctx(t,part,si)} data-v="${n}">${n}인 1조</button>`).join('')}</span>`;}
+function fctx(t,part,si){return `data-t="${t.id}" data-k="${part}"${si!=null?` data-s="${si}"`:''}`;}
+function vFinals(t,ed){
+  const f=t.finals;
+  if(!f){
+    const F=allFinalists(t);const e=ed;
+    const size=S.tab['fs'+t.id]||t.opt.finalSize||3;
+    return `<div class="card"><h3>결승라운드 진출자 <small>${F.length}명</small></h3><div class="fin-list">${F.map(p=>`<span class="chip gold">${tn(t,p)}</span>`).join('')||'<span class="muted">아직 없음</span>'}</div>
+      ${e?`<div class="fld" style="margin-top:14px"><label>결승라운드 조 구성</label><div class="opt">${[3,2].map(n=>`<button class="${size===n?'on':''}" data-act="fsize" data-t="${t.id}" data-v="${n}">${n}인 1조</button>`).join('')}</div></div>
+      <div class="small muted" style="margin-bottom:10px">1차 조별 경주 → 각 조 1위는 최종 결승, 탈락자는 순위결정전(4위 결정전)으로 편성됩니다. 3명 이하면 바로 최종 결승입니다.</div>
+      <button class="btn pri" data-act="makeFinals" data-t="${t.id}" ${F.length?'':'disabled'}>결승라운드 대진표 작성</button>`:''}</div>`;
+  }
+  const e=ed;let h='';
+  if(f.stage1){
+    h+=`<div class="sec"><h4>결승라운드 1차 <small>${f.size}인 1조 · 1위 최종결승 / 나머지 순위결정전</small><span class="sp"></span>${e&&!f.upper?fszSel(t,'f1',null,f.size):''}${e&&!f.upper?`<button class="btn sm" data-act="reshuffle" ${fctx(t,'f1')}>↻ 재편성</button>`:''}${e?`<button class="btn sm red" data-act="resetFinals" data-t="${t.id}">결승 대진 초기화</button>`:''}</h4>
+      <div class="heat-grid">${f.stage1.heats.map((hh,i)=>heatCard(t,hh,`${i+1}조`,{kind:'adv',ed:e,ctx:fctx(t,'f1')})).join('')}</div></div>`;
+  }else if(e){h+=`<div class="row" style="justify-content:flex-end;margin-bottom:8px"><button class="btn sm red" data-act="resetFinals" data-t="${t.id}">결승 대진 초기화</button></div>`;}
+  if(f.upper||f.lower){
+    const uh=finalsUpperHeat(f);const off=uh?act(t,uh).length+1:null;
+    const chainHTML=(ch,part,label,offset,cls)=>{
+      if(!ch)return `<div class="muted small">해당 없음</div>`;
+      if(!ch.stages.length)return '<div class="muted small">대상자 없음</div>';
+      return ch.stages.map((st,si)=>st.kind==='rank'?heatCard(t,st.heats[0],label,{kind:'rank',ed:e,offset,ctx:fctx(t,part,si),cls}):
+        `<div class="row small muted" style="margin:4px 0">${label} 예선 ${si+1}단계 (${ch.size}인 1조 · 각 조 1위 진출)<span class="sp"></span>${e&&si===ch.stages.length-1&&!ch.done?fszSel(t,part,si,ch.size):''}</div><div class="heat-grid">${st.heats.map((hh,i)=>heatCard(t,hh,`${i+1}조`,{kind:'adv',ed:e,ctx:fctx(t,part,si)})).join('')}</div>`).join('<div style="height:8px"></div>');
+    };
+    const lowLabel=off?`${off}위 결정전`:'순위 결정전';
+    h+=`<div class="sec"><h4>${f.lower?lowLabel+' → ':''}최종 결승 <small>순위결정전을 먼저 진행합니다</small></h4>
+      <div class="grid2" style="grid-template-columns:1fr 1fr;gap:10px">
+        <div>${f.lower?`<div class="small" style="font-weight:900;margin-bottom:6px">① ${lowLabel}</div>${chainHTML(f.lower,'low',lowLabel,off||1,'blue')}`:'<div class="small muted">순위결정전 없음</div>'}</div>
+        <div><div class="small" style="font-weight:900;margin-bottom:6px">${f.lower?'②':''} 최종 결승</div>${chainHTML(f.upper,'up','최종 결승',1,'blue')}</div>
+      </div></div>`;
+  }
+  if(t.result)h+=`<div class="flow"><div class="msg">🏁 결승라운드 종료 — 최종 결과가 확정되었습니다.</div><button class="btn pri" data-act="ttab" data-t="${t.id}" data-v="res">최종 결과 보기</button></div>`;
+  return h;
+}
+function rankListHTML(t,list){
+  if(!list||!list.length)return '<div class="empty">결과가 없습니다.</div>';
+  return `<div class="rank-list">${list.map(o=>`<div class="ri ${o.rank&&o.rank<=3?'top':''}"><div class="rk">${o.rank?medal(o.rank):'<span class="small muted">순위외</span>'}</div>${nmHTML(o.name?o:t.people[o.pid])}${o.dq?'<span class="rtag D">실격</span>':''}</div>`).join('')}</div>`;
+}
+function rankGridHTML(t,list){
+  if(!list||!list.length)return '<div class="empty">결과가 없습니다.</div>';
+  const cell=o=>`<div class="rg ${o.rank&&o.rank<=3?'top t'+o.rank:''}"><div class="rk">${o.rank?medal(o.rank):'<span class="small muted">순위외</span>'}</div><div class="nmw">${nmHTML(o.name?o:t.people[o.pid])}${o.dq?' <span class="rtag D">실격</span>':''}</div></div>`;
+  const top=list.filter(o=>o.rank&&o.rank<=3),rest=list.filter(o=>!(o.rank&&o.rank<=3));
+  return `${top.length?`<div class="rgrid3 topgrid">${top.map(cell).join('')}</div>`:''}${rest.length?`<div class="rgrid3">${rest.map(cell).join('')}</div>`:''}`;
+}
+function otherParticipants(t){
+  const ids=new Set((t.result||[]).map(o=>o.pid));const rest=activeList(t).filter(p=>!ids.has(p));
+  if(!rest.length)return '';
+  return `<div style="margin-top:14px" class="small muted">참가</div><div class="fin-list" style="margin-top:6px">${rest.map(p=>`<span class="chip">${tn(t,p)}</span>`).join('')}</div>`;
+}
+
+/* ===== 포인트전 화면 ===== */
+const MOPT=[['W','승'],['L','패'],['D','실격'],['DD','둘 다 실격'],['N','경기전']];
+function cellVal(t,a,b){const r=t.pts.res[mkey(a,b)];if(!r)return 'N';if(r[a]==='D'&&r[b]==='D')return 'DD';return r[a]||'N';}
+function vPoints(t,ed){
+  const P=t.pts;
+  const tabs=[['league','1단계 리그'],['surv','2단계 본선 서바이벌']];if(t.result)tabs.push(['res','최종 결과']);
+  let cur=S.tab[t.id];if(!cur||!tabs.some(x=>x[0]===cur))cur=t.result?'res':(P.seeds?'surv':'league');
+  let h=`<div class="ttabs">${tabs.map(x=>`<button class="${cur===x[0]?'on':''}" data-act="ttab" data-t="${t.id}" data-v="${x[0]}">${x[1]}</button>`).join('')}</div>`;
+  if(cur==='res')return h+`<div class="card"><h3>🏁 최종 결과</h3>${rankGridHTML(t,t.result)}</div>`;
+  if(cur==='surv')return h+vSurv(t,ed);
+  const ps=activeList(t);const e=ed&&!P.seeds;
+  const st=standings(t);const idx={};st.forEach((s,i)=>idx[s.pid]=i);
+  h+=`<div class="card"><h3>대진 매트릭스 <small>${playedMatches(t)}/${totalMatches(t)} 경기 · 행 기준 결과${e?' · 칸을 눌러 입력':''}</small></h3>
+    <div class="mx-wrap"><table class="mtx"><thead><tr><th class="rh">선수</th>${ps.map((p,i)=>`<th title="${esc(nameTxt(t.people[p]))}">${i+1}</th>`).join('')}<th>점수</th></tr></thead><tbody>
+    ${ps.map((a,i)=>`<tr><td class="rh"><span class="small muted">${i+1}.</span> ${tn(t,a)}</td>${ps.map(b=>{if(a===b)return '<td class="self"></td>';const v=cellVal(t,a,b);const lab={W:'승',L:'패',D:'실격',DD:'둘실',N:'·'}[v];return `<td class="c ${v} ${e?'ed':''}" ${e?`data-act="cell" data-t="${t.id}" data-a="${a}" data-b="${b}"`:''}>${lab}</td>`;}).join('')}<td class="tot">${(st[idx[a]]||{}).pts||0}</td></tr>`).join('')}
+    </tbody></table></div></div>`;
+  h+=`<div class="card"><h3>예선 순위 <small>승 2 · 패 1 · 실격 0${ed&&!P.seeds?' · 동점자는 ▲▼로 순위 조정':''}</small></h3><div class="tbwrap"><table class="tb"><thead><tr><th class="num">순위</th><th>선수</th><th class="num">경기</th><th class="num">승</th><th class="num">패</th><th class="num">실격</th><th class="num">포인트</th>${ed&&!P.seeds?'<th></th>':''}</tr></thead><tbody>
+    ${st.map((s,i)=>`<tr><td class="num"><b>${i+1}</b></td><td>${tn(t,s.pid)}</td><td class="num">${s.g}</td><td class="num">${s.w}</td><td class="num">${s.l}</td><td class="num">${s.d}</td><td class="num"><b>${s.pts}</b></td>${ed&&!P.seeds?`<td><span class="mv"><button data-act="tieMv" data-t="${t.id}" data-p="${s.pid}" data-v="-1">▲</button><button data-act="tieMv" data-t="${t.id}" data-p="${s.pid}" data-v="1">▼</button></span></td>`:''}</tr>`).join('')}
+    </tbody></table></div>
+    ${ed&&!P.seeds?`<div class="row" style="margin-top:12px;justify-content:flex-end"><button class="btn pri" data-act="startSurv" data-t="${t.id}">예선 순위 확정 → 본선 서바이벌 시작</button></div>`:''}
+    ${P.seeds?'<div class="small muted" style="margin-top:8px">본선이 시작되어 리그 결과는 잠겨 있습니다. 수정하려면 2단계에서 [본선 초기화]를 누르세요.</div>':''}</div>`;
+  return h;
+}
+function vSurv(t,ed){
+  const P=t.pts;
+  if(!P.seeds)return '<div class="card empty">1단계 리그를 마친 뒤 [본선 서바이벌 시작]을 누르세요.</div>';
+  const anyRes=P.heats.some(h=>h.elim.length)||(P.final&&hasRes(P.final));
+  let h=`<div class="card"><h3>본선 시드 <small>예선 순위</small><span class="sp"></span>${ed?`<button class="btn sm red" data-act="resetSurv" data-t="${t.id}">본선 초기화</button>`:''}</h3>
+    <div class="small muted" style="margin-bottom:8px">${ed&&!anyRes?'경기 시작 전, 동점자 등은 ▲▼로 시드 순서를 조정할 수 있습니다.':'꼴찌부터 3명씩 경기하여 진출자를 정합니다.'}</div>
+    <div class="fin-list">${P.seeds.map((p,i)=>`<span class="chip">${i+1}. ${tn(t,p)}${ed&&!anyRes?`<span class="mv"><button data-act="seedMv" data-t="${t.id}" data-p="${p}" data-v="-1">▲</button><button data-act="seedMv" data-t="${t.id}" data-p="${p}" data-v="1">▼</button></span>`:''}</span>`).join('')}</div></div>`;
+  h+='<div class="heat-grid">';
+  P.heats.forEach((hh,i)=>{
+    const R=hh.R;const label=R===4?'준결승 (4위 결정)':`서바이벌 ${i+1}경기 (${hh.elimCount===2?`${R-1}·${R}위`:`${R}위`} 결정)`;
+    const done=svHeatDone(t,hh);
+    const advL=svAdvList(t,hh);const nAdv=Math.max(0,act(t,hh).length-hh.elimCount);
+    const rows=hh.players.map(pid=>{
+      const rm=!isActive(t,pid);const ei=hh.elim.indexOf(pid);const adv=advL.includes(pid);
+      const rk=ei>=0?R-ei:null;
+      return `<div class="hp ${rm?'rm':adv?'win':ei>=0?'out':''}"><div class="nmline">${tn(t,pid)}${rm?'<span class="rtag L">제외</span>':adv?'<span class="rtag W">진출</span>':ei>=0?`<span class="rtag L">${rk}위 확정</span>`:''}</div>
+        ${ed&&!rm?`<div class="seg"><button class="W ${adv?'on':''}" data-act="svAdv" data-t="${t.id}" data-h="${hh.id}" data-p="${pid}">${adv?'진출 ✓':'진출'}</button></div>`:''}</div>`;
+    }).join('');
+    h+=`<div class="heat ${R<=4?'blue':''} ${done?'ok':''}"><div class="hh"><span>${label}</span>${done?'<span class="badge done">완료</span>':'<span class="badge">진행</span>'}</div>
+      ${ed?`<div class="row small" style="margin-bottom:4px">진출 인원 <span class="opt">${[1,2].map(n=>`<button class="${hh.elimCount===n?'on':''}" style="padding:3px 9px;font-size:12.5px" ${R<=5&&n===2?'disabled':''} data-act="svCount" data-t="${t.id}" data-h="${hh.id}" data-v="${n}">${Math.max(0,act(t,hh).length-n)}명</button>`).join('')}</span></div>`:`<div class="small muted" style="margin-bottom:4px">${nAdv}명 진출</div>`}
+      ${rows}
+      ${ed?`<div class="row" style="margin-top:6px">${hh.elim.length===2?`<button class="btn sm" data-act="svSwap" data-t="${t.id}" data-h="${hh.id}">⇅ 하위 순위 교체</button>`:''}<button class="btn sm red" data-act="svReset" data-t="${t.id}" data-h="${hh.id}">재경기(리셋)</button></div>`:''}</div>`;
+  });
+  if(P.final){
+    h+=`<div>${heatCard(t,P.final,'🏆 결승 (1~3위 결정)',{kind:'rank',ed,ctx:`data-t="${t.id}" data-k="svf"`,cls:'blue'})}${ed?`<div class="row" style="margin-top:6px"><button class="btn sm red" data-act="svReset" data-t="${t.id}" data-h="${P.final.id}">결승 재경기(리셋)</button></div>`:''}</div>`;
+  }
+  h+='</div>';
+  if(t.result)h+=`<div class="flow"><div class="msg">🏁 대회 종료</div><button class="btn pri" data-act="ttab" data-t="${t.id}" data-v="res">최종 결과 보기</button></div>`;
+  return h;
+}
+
+/* ================= 선수 명단 ================= */
+function vPlayers(){
+  const ed=canEdit();
+  const so=S.tab.plSort||{k:'name',dir:1};
+  const fld={name:p=>p.name||'',nick:p=>p.nick||'',team:p=>p.team||'',memo:p=>p.memo||''};
+  const list=S.players.map((p,i)=>Object.assign({_i:i},p)).sort((a,b)=>{
+    if(so.k==='reg')return (a._i-b._i)*so.dir;
+    const x=fld[so.k](a),y=fld[so.k](b);
+    if(!x&&y)return 1;if(x&&!y)return -1;
+    return (x.localeCompare(y,'ko')||a.name.localeCompare(b.name,'ko'))*so.dir;
+  });
+  const sth=(k,l)=>`<th class="sth ${so.k===k?'on':''}" data-act="plSort" data-k="${k}">${l}<span class="arw">${so.k===k?(so.dir>0?'▲':'▼'):'↕'}</span></th>`;
+  let h=`<h2 class="pg">선수 명단 <span class="badge">${list.length}명</span><span class="sp"></span>${ed?`<button class="btn sm dark" data-act="bulkText">✎ 텍스트로 일괄 입력</button><button class="btn pri sm" data-act="editPlayer">+ 선수 등록</button>`:''}</h2>`;
+  if(ed)h+=`<div class="card"><h3>스프레드시트 <small>Excel·Google 스프레드시트 호환 (.xlsx / .csv)</small></h3><div class="row">
+    <button class="btn sm" data-act="expPlayers" data-v="xlsx">⬇ 엑셀(.xlsx) 다운로드</button><button class="btn sm" data-act="expPlayers" data-v="csv">⬇ CSV 다운로드</button><button class="btn sm dark" data-act="impPlayers">⬆ 스프레드시트 가져오기</button></div>
+    <div class="small muted" style="margin-top:8px">열 이름: 선수이름 · 닉네임 · 소속 · 메모. 구글 시트는 [파일 → 다운로드 → .xlsx 또는 .csv]로 받은 파일을 가져오세요.</div></div>`;
+  h+=`<div class="card"><div class="row" style="margin-bottom:10px"><span class="small muted">정렬</span><select id="pl-sort" style="border:1px solid #d5d9df;border-radius:10px;padding:8px 10px;background:#fff">${[['name','이름순'],['nick','닉네임순'],['team','소속순'],['memo','메모순'],['reg','등록순']].map(o=>`<option value="${o[0]}" ${so.k===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select><button class="btn sm" data-act="plSortDir">${so.dir>0?'▲ 오름차순':'▼ 내림차순'}</button><input id="pl-q" value="${esc(S.tab.plq||'')}" placeholder="이름·닉네임·소속 검색" style="flex:1;border:1px solid #d5d9df;border-radius:10px;padding:9px 12px"></div>
+    <div class="plgrid" id="pl-tb">
+    ${list.length?list.map(p=>`<div class="plc" data-s="${esc((p.name+' '+p.nick+' '+p.team+' '+(p.memo||'')).toLowerCase())}"><div class="plm"><div class="pln"><b>${esc(p.name)}</b> <span class="nk ${p.nick&&p.nick!==p.name?'blue':'same'}" style="font-weight:700">/ ${esc(p.nick||'')}</span></div><div class="small muted">${p.team?`<span class="badge">${esc(p.team)}</span> `:''}${esc(p.memo||'')}</div></div>${ed?`<div class="row" style="gap:4px;flex-shrink:0"><button class="btn sm" data-act="editPlayer" data-p="${p.id}">수정</button><button class="btn sm red" data-act="delPlayer" data-p="${p.id}">삭제</button></div>`:''}</div>`).join(''):`<div class="empty" style="grid-column:1/-1">등록된 선수가 없습니다.</div>`}
+    </div><div class="small muted" style="margin-top:8px">닉네임이 이름과 같으면 <span class="nk same">회색</span>, 다르면 <span class="nk blue">파란색</span>으로 표시됩니다.</div></div>`;
+  return h;
+}
+function applyPlayerFilter(){const q=(S.tab.plq||'').trim().toLowerCase();document.querySelectorAll('#pl-tb .plc[data-s]').forEach(r=>{r.style.display=!q||r.dataset.s.indexOf(q)>=0?'':'none';});}
+
+/* ================= 명예의 전당 ================= */
+function vHof(){
+  const done=sortedTours().filter(t=>t.status==='done'&&t.result&&t.result.length);
+  const m={};
+  done.forEach(t=>t.result.forEach(o=>{if(!o.rank||o.rank>4)return;const k=o.name+'|'+o.nick;if(!m[k])m[k]={name:o.name,nick:o.nick,c:[0,0,0,0]};m[k].c[o.rank-1]++;}));
+  const rows=Object.values(m).sort((a,b)=>b.c[0]-a.c[0]||b.c[1]-a.c[1]||b.c[2]-a.c[2]||b.c[3]-a.c[3]||a.name.localeCompare(b.name,'ko'));
+  let h=`<h2 class="pg">🏆 JJNB 명예의 전당<span class="sp"></span>${canEdit()?'<button class="btn sm dark" data-act="hofRefresh">↻ 대회결과 재반영</button>':''}</h2><div class="card"><h3>선수별 입상 기록 <small>종료된 대회 ${done.length}개 기준 · 취소·삭제된 대회 제외</small></h3>`;
+  h+=rows.length?`<div class="tbwrap"><table class="tb"><thead><tr><th class="num">#</th><th>선수</th><th class="num">${medal(1)}</th><th class="num">${medal(2)}</th><th class="num">${medal(3)}</th><th class="num">${medal(4)}</th><th class="num">입상</th></tr></thead><tbody>
+    ${rows.map((r,i)=>`<tr><td class="num"><b>${i+1}</b></td><td>${nmHTML(r)}</td>${r.c.map(c=>`<td class="num" style="font-weight:${c?900:400};color:${c?'inherit':'#c3c7cd'}">${c}</td>`).join('')}<td class="num"><b>${r.c.reduce((a,b)=>a+b,0)}</b></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">아직 종료된 대회가 없습니다.</div>';
+  h+='</div>';
+  if(done.length)h+=`<div class="card"><h3>역대 대회 입상자</h3><div class="tbwrap"><table class="tb"><thead><tr><th>일자</th><th>방식</th><th>대회</th><th>1위</th><th>2위</th><th>3위</th><th>4위</th></tr></thead><tbody>
+    ${done.map(t=>{const g=r=>{const o=t.result.find(x=>x.rank===r);return o?nmHTML(o):'<span class="muted">-</span>';};return `<tr><td class="small" style="white-space:nowrap">${esc(t.date)}</td><td>${kindLabel(tKind(t))?`<span class="badge ${tKind(t)==='points'?'pts':'tour'}">${kindLabel(tKind(t))}</span>`:'-'}</td><td><a href="#t-${t.id}">${esc(t.name)}</a></td><td>${g(1)}</td><td>${g(2)}</td><td>${g(3)}</td><td>${g(4)}</td></tr>`;}).join('')}</tbody></table></div></div>`;
+  return h;
+}
+
+/* ================= 설정 ================= */
+function vConfig(){
+  const st=S.settings;
+  return `<h2 class="pg">설정</h2>
+  <div class="card"><h3>배너 로고</h3><div class="row"><div style="background:var(--dark);padding:10px;border-radius:10px">${st.logo?`<img src="${esc(st.logo)}" style="max-height:64px;display:block">`:DEFAULT_LOGO}</div></div>
+    <div class="row" style="margin-top:10px"><label class="btn sm dark">로고 이미지 업로드<input type="file" id="logo-in" accept="image/*" style="display:none"></label>${st.logo?'<button class="btn sm red" data-act="rmLogo">기본 로고로</button>':''}</div>
+    <div class="small muted" style="margin-top:6px">PNG(투명 배경)를 권장합니다. 자동으로 축소되어 저장됩니다.</div></div>
+  <div class="card"><h3>QR 링크</h3>
+    <div class="fld"><label>대진표 페이지 주소 (참가자 QR에 사용)</label><input id="cf-url" value="${esc(st.appUrl||appUrl())}" placeholder="https://claude.ai/..."></div>
+    <div class="fld"><label>밴드 주소</label><input id="cf-band" value="${esc(st.band||BAND_URL)}"></div>
+    <div class="fld"><label>카카오톡 오픈채팅</label><input id="cf-kakao" value="${esc(st.kakao||KAKAO_URL)}"></div>
+    <button class="btn pri" data-act="saveCfg">저장</button></div>
+  <div class="card"><h3>화면</h3><div class="row"><button class="btn" data-act="viewOnly">${S.viewOnly?'진행자 모드로 전환':'관람 모드 (진행 버튼 숨기기)'}</button></div><div class="small muted" style="margin-top:6px">대형 화면에 띄울 때 관람 모드를 사용하세요. 이 기기에서만 적용됩니다.</div></div>
+  <div class="card"><h3>저장소</h3><div class="small">${S.mode==='db'?'✅ 서버(백엔드 DB)에 저장 · 모든 기기에서 실시간 동기화':'⚠️ 로컬 모드: 이 브라우저에만 저장됩니다'}</div></div>`;
+}
+function uploadLogo(file){
+  const img=new Image();const url=URL.createObjectURL(file);
+  img.onload=()=>{
+    const maxW=640,maxH=200;let w=img.width,h=img.height;const sc=Math.min(1,maxW/w,maxH/h);w=Math.round(w*sc);h=Math.round(h*sc);
+    const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
+    let d=c.toDataURL('image/png');if(d.length>180000)d=c.toDataURL('image/jpeg',0.85);
+    URL.revokeObjectURL(url);
+    saveSettings(Object.assign({},S.settings,{logo:d}));render();toast('로고를 저장했습니다');
+  };
+  img.onerror=()=>toast('이미지를 읽을 수 없습니다');
+  img.src=url;
+}
+
+/* ================= 모달 ================= */
+function openModal(html){const m=$('#modal');m.innerHTML=`<div class="mbox">${html}</div>`;m.classList.add('on');drawQRs(m);}
+function closeModal(silent){const m=$('#modal');m.classList.remove('on');m.innerHTML='';S.modalRender=null;if(S._ask){const r=S._ask;S._ask=null;r(false);}}
+function ask(msg,okText,danger){return new Promise(res=>{openModal(`<p class="ask">${esc(msg)}</p><div class="mact"><button class="btn" data-act="__no">아니오</button><button class="btn ${danger?'red':'pri'}" data-act="__yes">${esc(okText||'확인')}</button></div>`);S._ask=res;});}
+$('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal();});
+function pickFile(accept,handler){let inp=$('#file-in');if(!inp){inp=document.createElement('input');inp.type='file';inp.id='file-in';inp.style.display='none';document.body.appendChild(inp);}inp.accept=accept;S._fileHandler=handler;inp.click();}
+async function saveFile(name,data){
+  const dl=await getCap('downloads');
+  if(!dl){toast('이 화면에서는 파일 저장이 지원되지 않습니다');return;}
+  try{await dl.save({filename:name,data});toast('파일을 저장했습니다');}
+  catch(e){if(e&&e.code==='declined')return;toast('저장 실패: '+((e&&e.message)||(e&&e.code)||''));}
+}
+
+/* ================= 액션 ================= */
+const ACT={};
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b||b.disabled)return;
+  if(b.tagName==='A')e.preventDefault();
+  const f=ACT[b.dataset.act];if(f){try{f(b.dataset,b);}catch(err){console.error(err);toast('오류: '+err.message);}}
+});
+ACT.__yes=()=>{const r=S._ask;S._ask=null;closeModal();r&&r(true);};
+ACT.__no=()=>{closeModal();};
+ACT.close=()=>closeModal();
+ACT.nav=d=>go(d.h);
+ACT.viewOnly=()=>{S.viewOnly=!S.viewOnly;renderShell();render();};
+ACT.tourFilter=d=>{S.tab.tourFilter=d.v;render();};
+ACT.ttab=d=>{S.tab[d.t]=d.v;render();window.scrollTo(0,0);};
+function T(d){const t=S.tours[d.t];if(!t)throw new Error('대회를 찾을 수 없습니다');return clone(t);}
+
+/* 대회 개최 */
+function autoTourName(F){
+  const d=(F.date||today()).split('-');const y=d[0],m=+d[1];
+  const n=Object.values(S.tours).filter(t=>t.status!=='cancelled'&&(t.date||'').slice(0,7)===y+'-'+d[1]).length+1;
+  return `진주놀방 ${m}월 ${n}차 (${F.type==='points'?'포인트전':'토너먼트'})`;
+}
+ACT.nf=d=>{const F=S.newForm;let v=d.v;if(/^\d+$/.test(v))v=+v;F[d.k]=v;render();};
+ACT.selAll=()=>{const vis=[...document.querySelectorAll('#nf-pick label')].filter(l=>l.style.display!=='none').map(l=>l.querySelector('input').dataset.pid);vis.forEach(p=>{if(!S.newForm.sel.includes(p))S.newForm.sel.push(p);});render();};
+ACT.selNone=()=>{S.newForm.sel=[];render();};
+function parseEntrants(txt){
+  const toks=txt.split(/[\r\n,\t;]+/).map(x=>x.trim()).filter(Boolean);
+  const seen=new Set();const out=[];
+  toks.forEach(x=>{
+    x=x.replace(/^\d+[.)]\s*/,'');if(!x)return;
+    let name=x,nick='';
+    const m=x.match(/^(.+?)\s*[(（](.+?)[)）]$/);
+    if(m){name=m[1].trim();nick=m[2].trim();}else if(x.indexOf('/')>=0){const f=x.split('/');name=f[0].trim();nick=f.slice(1).join('/').trim();}
+    const k=name+'|'+nick;if(seen.has(k))return;seen.add(k);out.push({raw:x,name,nick});
+  });
+  return out;
+}
+function matchEntrant(e){
+  const P=S.players;
+  if(e.nick){return P.find(p=>p.name===e.name&&p.nick===e.nick)||P.find(p=>p.nick===e.nick)||null;}
+  const byName=P.filter(p=>p.name===e.name);if(byName.length)return byName[0];
+  const byNick=P.filter(p=>p.nick===e.name);if(byNick.length)return byNick[0];
+  return null;
+}
+ACT.selText=()=>{
+  openModal(`<h3>참가 선수 텍스트로 선택</h3>
+    <div class="small muted" style="margin-bottom:8px">이름 또는 닉네임을 줄바꿈이나 쉼표(,)로 구분해 입력하세요.<br>동명이인은 <b>이름/닉네임</b> 또는 <b>이름(닉네임)</b>으로 쓰면 정확히 찾습니다. 카톡 명단을 그대로 붙여넣어도 됩니다.</div>
+    <textarea id="st-ta" rows="8" style="width:100%;border:1px solid #d5d9df;border-radius:10px;padding:10px 12px;font-size:16px;line-height:1.6" placeholder="이정채, 홍길동, 김철수\n규아빠\n박영희/영희맘">${esc(S._stTxt||'')}</textarea>
+    <div class="small muted" id="st-cnt" style="margin-top:4px"></div>
+    <div class="fld" style="margin-top:8px"><label>선택 방식</label><div class="opt"><button class="${S._stMode!=='replace'?'on':''}" data-act="stMode" data-v="add">기존 선택에 추가</button><button class="${S._stMode==='replace'?'on':''}" data-act="stMode" data-v="replace">이 명단으로 교체</button></div></div>
+    <div class="mact"><button class="btn" data-act="close">취소</button><button class="btn pri" data-act="stNext">확인</button></div>`);
+  const ta=$('#st-ta');const upd=()=>{S._stTxt=ta.value;const es=parseEntrants(ta.value);const miss=es.filter(e=>!matchEntrant(e)).length;$('#st-cnt').textContent=`${es.length}명 인식 · 명단에 있음 ${es.length-miss}명${miss?` · 명단에 없음 ${miss}명`:''}`;};
+  ta.addEventListener('input',upd);upd();setTimeout(()=>ta.focus(),50);
+};
+ACT.stMode=(d,b)=>{S._stMode=d.v;b.parentNode.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));};
+ACT.stNext=()=>{
+  const es=parseEntrants($('#st-ta').value);
+  if(!es.length){toast('입력된 선수가 없습니다');return;}
+  const found=[],miss=[];es.forEach(e=>{const p=matchEntrant(e);if(p){if(!found.includes(p.id))found.push(p.id);}else miss.push(e);});
+  S._stFound=found;S._stMiss=miss;
+  if(!miss.length){stApply(false);return;}
+  openModal(`<h3>명단에 없는 선수 ${miss.length}명</h3>
+    <div>선수 명단에 없는 인원이 있습니다. <b>선수 명단에도 추가하고</b> 대회에 참가시킬까요?</div>
+    <div class="pick" style="max-height:220px;margin:10px 0">${miss.map(e=>`<div style="padding:8px 12px;border-bottom:1px solid #f0f1f3">${nmHTML({name:e.name,nick:e.nick||e.name})}</div>`).join('')}</div>
+    <div class="small muted">명단에 있는 ${found.length}명은 그대로 선택됩니다. 닉네임을 적지 않은 선수는 닉네임이 이름과 같게 등록됩니다.</div>
+    <div class="mact"><button class="btn" data-act="selText">← 다시 입력</button><button class="btn" data-act="stApply" data-v="0">추가 안 함 (명단에 있는 선수만)</button><button class="btn pri" data-act="stApply" data-v="1">선수 추가하고 참가</button></div>`);
+};
+function stApply(addMissing){
+  const F=S.newForm;if(!F)return closeModal();
+  const ids=S._stFound.slice();
+  if(addMissing&&S._stMiss.length){
+    const list=S.players.slice();
+    S._stMiss.forEach(e=>{const nick=e.nick||e.name;let p=list.find(x=>x.name===e.name&&x.nick===nick);if(!p){p={id:uid(),name:e.name,nick,team:'',memo:''};list.push(p);}if(!ids.includes(p.id))ids.push(p.id);});
+    savePlayers(list);
+  }
+  if(S._stMode==='replace')F.sel=ids;else ids.forEach(id=>{if(!F.sel.includes(id))F.sel.push(id);});
+  const n=ids.length;S._stTxt='';S._stFound=S._stMiss=null;closeModal();render();
+  toast(`참가 선수 ${n}명을 선택했습니다${addMissing?' (새 선수 명단 등록 포함)':''} · 총 ${F.sel.length}명`);
+}
+ACT.stApply=d=>stApply(d.v==='1');
+ACT.quickAdd=()=>playerModal(null,p=>{if(S.newForm)S.newForm.sel.push(p.id);render();});
+ACT.createTour=()=>{
+  const F=S.newForm;const sel=F.sel.filter(id=>S.players.some(p=>p.id===id));
+  if(!F.name.trim()){toast('대회명을 입력하세요');$('#nf-name')&&$('#nf-name').focus();return;}
+  if(sel.length<2){toast('참가 선수를 2명 이상 선택하세요');return;}
+  const people={};sel.forEach(id=>{const p=S.players.find(x=>x.id===id);people[id]={name:p.name,nick:p.nick||'',team:p.team||''};});
+  const rawD=(($('#nf-date')||{}).value||'').trim();const nd=rawD?normDate(rawD):(F.date||today());if(!nd){toast('일자를 확인하세요 (예: 2026-11-22)');return;}F.date=nd;
+  const t={id:uid(),name:F.name.trim(),date:nd,type:F.type,status:'active',createdAt:Date.now(),people,active:sel.slice(),removed:[],result:null};
+  if(F.type==='tournament'){const sz=F.size||3;t.opt={rounds:F.rounds,qualCount:F.qualCount,qualSize:sz,mainSize:sz,finalSize:sz};t.rounds=[];t.finals=null;startRound(t);}
+  else{t.pts={res:{},tie:[],seeds:null,heats:[],final:null};}
+  S.newForm=null;saveTour(t);go('t-'+t.id);toast('대회가 생성되었습니다');
+};
+
+/* 결과 입력 (토너먼트) */
+function locate(t,d){
+  const k=d.k;
+  if(k==='svf')return {heat:t.pts.final,kind:'rank'};
+  if(k==='qual'||k==='rep'||k==='main'){
+    const r=t.rounds[+d.r];
+    if(k==='main'){const st=r.main.stages[+d.s];return {round:r,ri:+d.r,stage:st,si:+d.s,chain:r.main,kind:st.kind};}
+    return {round:r,ri:+d.r,stage:r[k],kind:'adv'};
+  }
+  const f=t.finals;
+  if(k==='f1')return {stage:f.stage1,kind:'adv'};
+  const ch=k==='up'?f.upper:f.lower;const st=ch.stages[+d.s];return {stage:st,si:+d.s,chain:ch,kind:st.kind};
+}
+function setVal(t,h,pid,v,kind){
+  if(pid==='*'){const a=act(t,h);const all=a.length&&a.every(p=>h.res[p]==='D');a.forEach(p=>{if(all)delete h.res[p];else h.res[p]='D';});return;}
+  if(h.res[pid]===v){delete h.res[pid];return;}
+  if(kind==='adv'){
+    const firstW=v==='W'&&!act(t,h).some(p=>h.res[p]==='W');
+    h.res[pid]=v;
+    if(firstW)act(t,h).forEach(p=>{if(p!==pid&&h.res[p]==null)h.res[p]='L';});
+  }else{
+    if(typeof v==='number')act(t,h).forEach(p=>{if(p!==pid&&h.res[p]===v)delete h.res[p];});
+    h.res[pid]=v;
+    const ap=act(t,h);const un=ap.filter(p=>h.res[p]==null);
+    if(un.length===1){const used=ap.map(p=>h.res[p]).filter(x=>typeof x==='number');const dq=ap.filter(p=>h.res[p]==='D').length;for(let i=1;i<=ap.length-dq;i++){if(!used.includes(i)){h.res[un[0]]=i;break;}}}
+  }
+}
+ACT.res=async d=>{
+  const t=T(d);let v=d.v;if(/^\d+$/.test(v))v=+v;
+  if(d.k==='svf'){
+    const P=t.pts;setVal(t,P.final,d.p,v,'rank');autoProgress(t);saveTour(t);return;
+  }
+  const L=locate(t,d);
+  const heat=L.stage.heats.find(x=>x.id===d.h);if(!heat)return;
+  // 하위 단계 영향 처리
+  let reset=null,hasDown=false;
+  if(d.k==='qual'){const r=L.round;if(r.rep||r.main){hasDown=true;reset=()=>{r.rep=null;r.main=null;};}}
+  else if(d.k==='rep'){const r=L.round;if(r.main){hasDown=true;reset=()=>{r.main=null;};}}
+  else if(d.k==='main'||d.k==='up'||d.k==='low'){const ch=L.chain;if(L.si<ch.stages.length-1||ch.done){hasDown=L.si<ch.stages.length-1;reset=()=>{ch.stages.splice(L.si+1);ch.done=false;ch.result=[];};}}
+  else if(d.k==='f1'){const f=t.finals;if(f.upper||f.lower){hasDown=true;reset=()=>{f.upper=null;f.lower=null;};}}
+  if(hasDown&&reset){
+    const msg=d.k==='qual'?'예선 결과를 바꾸면 패자부활전·본선이 초기화됩니다. 계속할까요?':d.k==='rep'?'패자부활전 결과를 바꾸면 본선이 초기화됩니다. 계속할까요?':d.k==='f1'?'1차 결과를 바꾸면 순위결정전·최종결승이 초기화됩니다. 계속할까요?':'이후 진행된 단계가 초기화됩니다. 계속할까요?';
+    const downHasRes=d.k==='qual'?((L.round.rep&&L.round.rep.heats.some(hasRes))||chainHasRes(L.round.main)):d.k==='rep'?chainHasRes(L.round.main):d.k==='f1'?(chainHasRes(t.finals.upper)||chainHasRes(t.finals.lower)):L.chain.stages.slice(L.si+1).some(s=>s.heats.some(hasRes));
+    if(downHasRes&&!(await ask(msg,'초기화하고 변경',true)))return;
+  }
+  if(reset)reset();
+  setVal(t,heat,d.p,v,L.kind);
+  autoProgress(t);saveTour(t);
+};
+ACT.reshuffle=async d=>{
+  const t=T(d);const k=d.k;
+  if(k==='qual'){const r=t.rounds[+d.r];if((r.qual.heats.some(hasRes)||r.rep||r.main)&&!(await ask('예선 조를 재편성하면 예선 결과와 이후 경기(패자부활전·본선)가 초기화됩니다.','재편성',true)))return;
+    const pool=r.qual.heats.flatMap(h=>act(t,h));r.qual={heats:makeGroups(pool,r.size||3).map(newHeat)};r.rep=null;r.main=null;}
+  else if(k==='rep'){const r=t.rounds[+d.r];if(r.rep.heats.some(hasRes)&&!(await ask('패자부활전 결과가 초기화됩니다.','재편성',true)))return;const pool=r.rep.heats.flatMap(h=>act(t,h));r.rep={heats:makeGroups(pool,r.repSize||r.size||3).map(newHeat)};r.main=null;}
+  else if(k==='main'){const r=t.rounds[+d.r];const ch=r.main;const st=ch.stages[+d.s];if(st.heats.some(hasRes)&&!(await ask('이 단계의 결과가 초기화됩니다.','재편성',true)))return;const pool=st.heats.flatMap(h=>act(t,h));st.heats=makeGroups(pool,ch.size).map(newHeat);ch.stages.splice(+d.s+1);ch.done=false;}
+  else if(k==='f1'){const f=t.finals;if(f.stage1.heats.some(hasRes)&&!(await ask('결승라운드 1차 결과가 초기화됩니다.','재편성',true)))return;const pool=f.stage1.heats.flatMap(h=>act(t,h));f.stage1={heats:makeGroups(pool,f.size).map(newHeat)};f.upper=null;f.lower=null;}
+  autoProgress(t);saveTour(t);toast('조를 재편성했습니다');
+};
+ACT.setSize=async d=>{
+  const t=T(d);const r=t.rounds[+d.r];const n=+d.v;const k=d.k;
+  if(k==='repPre'){r.repSize=n;saveTour(t);return;}
+  if(k==='mainPre'){r.mainSize=n;saveTour(t);return;}
+  if(k==='qual'){if(r.size===n)return;if(r.qual.heats.some(hasRes)&&!(await ask(`예선을 ${n}인 1조로 다시 편성하면 입력된 예선 결과가 초기화됩니다.`,'다시 편성',true)))return;
+    r.size=n;if(!r.repSize||r.repSize===(r.size===3?2:3))r.repSize=n;const pool=r.qual.heats.flatMap(h=>act(t,h));r.qual={heats:makeGroups(pool,n).map(newHeat)};r.rep=null;r.main=null;}
+  else if(k==='rep'){if(r.repSize===n&&r.rep)return;if(r.rep.heats.some(hasRes)&&!(await ask(`패자부활전을 ${n}인 1조로 다시 편성하면 결과가 초기화됩니다.`,'다시 편성',true)))return;
+    r.repSize=n;const pool=r.rep.heats.flatMap(h=>act(t,h));r.rep={heats:makeGroups(pool,n).map(newHeat)};}
+  else if(k==='main'){const ch=r.main;const si=ch.stages.length-1;const st=ch.stages[si];if(ch.size===n)return;
+    if(st.heats.some(hasRes)&&!(await ask(`본선 현재 단계를 ${n}인 1조로 다시 편성하면 이 단계 결과가 초기화됩니다.`,'다시 편성',true)))return;
+    ch.size=n;r.mainSize=n;const pool=st.heats.flatMap(h=>act(t,h));st.heats=makeGroups(pool,n).map(newHeat);}
+  autoProgress(t);saveTour(t);toast(`${n}인 1조로 편성했습니다`);
+};
+ACT.startRep=d=>{const t=T(d);const r=t.rounds[+d.r];const pool=qualLosers(t,r);if(!pool.length){toast('패자부활전 대상자가 없습니다');return;}r.rep={heats:makeGroups(pool,r.repSize||r.size||3).map(newHeat)};saveTour(t);};
+ACT.cancelRep=async d=>{const t=T(d);const r=t.rounds[+d.r];if(r.rep.heats.some(hasRes)&&!(await ask('패자부활전을 취소할까요? 입력된 결과가 삭제됩니다.','취소',true)))return;r.rep=null;saveTour(t);};
+ACT.startMain=d=>{
+  const t=T(d);const r=t.rounds[+d.r];
+  const pool=qualWinners(t,r).concat(r.rep?r.rep.heats.flatMap(x=>winners(t,x)):[]);
+  if(!pool.length){toast('본선 진출자가 없습니다. (이 라운드는 결승 진출자 없음)');}
+  r.main=chainStart(t,pool,r.mainSize||t.opt.mainSize||3,r.qualCount||2);saveTour(t);
+};
+ACT.setQC=d=>{const t=T(d);const r=t.rounds[+d.r];const n=+d.v;r.qualCount=n;if(r.main){r.main.N=n;}saveTour(t);};
+ACT.nextRound=d=>{const t=T(d);if(startRound(t)){saveTour(t);S.tab[t.id]='r'+(t.rounds.length-1);render();}};
+ACT.toFinals=d=>{S.tab[d.t]='fin';const t=S.tours[d.t];if(t&&t.rounds.length<t.opt.rounds){const tt=clone(t);tt.opt.rounds=tt.rounds.length;saveTour(tt);}else render();};
+ACT.fsize=d=>{S.tab['fs'+d.t]=+d.v;render();};
+ACT.setFSize=async d=>{
+  const t=T(d);const f=t.finals;const n=+d.v;
+  if(d.k==='f1'){
+    if(f.size===n||f.upper)return;
+    if(f.stage1.heats.some(hasRes)&&!(await ask(`결승라운드 1차를 ${n}인 1조로 다시 편성하면 입력된 결과가 초기화됩니다.`,'다시 편성',true)))return;
+    const pool=f.stage1.heats.flatMap(h=>act(t,h));
+    if(pool.length<=3){f.stage1=null;f.upper={size:n,N:null,stages:[{kind:'rank',heats:[newHeat(shuffle(pool))]}],done:false,result:[]};}
+    else f.stage1={heats:makeGroups(pool,n).map(newHeat)};
+    f.size=n;t.opt.finalSize=n;
+  }else{
+    const ch=d.k==='up'?f.upper:f.lower;const si=+d.s;const st=ch.stages[si];if(!st||st.kind!=='adv'||ch.size===n)return;
+    if(st.heats.some(hasRes)&&!(await ask(`이 단계를 ${n}인 1조로 다시 편성하면 결과가 초기화됩니다.`,'다시 편성',true)))return;
+    ch.size=n;const pool=st.heats.flatMap(h=>act(t,h));st.heats=makeGroups(pool,n).map(newHeat);ch.stages.splice(si+1);ch.done=false;
+  }
+  autoProgress(t);saveTour(t);toast(`${n}인 1조로 편성했습니다`);
+};
+ACT.makeFinals=d=>{
+  const t=T(d);const F=allFinalists(t);if(!F.length)return;
+  const size=S.tab['fs'+t.id]||t.opt.finalSize||3;t.opt.finalSize=size;
+  const f={size,stage1:null,upper:null,lower:null};
+  if(F.length<=3)f.upper={size,N:null,stages:[{kind:'rank',heats:[newHeat(shuffle(F))]}],done:false,result:[]};
+  else f.stage1={heats:makeGroups(F,size).map(newHeat)};
+  t.finals=f;autoProgress(t);saveTour(t);
+};
+ACT.resetFinals=async d=>{if(!(await ask('결승라운드 대진과 결과를 모두 초기화할까요?','초기화',true)))return;const t=T(d);t.finals=null;t.result=null;if(t.status==='done')t.status='active';saveTour(t);};
+
+/* 포인트전 */
+ACT.cell=d=>{
+  const t=S.tours[d.t];const a=d.a,b=d.b;const cur=cellVal(t,a,b);
+  openModal(`<h3>${nmHTML(t.people[a])} <span class="muted" style="font-weight:500">vs</span> ${nmHTML(t.people[b])}</h3><div class="small muted" style="margin-bottom:10px">${esc(t.people[a].name)} 기준 결과를 선택하세요</div>
+    <div class="opt" style="flex-direction:column">${MOPT.map(o=>`<button class="${cur===o[0]?'on':''}" style="text-align:left;padding:13px 16px;font-size:17px" data-act="setMatch" data-t="${t.id}" data-a="${a}" data-b="${b}" data-v="${o[0]}">${o[1]}${o[0]==='W'?' (2점 / 상대 1점)':o[0]==='L'?' (1점 / 상대 2점)':o[0]==='D'?' (0점 / 상대 2점)':o[0]==='DD'?' (둘 다 0점)':''}</button>`).join('')}</div>
+    <div class="mact"><button class="btn" data-act="close">닫기</button></div>`);
+};
+ACT.setMatch=d=>{
+  const t=T(d);const a=d.a,b=d.b,k=mkey(a,b);
+  if(t.pts.seeds){toast('본선이 시작되어 수정할 수 없습니다');closeModal();return;}
+  const map={W:[ 'W','L'],L:['L','W'],D:['D','W'],DD:['D','D']}[d.v];
+  if(!map)delete t.pts.res[k];else t.pts.res[k]={[a]:map[0],[b]:map[1]};
+  closeModal();saveTour(t);
+};
+ACT.tieMv=d=>{
+  const t=T(d);const st=standings(t);const i=st.findIndex(s=>s.pid===d.p);const j=i+(+d.v);
+  if(j<0||j>=st.length)return;
+  if(st[i].pts!==st[j].pts){toast('동점자끼리만 순위를 조정할 수 있습니다. (본선 시작 후 시드 조정 가능)');return;}
+  const order=st.map(s=>s.pid);[order[i],order[j]]=[order[j],order[i]];t.pts.tie=order;saveTour(t);
+};
+ACT.startSurv=async d=>{
+  const t=T(d);const n=activeList(t).length;
+  if(n<2){toast('참가자가 부족합니다');return;}
+  if(playedMatches(t)<totalMatches(t)&&!(await ask(`아직 ${totalMatches(t)-playedMatches(t)}경기가 남았습니다. 현재 순위로 본선을 시작할까요?`,'본선 시작')))return;
+  t.pts.seeds=standings(t).map(s=>s.pid);t.pts.heats=[];t.pts.final=null;svProgress(t);S.tab[t.id]='surv';saveTour(t);
+};
+ACT.seedMv=d=>{const t=T(d);const P=t.pts;const i=P.seeds.indexOf(d.p),j=i+(+d.v);if(j<0||j>=P.seeds.length)return;[P.seeds[i],P.seeds[j]]=[P.seeds[j],P.seeds[i]];P.heats=[];P.final=null;svProgress(t);saveTour(t);};
+ACT.resetSurv=async d=>{if(!(await ask('본선 서바이벌을 초기화하고 1단계 리그로 돌아갈까요?','초기화',true)))return;const t=T(d);t.pts.seeds=null;t.pts.heats=[];t.pts.final=null;t.result=null;if(t.status==='done')t.status='active';S.tab[t.id]='league';saveTour(t);};
+async function svTruncate(t,idx){
+  const P=t.pts;const later=P.heats.slice(idx+1);const has=later.some(h=>h.elim.length)||(P.final&&hasRes(P.final));
+  if(has&&!(await ask('이후 진행된 경기 결과가 초기화됩니다. 계속할까요?','초기화하고 변경',true)))return false;
+  P.heats.splice(idx+1);P.final=null;return true;
+}
+function svAdvList(t,h){const a=act(t,h);if(h.adv)return h.adv.filter(p=>a.includes(p));return svHeatDone(t,h)&&h.elim.length?a.filter(p=>!h.elim.includes(p)):[];}
+function svApply(t,h){
+  const a=act(t,h);const nAdv=Math.max(0,a.length-h.elimCount);
+  h.adv=(h.adv||[]).filter(p=>a.includes(p)).slice(0,nAdv);
+  if(nAdv>0&&h.adv.length===nAdv){const rest=a.filter(p=>!h.adv.includes(p));if(!(h.elim.length===rest.length&&rest.every(p=>h.elim.includes(p))))h.elim=rest;}
+  else h.elim=[];
+}
+ACT.svAdv=async d=>{
+  const t=T(d);const P=t.pts;const idx=P.heats.findIndex(h=>h.id===d.h);const h=P.heats[idx];
+  if(!(await svTruncate(t,idx)))return;
+  if(!h.adv)h.adv=svAdvList(t,h);
+  const a=act(t,h);const nAdv=Math.max(0,a.length-h.elimCount);
+  const i=h.adv.indexOf(d.p);
+  if(i>=0)h.adv.splice(i,1);
+  else{if(h.adv.length>=nAdv){toast(`진출 인원은 ${nAdv}명입니다. 다른 선수를 먼저 해제하세요.`);return;}h.adv.push(d.p);}
+  svApply(t,h);svProgress(t);saveTour(t);
+};
+ACT.svCount=async d=>{const t=T(d);const P=t.pts;const idx=P.heats.findIndex(h=>h.id===d.h);const h=P.heats[idx];if(!(await svTruncate(t,idx)))return;if(!h.adv)h.adv=svAdvList(t,h);h.elimCount=+d.v;svApply(t,h);svProgress(t);saveTour(t);};
+ACT.svSwap=async d=>{const t=T(d);const P=t.pts;const idx=P.heats.findIndex(h=>h.id===d.h);const h=P.heats[idx];if(!(await svTruncate(t,idx)))return;h.elim.reverse();svProgress(t);saveTour(t);};
+ACT.svReset=async d=>{
+  const t=T(d);const P=t.pts;
+  if(P.final&&P.final.id===d.h){if(!(await ask('결승 결과를 초기화하고 재경기할까요?','재경기',true)))return;P.final.res={};svProgress(t);saveTour(t);return;}
+  const idx=P.heats.findIndex(h=>h.id===d.h);if(idx<0)return;
+  if(!(await ask('이 경기와 이후 경기 결과를 초기화하고 재경기할까요?','재경기',true)))return;
+  P.heats[idx].elim=[];P.heats[idx].adv=[];P.heats.splice(idx+1);P.final=null;svProgress(t);saveTour(t);
+};
+
+/* 대회 관리 */
+ACT.editTour=d=>{
+  const t=S.tours[d.t];if(!t)return;
+  S._et={rounds:t.opt?t.opt.rounds:3,qualCount:t.opt?t.opt.qualCount||2:2,size:t.opt?t.opt.qualSize||3:3,kind:t.kind||'tournament'};
+  etRender(t);
+};
+function etRender(t){
+  const E=S._et;
+  const ob=(k,vals,dis)=>`<div class="opt">${vals.map(v=>`<button class="${E[k]===v[0]?'on':''}" ${dis&&dis(v[0])?'disabled':''} data-act="etOpt" data-t="${t.id}" data-k="${k}" data-v="${v[0]}">${v[1]}</button>`).join('')}</div>`;
+  const nm=($('#et-name')||{}).value, dt=($('#et-date')||{}).value;
+  let body='';
+  if(t.type==='tournament'){
+    const minR=Math.max(2,t.rounds.length);const fin=!!t.finals;
+    body=`<div class="fld"><label>라운드 수 ${fin?'<span class="muted">(결승라운드 진행 중에는 변경 불가)</span>':`<span class="muted">(현재 ${t.rounds.length}라운드 진행)</span>`}</label>${ob('rounds',[[2,'2회'],[3,'3회'],[4,'4회'],[5,'5회']],v=>fin||v<minR)}</div>
+      <div class="fld"><label>라운드별 결승라운드 진출 인원 <span class="muted">(진행 중인 라운드 본선과 이후 라운드에 적용)</span></label>${ob('qualCount',[[1,'1명'],[2,'2명']])}</div>
+      <div class="fld"><label>조 구성 <span class="muted">(다음에 편성되는 경기부터 적용)</span></label>${ob('size',[[3,'3인 1조'],[2,'2인 1조']])}</div>`;
+  }else if(t.type==='record'){
+    const pv=r=>{const el=$('#et-p'+r);if(el)return el.value;const o=(t.result||[]).find(x=>x.rank===r);return o?(o.nick&&o.nick!==o.name?o.name+'/'+o.nick:o.name):'';};
+    body=`<div class="fld"><label>진행 방식</label>${ob('kind',[['tournament','토너먼트'],['points','포인트전']])}</div>
+      <div class="fld"><label>입상자 <span class="muted">(이름 또는 이름/닉네임, 비우면 해당 순위 없음)</span></label>
+      ${[1,2,3,4].map(r=>`<div class="row" style="margin-bottom:6px;flex-wrap:nowrap">${medal(r)}<input id="et-p${r}" value="${esc(pv(r))}" placeholder="${r}위" style="flex:1;border:1px solid #d5d9df;border-radius:10px;padding:9px 12px"></div>`).join('')}</div>`;
+  }
+  openModal(`<h3>대회수정</h3>
+    <div class="fld"><label>대회명</label><input id="et-name" value="${esc(nm!=null?nm:t.name)}"></div>
+    <div class="fld"><label>일자</label>${dateField('et-date',dt!=null?dt:t.date)}</div>
+    ${body}
+    <div class="mact"><button class="btn" data-act="close">취소</button><button class="btn pri" data-act="etSave" data-t="${t.id}">저장</button></div>`);
+}
+ACT.etOpt=d=>{let v=d.v;if(/^\d+$/.test(v))v=+v;S._et[d.k]=v;etRender(S.tours[d.t]);};
+ACT.etSave=d=>{
+  const t=T(d);const E=S._et;
+  const name=$('#et-name').value.trim();if(!name){toast('대회명을 입력하세요');return;}
+  const dv=($('#et-date').value||'').trim();const nd=dv?normDate(dv):t.date;if(!nd){toast('일자를 확인하세요 (예: 2026-11-22)');return;}
+  t.name=name;t.date=nd;
+  if(t.type==='tournament'){
+    if(!t.finals)t.opt.rounds=Math.max(E.rounds,t.rounds.length);
+    t.opt.qualCount=E.qualCount;
+    const R=t.rounds[t.rounds.length-1];
+    if(R&&!t.finals&&(!R.main||!R.main.done)){R.qualCount=E.qualCount;if(R.main)R.main.N=E.qualCount;}
+    if(E.size!==t.opt.qualSize){
+      t.opt.qualSize=t.opt.mainSize=t.opt.finalSize=E.size;
+      if(R&&!t.finals){if(!R.rep)R.repSize=E.size;if(!R.main)R.mainSize=E.size;}
+      S.tab['fs'+t.id]=E.size;
+    }
+    autoProgress(t);
+  }else if(t.type==='record'){
+    t.kind=E.kind;
+    const people={},active=[],result=[];
+    (t.result||[]).filter(o=>o.rank>4).forEach(o=>{result.push(o);people[o.pid]=t.people[o.pid]||{name:o.name,nick:o.nick};active.push(o.pid);});
+    [1,2,3,4].forEach(r=>{const p=parsePlacer($('#et-p'+r).value);if(!p)return;const old=(t.result||[]).find(o=>o.rank===r&&o.name===p.name&&o.nick===p.nick);const pid=old?old.pid:'r'+r+uid();people[pid]={name:p.name,nick:p.nick};active.push(pid);result.push({pid,rank:r,name:p.name,nick:p.nick,dq:false});});
+    result.sort((a,b)=>a.rank-b.rank);t.people=people;t.active=active;t.removed=[];t.result=result;
+  }
+  S._et=null;closeModal();saveTour(t);toast('대회 정보를 수정했습니다');
+};
+ACT.cancelTour=async d=>{if(!(await ask('대회를 취소할까요?\n취소된 대회는 명예의 전당에 반영되지 않습니다.','대회 취소',true)))return;const t=T(d);t.status='cancelled';saveTour(t);toast('대회가 취소되었습니다');};
+ACT.restoreTour=d=>{const t=T(d);t.status=t.result?'done':'active';saveTour(t);toast('취소를 철회했습니다');};
+ACT.delTour=async d=>{const t=S.tours[d.t];if(!t)return;if(!(await ask(`'${t.name}' 대회를 삭제할까요?\n기록과 명예의 전당 반영분이 함께 삭제됩니다.`,'삭제',true)))return;delTour(d.t);if(route()==='t-'+d.t)go('tours');toast('삭제했습니다');};
+ACT.qr=d=>{const t=S.tours[d.t];const host=d.m==='host';const u=tourUrl(d.t,host);
+  openModal(`<h3>${esc(t.name)} · 실시간 대진표</h3>
+  ${canEdit()?`<div class="opt" style="margin-bottom:10px"><button class="${host?'':'on'}" data-act="qr" data-t="${t.id}" data-m="watch">관람모드 링크</button><button class="${host?'on':''}" data-act="qr" data-t="${t.id}" data-m="host">진행자용 링크</button></div>`:''}
+  <div class="qrbox"><div class="qr" id="qr-tour" data-qr="${esc(u)}" data-sz="240"></div><div class="small muted">${host?'진행자용: 편집 권한이 있는 사람은 결과를 입력할 수 있습니다.':'관람모드: 진행 버튼이 숨겨진 상태로 실시간 진행 상황을 볼 수 있습니다.'}</div><input readonly value="${esc(u)}" style="width:100%;border:1px solid #d5d9df;border-radius:10px;padding:9px;font-size:14px" onclick="this.select()"></div>
+  <div class="mact"><button class="btn" data-act="copyUrl" data-u="${esc(u)}">링크 복사</button><button class="btn dark" data-act="saveQR" data-q="qr-tour" data-n="${esc(t.name)}_QR${host?'_진행자':''}">QR 이미지 저장</button><button class="btn pri" data-act="close">닫기</button></div>`);};
+ACT.saveQR=async d=>{
+  const el=document.getElementById(d.q);if(!el){toast('QR을 찾을 수 없습니다');return;}
+  const c=el.querySelector('canvas'),img=el.querySelector('img');
+  let src=c&&c.width?c:null;
+  const pad=24,sz=src?src.width:(img&&img.naturalWidth)||240;
+  const out=document.createElement('canvas');out.width=sz+pad*2;out.height=sz+pad*2;const g=out.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,out.width,out.height);
+  try{if(src)g.drawImage(src,pad,pad);else if(img)g.drawImage(img,pad,pad,sz,sz);else throw new Error('no qr');}catch(e){toast('QR 이미지를 만들 수 없습니다');return;}
+  out.toBlob(b=>{if(b)saveFile((d.n||'QR').replace(/[\\/:*?"<>|]/g,'_')+'.png',b);else toast('QR 이미지를 만들 수 없습니다');},'image/png');
+};
+ACT.copyUrl=async d=>{try{await navigator.clipboard.writeText(d.u);toast('링크를 복사했습니다');}catch(e){toast('복사가 안되면 주소 칸을 길게 눌러 복사하세요');}};
+
+/* 참가자 추가/제외 (진행 중) */
+ACT.pm=d=>{S.modalRender=()=>pmRender(d.t);pmRender(d.t);};
+function pmRender(tid){
+  const t=S.tours[tid];if(!t)return closeModal();
+  const act=activeList(t),rm=t.removed||[];
+  const others=S.players.filter(p=>!t.active.includes(p.id)).sort((a,b)=>a.name.localeCompare(b.name,'ko'));
+  const q=($('#pm-q')||{}).value||'';
+  openModal(`<h3>참가자 추가 / 제외</h3>
+    <div class="small muted" style="margin-bottom:8px">제외된 선수는 남은 경기·다음 라운드·결승에서 빠집니다. 추가된 선수는 진행 중인 예선(또는 다음 라운드)에 편성됩니다.</div>
+    <div style="font-weight:900;margin:8px 0 4px">참가 중 (${act.length})</div>
+    <div class="pick" style="max-height:220px">${act.map(p=>`<div class="row" style="padding:8px 12px;border-bottom:1px solid #f0f1f3">${tn(t,p)}<span class="sp"></span><button class="btn sm red" data-act="pmRemove" data-t="${tid}" data-p="${p}">제외</button></div>`).join('')}</div>
+    ${rm.length?`<div style="font-weight:900;margin:12px 0 4px">제외됨 (${rm.length})</div><div class="pick" style="max-height:150px">${rm.map(p=>`<div class="row" style="padding:8px 12px;border-bottom:1px solid #f0f1f3;opacity:.7">${tn(t,p)}<span class="sp"></span><button class="btn sm" data-act="pmRestore" data-t="${tid}" data-p="${p}">복귀</button></div>`).join('')}</div>`:''}
+    <div style="font-weight:900;margin:12px 0 4px">명단에서 추가</div>
+    <div class="row" style="margin-bottom:6px"><input id="pm-q" value="${esc(q)}" placeholder="검색" style="flex:1;border:1px solid #d5d9df;border-radius:10px;padding:8px 12px"><button class="btn sm" data-act="pmNew" data-t="${tid}">+ 새 선수</button></div>
+    <div class="pick" id="pm-add" style="max-height:200px">${others.length?others.map(p=>`<div class="row pmr" data-s="${esc((p.name+' '+p.nick).toLowerCase())}" style="padding:8px 12px;border-bottom:1px solid #f0f1f3">${nmHTML(p)}<span class="sp"></span><button class="btn sm blue" data-act="pmAdd" data-t="${tid}" data-p="${p.id}">추가</button></div>`).join(''):'<div class="empty small">추가할 선수가 없습니다</div>'}</div>
+    <div class="mact"><button class="btn pri" data-act="close">완료</button></div>`);
+  if(q){const ev=new Event('input',{bubbles:true});$('#pm-q').dispatchEvent(ev);}
+}
+function addToTour(t,pid){
+  const p=S.players.find(x=>x.id===pid);if(!p)return;
+  t.people[pid]={name:p.name,nick:p.nick||'',team:p.team||''};
+  if(!t.active.includes(pid))t.active.push(pid);
+  t.removed=(t.removed||[]).filter(x=>x!==pid);
+  let msg='참가자를 추가했습니다';
+  if(t.type==='tournament'&&!t.finals){
+    const r=t.rounds[t.rounds.length-1];
+    if(r&&!r.main){
+      r.rep=null;
+      const hs=r.qual.heats;const last=hs[hs.length-1];
+      if(last&&act(t,last).length<3)last.players.push(pid);else hs.push(newHeat([pid]));
+      msg='현재 라운드 예선에 편성했습니다 (필요시 재편성)';
+    }else msg='다음 라운드부터 편성됩니다';
+  }else if(t.type==='points'&&t.pts.seeds)msg='본선이 시작되어 리그 기록에만 추가됩니다';
+  else if(t.type==='tournament'&&t.finals)msg='결승라운드가 진행 중이라 대진에는 반영되지 않습니다';
+  toast(msg);
+}
+ACT.pmAdd=d=>{const t=T(d);addToTour(t,d.p);autoProgress(t);saveTour(t);pmRender(d.t);};
+ACT.pmRemove=d=>{const t=T(d);t.removed=(t.removed||[]).filter(x=>x!==d.p);t.removed.push(d.p);autoProgress(t);saveTour(t);pmRender(d.t);toast('제외했습니다');};
+ACT.pmRestore=d=>{const t=T(d);t.removed=(t.removed||[]).filter(x=>x!==d.p);autoProgress(t);saveTour(t);pmRender(d.t);toast('복귀했습니다');};
+ACT.pmNew=d=>playerModal(null,p=>{const t=clone(S.tours[d.t]);addToTour(t,p.id);autoProgress(t);saveTour(t);pmRender(d.t);});
+
+/* 선수 */
+function playerModal(id,after){
+  const p=id?S.players.find(x=>x.id===id):{name:'',nick:'',team:'',memo:''};
+  openModal(`<h3>${id?'선수 수정':'선수 등록'}</h3>
+    <div class="fld"><label>선수이름 *</label><input id="pf-name" value="${esc(p.name)}"></div>
+    <div class="fld"><label>닉네임</label><input id="pf-nick" value="${esc(p.nick)}" placeholder="비우면 이름과 동일"></div>
+    <div class="fld"><label>소속</label><input id="pf-team" value="${esc(p.team)}"></div>
+    <div class="fld"><label>메모</label><input id="pf-memo" value="${esc(p.memo)}"></div>
+    <div class="mact"><button class="btn" data-act="close">취소</button><button class="btn pri" data-act="savePlayer" data-p="${id||''}">저장</button></div>`);
+  S._afterPlayer=after||null;
+  setTimeout(()=>{const i=$('#pf-name');i&&i.focus();},50);
+}
+ACT.plSort=d=>{const so=S.tab.plSort||{k:'name',dir:1};S.tab.plSort=so.k===d.k?{k:d.k,dir:-so.dir}:{k:d.k,dir:1};render();};
+ACT.plSortDir=()=>{const so=S.tab.plSort||{k:'name',dir:1};S.tab.plSort={k:so.k,dir:-so.dir};render();};
+ACT.editPlayer=d=>playerModal(d.p||null);
+ACT.savePlayer=d=>{
+  const name=$('#pf-name').value.trim();if(!name){toast('선수이름을 입력하세요');return;}
+  const nick=$('#pf-nick').value.trim()||name,team=$('#pf-team').value.trim(),memo=$('#pf-memo').value.trim();
+  const list=S.players.slice();let p;
+  if(d.p){const i=list.findIndex(x=>x.id===d.p);p=Object.assign({},list[i],{name,nick,team,memo});list[i]=p;}
+  else{if(list.some(x=>x.name===name&&x.nick===nick)){toast('같은 이름·닉네임의 선수가 이미 있습니다');return;}p={id:uid(),name,nick,team,memo};list.push(p);}
+  const after=S._afterPlayer;S._afterPlayer=null;closeModal();savePlayers(list);toast('저장했습니다');after&&after(p);
+};
+ACT.delPlayer=async d=>{const p=S.players.find(x=>x.id===d.p);if(!p)return;if(!(await ask(`'${p.name}' 선수를 명단에서 삭제할까요?\n(지난 대회 기록은 유지됩니다)`,'삭제',true)))return;savePlayers(S.players.filter(x=>x.id!==d.p));};
+ACT.expPlayers=async d=>{
+  const rows=S.players.slice().sort((a,b)=>a.name.localeCompare(b.name,'ko')).map(p=>({'선수이름':p.name,'닉네임':p.nick||'','소속':p.team||'','메모':p.memo||''}));
+  try{
+    const X=await needXLSX();const ws=X.utils.json_to_sheet(rows,{header:['선수이름','닉네임','소속','메모']});
+    if(d.v==='csv'){await saveFile(`JJNB_선수명단_${today()}.csv`,'﻿'+X.utils.sheet_to_csv(ws));}
+    else{const wb=X.utils.book_new();ws['!cols']=[{wch:12},{wch:14},{wch:14},{wch:30}];X.utils.book_append_sheet(wb,ws,'선수명단');await saveFile(`JJNB_선수명단_${today()}.xlsx`,new Uint8Array(X.write(wb,{bookType:'xlsx',type:'array'})));}
+  }catch(e){toast('내보내기 실패: '+e.message);}
+};
+async function readSheetFile(file){
+  const X=await needXLSX();
+  let wb;
+  if(/\.csv$/i.test(file.name)||file.type==='text/csv'){const txt=await file.text();wb=X.read(txt.replace(/^﻿/,''),{type:'string'});}
+  else wb=X.read(new Uint8Array(await file.arrayBuffer()),{type:'array'});
+  return wb;
+}
+function pickCol(row,names){for(const n of names){for(const k of Object.keys(row)){if(k.replace(/\s/g,'').toLowerCase()===n)return String(row[k]==null?'':row[k]).trim();}}return '';}
+ACT.impPlayers=()=>pickFile('.xlsx,.xls,.csv',async file=>{
+  try{
+    const X=await needXLSX();const wb=await readSheetFile(file);const ws=wb.Sheets[wb.SheetNames[0]];
+    const rows=X.utils.sheet_to_json(ws,{defval:''});
+    const parsed=rows.map(r=>({name:pickCol(r,['선수이름','이름','선수명','name']),nick:pickCol(r,['닉네임','별명','nick','nickname']),team:pickCol(r,['소속','팀','team']),memo:pickCol(r,['메모','비고','memo','note'])})).filter(r=>r.name);
+    if(!parsed.length){toast('선수이름 열을 찾을 수 없습니다');return;}
+    parsed.forEach(r=>{if(!r.nick)r.nick=r.name;});
+    showImport(parsed,'파일');
+  }catch(e){toast('파일을 읽을 수 없습니다: '+e.message);}
+});
+function showImport(parsed,src){
+    S._imp=parsed;
+    const exist=parsed.filter(r=>S.players.some(p=>p.name===r.name&&p.nick===r.nick)).length;
+    openModal(`<h3>선수 명단 가져오기</h3><div>${src}에서 <b>${parsed.length}명</b>을 읽었습니다. (기존 명단과 일치 ${exist}명)</div>
+      <div class="pick" style="max-height:220px;margin:10px 0">${parsed.slice(0,200).map(r=>`<div style="padding:7px 12px;border-bottom:1px solid #f0f1f3">${nmHTML(r)} <span class="small muted">${esc(r.team)}</span></div>`).join('')}</div>
+      <div class="fld"><label>가져오기 방식</label><div class="opt" id="imp-mode"><button class="on" data-act="impMode" data-v="merge">병합 (추가·갱신)</button><button data-act="impMode" data-v="replace">전체 교체</button></div></div>
+      <div class="small muted">병합: 이름+닉네임이 같으면 소속·메모를 갱신하고, 없으면 추가합니다.</div>
+      <div class="mact"><button class="btn" data-act="close">취소</button>${src==='텍스트'?'<button class="btn" data-act="bulkText">← 다시 입력</button>':''}<button class="btn pri" data-act="impDone">완료</button></div>`);
+    S._impMode='merge';
+}
+function parseBulk(txt){
+  return txt.split(/\r?\n/).map(l=>l.trim()).filter(l=>l&&!/^#/.test(l)).map(l=>{
+    let f=l.indexOf('\t')>=0?l.split('\t'):l.indexOf(',')>=0?l.split(','):l.split('/');
+    f=f.map(x=>x.trim());
+    return {name:f[0]||'',nick:f[1]||f[0]||'',team:f[2]||'',memo:f.slice(3).join(', ')};
+  }).filter(r=>r.name&&!/^(선수)?이름$/.test(r.name));
+}
+ACT.bulkText=()=>{
+  openModal(`<h3>텍스트로 선수 일괄 입력</h3>
+    <div class="small muted" style="margin-bottom:8px">한 줄에 한 명씩 <b>이름, 닉네임, 소속, 메모</b> 순서로 입력하세요.<br>쉼표(,) · 슬래시(/) · 탭으로 구분하며, 이름만 써도 됩니다 (닉네임은 이름과 동일).<br>엑셀·구글 시트에서 칸을 복사해 그대로 붙여넣어도 됩니다.</div>
+    <textarea id="bulk-ta" rows="10" style="width:100%;border:1px solid #d5d9df;border-radius:10px;padding:10px 12px;font-size:16px;line-height:1.6" placeholder="이정채, 규아빠, JJNB, 메모\n홍길동, 길동이, 진주팀\n김철수">${esc(S._bulkTxt||'')}</textarea>
+    <div class="small muted" id="bulk-cnt" style="margin-top:4px">0명</div>
+    <div class="mact"><button class="btn" data-act="close">취소</button><button class="btn pri" data-act="bulkNext">다음 (미리보기)</button></div>`);
+  const ta=$('#bulk-ta');const upd=()=>{S._bulkTxt=ta.value;$('#bulk-cnt').textContent=parseBulk(ta.value).length+'명 인식';};
+  ta.addEventListener('input',upd);upd();setTimeout(()=>ta.focus(),50);
+};
+ACT.bulkNext=()=>{
+  const rows=parseBulk($('#bulk-ta').value);
+  if(!rows.length){toast('입력된 선수가 없습니다');return;}
+  showImport(rows,'텍스트');
+};
+ACT.impMode=(d,b)=>{S._impMode=d.v;b.parentNode.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));};
+ACT.impDone=()=>{
+  const rows=S._imp||[];let list;
+  if(S._impMode==='replace'){list=rows.map(r=>{const ex=S.players.find(p=>p.name===r.name&&p.nick===r.nick);return {id:ex?ex.id:uid(),name:r.name,nick:r.nick,team:r.team,memo:r.memo};});}
+  else{list=S.players.map(p=>Object.assign({},p));rows.forEach(r=>{const ex=list.find(p=>p.name===r.name&&p.nick===r.nick);if(ex){ex.team=r.team||ex.team;ex.memo=r.memo||ex.memo;}else list.push({id:uid(),name:r.name,nick:r.nick,team:r.team,memo:r.memo});});}
+  const seen=new Set();list=list.filter(p=>{const k=p.name+'|'+p.nick;if(seen.has(k))return false;seen.add(k);return true;});
+  S._imp=null;S._bulkTxt='';closeModal();savePlayers(list);toast(`선수 명단을 업데이트했습니다 (${list.length}명)`);
+};
+
+/* 대회 결과 내보내기/가져오기 */
+ACT.expResults=async()=>{
+  try{
+    const X=await needXLSX();
+    const tours=sortedTours();
+    const nmT=o=>o?(o.name+(o.nick?' / '+o.nick:'')):'';
+    const rows=tours.map(t=>{const g=r=>nmT((t.result||[]).find(x=>x.rank===r));return {'대회ID':t.id,'대회명':t.name,'일자':t.date,'방식':kindLabel(tKind(t))||'기록','상태':t.status==='done'?'종료':t.status==='cancelled'?'취소':'진행중','참가인원':activeList(t).length,'1위':g(1),'2위':g(2),'3위':g(3),'4위':g(4),'전체순위':(t.result||[]).filter(o=>o.rank).map(o=>o.rank+'. '+nmT(o)).join(', ')};});
+    const wb=X.utils.book_new();const ws=X.utils.json_to_sheet(rows);ws['!cols']=[{wch:14},{wch:22},{wch:12},{wch:10},{wch:8},{wch:8},{wch:16},{wch:16},{wch:16},{wch:16},{wch:60}];
+    X.utils.book_append_sheet(wb,ws,'대회결과');
+    const data=[];tours.forEach(t=>{const j=JSON.stringify(t);for(let i=0,k=0;i<j.length;i+=30000,k++)data.push({id:t.id,part:k,data:j.slice(i,i+30000)});});
+    X.utils.book_append_sheet(wb,X.utils.json_to_sheet(data),'_data');
+    await saveFile(`JJNB_대회결과_${today()}.xlsx`,new Uint8Array(X.write(wb,{bookType:'xlsx',type:'array'})));
+  }catch(e){toast('내보내기 실패: '+e.message);}
+};
+function dateField(id,v){return `<div class="row" style="gap:6px;flex-wrap:nowrap"><input id="${id}" value="${esc(v||'')}" placeholder="2026-11-22" inputmode="numeric" autocomplete="off" style="flex:1;min-width:0"><input type="date" id="${id}-p" value="${esc(normDate(v)||'')}" title="달력에서 선택" style="width:46px;flex-shrink:0;padding:8px 4px;color:transparent"></div><div class="small muted" style="margin-top:3px">직접 입력 (예: 2026-11-22, 20261122, 11/22) 또는 오른쪽 달력에서 선택</div>`;}
+function normDate(x){
+  x=String(x||'').trim();
+  const m8=x.match(/^(\d{4})(\d{2})(\d{2})$/);if(m8)return m8[1]+'-'+m8[2]+'-'+m8[3];
+  const m4=x.match(/^(\d{2})(\d{2})$/);if(m4)return new Date().getFullYear()+'-'+m4[1]+'-'+m4[2];
+  const m=String(x||'').trim().match(/^(\d{4})[.\-\/년\s]+(\d{1,2})[.\-\/월\s]+(\d{1,2})일?\.?$/);
+  if(m)return m[1]+'-'+m[2].padStart(2,'0')+'-'+m[3].padStart(2,'0');
+  const m2=String(x||'').trim().match(/^(\d{1,2})[.\-\/월\s]+(\d{1,2})일?\.?$/);
+  if(m2)return new Date().getFullYear()+'-'+m2[1].padStart(2,'0')+'-'+m2[2].padStart(2,'0');
+  return null;
+}
+function parseKind(x){x=String(x||'').replace(/\s/g,'').toLowerCase();if(/^(토너먼트|토너|t|tournament)$/.test(x))return 'tournament';if(/^(포인트전|포인트|p|points?)$/.test(x))return 'points';return null;}
+function parsePlacer(x){
+  x=String(x||'').trim();if(!x||x==='-')return null;
+  let name=x,nick='';
+  let m=x.match(/^(.+?)\s*[(（](.+?)[)）]$/);
+  if(m){name=m[1].trim();nick=m[2].trim();}
+  else if(x.indexOf('/')>=0){const f=x.split('/');name=f[0].trim();nick=f.slice(1).join('/').trim();}
+  if(!nick){const p=S.players.find(q=>q.name===name)||S.players.find(q=>q.nick===name);if(p){name=p.name;nick=p.nick;}}
+  return {name,nick:nick||name};
+}
+function parseResText(txt){
+  const out=[];
+  txt.split(/\r?\n/).map(l=>l.trim()).filter(l=>l&&!/^#/.test(l)).forEach(l=>{
+    let f=(l.indexOf('\t')>=0?l.split('\t'):l.split(',')).map(x=>x.trim());
+    let date=normDate(f[0]);
+    if(date)f=f.slice(1);else if(/^(일자|날짜|date)$/i.test(f[0]))return;else date=today();
+    const name=f[0];if(!name||/^대회명$/.test(name))return;
+    let kind=parseKind(f[1]);let rest=f.slice(1);if(kind)rest=f.slice(2);
+    const pl=rest.slice(0,4).map(parsePlacer);
+    if(!pl.some(Boolean))return;
+    out.push({date,name,kind,pl});
+  });
+  return out;
+}
+ACT.resText=()=>{
+  openModal(`<h3>텍스트로 대회 결과 입력</h3>
+    <div class="small muted" style="margin-bottom:8px">한 줄에 한 대회씩 <b>일자, 대회명, 방식, 1위, 2위, 3위, 4위</b> 순서로 입력하세요.<br>방식은 <b>토너먼트</b> 또는 <b>포인트전</b> (생략하면 아래 기본 방식 적용).<br>쉼표(,) 또는 탭으로 구분합니다. 선수는 <b>이름/닉네임</b> 또는 <b>이름(닉네임)</b>으로 쓰고,<br>이름만 쓰면 선수 명단에서 닉네임을 찾아 넣습니다. 일자를 빼면 오늘 날짜가 들어갑니다.</div>
+    <textarea id="rt-ta" rows="8" style="width:100%;border:1px solid #d5d9df;border-radius:10px;padding:10px 12px;font-size:16px;line-height:1.6" placeholder="2026-11-01, 11월 정기전, 토너먼트, 이정채/규아빠, 홍길동, 김철수, 박영희\n2026.10.18, 10월 번개, 포인트전, 홍길동(길동이), 이정채, 김철수">${esc(S._resTxt||'')}</textarea>
+    <div class="fld" style="margin-top:10px"><label>기본 방식 (방식을 적지 않은 줄)</label><div class="opt">${[['tournament','토너먼트'],['points','포인트전']].map(o=>`<button class="${(S._resKind||'tournament')===o[0]?'on':''}" data-act="resKind" data-v="${o[0]}">${o[1]}</button>`).join('')}</div></div>
+    <div class="small muted" id="rt-cnt" style="margin-top:4px">0건</div>
+    <div class="mact"><button class="btn" data-act="close">취소</button><button class="btn pri" data-act="resTextNext">다음 (미리보기)</button></div>`);
+  const ta=$('#rt-ta');const upd=()=>{S._resTxt=ta.value;$('#rt-cnt').textContent=parseResText(ta.value).length+'건 인식';};
+  ta.addEventListener('input',upd);upd();setTimeout(()=>ta.focus(),50);
+};
+ACT.resKind=(d,b)=>{S._resKind=d.v;b.parentNode.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));};
+ACT.resTextNext=()=>{
+  const rows=parseResText($('#rt-ta').value);
+  if(!rows.length){toast('인식된 대회 결과가 없습니다');return;}
+  rows.forEach(r=>{if(!r.kind)r.kind=S._resKind||'tournament';});
+  S._resRows=rows;
+  openModal(`<h3>대회 결과 미리보기 <small class="muted" style="font-weight:500">${rows.length}건</small></h3>
+    <div class="pick" style="max-height:320px">${rows.map(r=>`<div style="padding:9px 12px;border-bottom:1px solid #f0f1f3"><div>${r.kind==='points'?'<span class="badge pts">포인트전</span>':'<span class="badge tour">토너먼트</span>'} <b>${esc(r.name)}</b> <span class="small muted">${esc(r.date)}</span></div>
+      <div class="podium" style="margin-top:4px">${r.pl.map((p,i)=>p?`${medal(i+1)}<div>${nmHTML(p)}</div>`:'').join('')}</div></div>`).join('')}</div>
+    <div class="small muted" style="margin-top:8px">'종료' 상태의 기록으로 저장되어 명예의 전당에 반영됩니다.</div>
+    <div class="mact"><button class="btn" data-act="close">취소</button><button class="btn" data-act="resText">← 다시 입력</button><button class="btn pri" data-act="resTextDone">완료</button></div>`);
+};
+ACT.resTextDone=()=>{
+  const rows=S._resRows||[];
+  rows.forEach(r=>{
+    const people={},active=[],result=[];
+    r.pl.forEach((p,i)=>{if(!p)return;const pid='r'+(i+1)+uid();people[pid]={name:p.name,nick:p.nick};active.push(pid);result.push({pid,rank:i+1,name:p.name,nick:p.nick,dq:false});});
+    const t={id:uid(),name:r.name,date:r.date,type:'record',kind:r.kind,status:'done',createdAt:Date.now(),people,active,removed:[],result};
+    S.tours[t.id]=t;queueWrite('tournaments/'+t.id,{json:JSON.stringify(t),updatedAt:Date.now()});
+  });
+  S._resRows=null;S._resTxt='';closeModal();render();toast(`대회 결과 ${rows.length}건을 저장했습니다`);
+};
+ACT.hofRefresh=async()=>{
+  if(!(await ask('모든 대회의 결과를 대진표 기준으로 다시 계산하고,\n선수 명단의 최신 이름·닉네임으로 갱신해 명예의 전당에 다시 반영할까요?','재반영')))return;
+  let changed=0;
+  Object.values(S.tours).forEach(orig=>{
+    const t=clone(orig);
+    Object.keys(t.people||{}).forEach(pid=>{const p=S.players.find(x=>x.id===pid);if(p){t.people[pid].name=p.name;t.people[pid].nick=p.nick||p.name;}});
+    if(t.type==='record'){
+      (t.result||[]).forEach(o=>{const p=S.players.find(x=>x.id===o.pid)||S.players.find(x=>x.name===o.name&&x.nick===o.nick)||(o.nick===o.name?S.players.find(x=>x.name===o.name):null);if(p){o.name=p.name;o.nick=p.nick||p.name;if(t.people[o.pid]){t.people[o.pid].name=o.name;t.people[o.pid].nick=o.nick;}}});
+    }else if(t.status!=='cancelled'){
+      autoProgress(t);
+    }else if(t.result){t.result=snapResult(t,t.result);}
+    if(JSON.stringify(t)!==JSON.stringify(orig)){changed++;t.updatedAt=Date.now();S.tours[t.id]=t;queueWrite('tournaments/'+t.id,{json:JSON.stringify(t),updatedAt:t.updatedAt});}
+  });
+  render();
+  const n=Object.values(S.tours).filter(t=>t.status==='done'&&t.result&&t.result.length).length;
+  toast(changed?`대회 ${changed}건을 갱신해 재반영했습니다 (종료 대회 ${n}개)`:`변경 사항 없이 재반영했습니다 (종료 대회 ${n}개)`);
+};
+ACT.resetAll=()=>{
+  const n=Object.keys(S.tours).length;
+  if(!n){toast('삭제할 대회 결과가 없습니다');return;}
+  openModal(`<h3 style="color:var(--red)">⚠ 대회 결과 전체 리셋</h3>
+    <div>진행 중인 대회를 포함한 <b>모든 대회 ${n}건</b>과 명예의 전당 기록이 삭제되며 되돌릴 수 없습니다.<br>선수 명단은 유지됩니다.</div>
+    <div class="small muted" style="margin:10px 0">삭제 전에 [⬇ 결과 내보내기]로 백업해 두는 것을 권장합니다.</div>
+    <div class="fld"><label>확인을 위해 <b>리셋</b> 을 입력하세요</label><input id="ra-in" autocomplete="off"></div>
+    <div class="mact"><button class="btn" data-act="close">취소</button><button class="btn" data-act="expResults">⬇ 먼저 백업</button><button class="btn pri" data-act="resetAllDo">전체 삭제</button></div>`);
+  setTimeout(()=>{const i=$('#ra-in');i&&i.focus();},50);
+};
+ACT.resetAllDo=()=>{
+  if(($('#ra-in').value||'').trim()!=='리셋'){toast("'리셋'을 정확히 입력하세요");return;}
+  const ids=Object.keys(S.tours);
+  ids.forEach(id=>{delete S.tours[id];queueDelete('tournaments/'+id);});
+  closeModal();render();toast(`대회 결과 ${ids.length}건을 모두 삭제했습니다`);
+};
+ACT.impResults=()=>pickFile('.xlsx,.xls,.csv',async file=>{
+  try{
+    const X=await needXLSX();const wb=await readSheetFile(file);
+    let tours=[];
+    if(wb.Sheets['_data']){
+      const parts={};X.utils.sheet_to_json(wb.Sheets['_data'],{defval:''}).forEach(r=>{(parts[r.id]=parts[r.id]||[])[+r.part]=String(r.data);});
+      Object.keys(parts).forEach(id=>{const t=parseJ(parts[id].join(''),null);if(t&&t.id)tours.push(t);});
+    }else{
+      const ws=wb.Sheets['대회결과']||wb.Sheets[wb.SheetNames[0]];
+      X.utils.sheet_to_json(ws,{defval:''}).forEach(r=>{
+        const name=pickCol(r,['대회명','name']);if(!name)return;
+        const id=(pickCol(r,['대회id','id'])||uid()).replace(/[^A-Za-z0-9-]/g,'')||uid();
+        const people={},active=[],result=[];
+        [1,2,3,4].forEach(rk=>{const v=pickCol(r,[rk+'위']);if(!v)return;const [n,k]=v.split('/').map(s=>s.trim());const pid='r'+rk+uid();people[pid]={name:n,nick:k||n};active.push(pid);result.push({pid,rank:rk,name:n,nick:k||n});});
+        const st=pickCol(r,['상태']);
+        const kv=parseKind(pickCol(r,['방식','type']));
+        tours.push({id,name,date:pickCol(r,['일자','date'])||today(),type:'record',kind:kv||'',status:st==='취소'?'cancelled':'done',createdAt:Date.now(),people,active,removed:[],result});
+      });
+    }
+    if(!tours.length){toast('가져올 대회 결과가 없습니다');return;}
+    const over=tours.filter(t=>S.tours[t.id]).length;
+    if(!(await ask(`대회 ${tours.length}건을 가져옵니다.${over?`\n(같은 ID ${over}건은 덮어씁니다)`:''}`,'가져오기')))return;
+    for(const t of tours){S.tours[t.id]=t;queueWrite('tournaments/'+t.id,{json:JSON.stringify(t),updatedAt:Date.now()});}
+    render();toast(`대회 ${tours.length}건을 가져왔습니다`);
+  }catch(e){toast('파일을 읽을 수 없습니다: '+e.message);}
+});
+
+/* 설정 */
+ACT.saveCfg=()=>{saveSettings(Object.assign({},S.settings,{appUrl:$('#cf-url').value.trim(),band:$('#cf-band').value.trim()||BAND_URL,kakao:$('#cf-kakao').value.trim()||KAKAO_URL}));render();toast('저장했습니다');};
+ACT.rmLogo=()=>{const s=Object.assign({},S.settings);delete s.logo;saveSettings(s);render();};
+
+/* 시작 */
+renderShell();
+initStore();
+</script>
+</body>
+</html>
