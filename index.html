@@ -278,6 +278,16 @@ td.tot{font-weight:900;background:#fffaf0}
 <script>
 /* ================= 기본 설정 ================= */
 const DEFAULT_APP_URL = "https://claude.ai/artifact/LGx4SbSjHoPNYNhAGWWMUJ";
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCYQlZ-GRN4WZyYK_FWi91BgTE4ZgpCvhQ",
+  authDomain: "jjnb-tournament.firebaseapp.com",
+  projectId: "jjnb-tournament",
+  storageBucket: "jjnb-tournament.firebasestorage.app",
+  messagingSenderId: "218279847486",
+  appId: "1:218279847486:web:00fe7d8a6a77208d2bd36f"
+};
+const FB_VER = "10.12.2";
+function useFirebase(){return /github\.io$/i.test(location.hostname)||/[?&]fb=1\b/.test(location.search);}
 const BAND_URL = "https://band.us/@sip";
 const KAKAO_URL = "https://open.kakao.com/o/gQQFAi1g";
 
@@ -303,7 +313,7 @@ function canEdit(){return S.canWrite && !S.viewOnly;}
 function getCap(name){try{if(typeof claude!=='undefined'&&claude&&claude.use)return claude.use(name);}catch(e){}return Promise.resolve(null);}
 function loadScript(src){return new Promise((res,rej)=>{if(document.querySelector('script[src="'+src+'"]')){res();return;}const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
 async function needXLSX(){if(window.XLSX)return window.XLSX;await loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');return window.XLSX;}
-function appUrl(){const u=(S.settings.appUrl||DEFAULT_APP_URL||'').trim();return u.indexOf('%%')>=0?'':u.split('#')[0];}
+function appUrl(){const u=(S.settings.appUrl||(S.mode==='fb'?location.origin+location.pathname:DEFAULT_APP_URL)||'').trim();return u.indexOf('%%')>=0?'':u.split('#')[0];}
 function tourUrl(id,host){const b=appUrl();return b?b+(host?'#t-':'#v-')+id:'';}
 function watchUrl(){const b=appUrl();return b?b+'#watch':'';}
 
@@ -330,6 +340,7 @@ async function flush(path){
 }
 function writeError(e){
   const code=e&&e.code;
+  if(code==='permission-denied'||code==='unauthenticated'){toast('진행자 로그인이 필요합니다 (저장되지 않았습니다)');return;}
   if(code==='invalid_argument'){S.canWrite=false;renderShell();render();toast('편집 권한이 없어 저장되지 않았습니다 (보기 전용)');}
   else if(code==='quota_exceeded'){toast('저장 공간이 가득 찼습니다. 오래된 대회를 정리해 주세요.');}
   else if(code==='unavailable'){toast('서버 연결이 불안정합니다. 잠시 후 다시 시도하세요.');}
@@ -340,12 +351,7 @@ function saveSettings(s){S.settings=s;renderShell();render(true);queueWrite('app
 function saveTour(t){t.updatedAt=Date.now();S.tours[t.id]=t;render(true);queueWrite('tournaments/'+t.id,{json:JSON.stringify(t),updatedAt:t.updatedAt});}
 function delTour(id){delete S.tours[id];render(true);queueDelete('tournaments/'+id);}
 
-async function initStore(){
-  let db=null;
-  try{ db=await getCap('db'); }catch(e){ db=null; }
-  if(db){
-    DB=db; S.mode='db';
-    try{const u=await getCap('user'); if(u&&u.can){const c=await u.can('data.write'); if(c===false) S.canWrite=false;}}catch(e){}
+function subscribeAll(){
     const slow=setTimeout(()=>{if(!S.loaded.tours){toast('서버 응답이 늦습니다. 연결을 확인 중…');}},10000);
     DB.doc('app/players').onSnapshot(s=>{S.players=s.exists?parseJ(s.data().json,[]):[];S.loaded.players=true;render(true);},onSnapErr);
     DB.doc('app/settings').onSnapshot(s=>{S.settings=s.exists?parseJ(s.data().json,{}):{};S.loaded.settings=true;renderShell();render(true);},onSnapErr);
@@ -354,6 +360,30 @@ async function initStore(){
       const m={};qs.docs.forEach(d=>{const t=parseJ((d.data()||{}).json,null);if(t&&t.id)m[d.id]=t;});
       S.tours=m;S.loaded.tours=true;render(true);
     },onSnapErr);
+}
+async function initFirebase(){
+  const b='https://www.gstatic.com/firebasejs/'+FB_VER+'/';
+  await loadScript(b+'firebase-app-compat.js');
+  await loadScript(b+'firebase-auth-compat.js');
+  await loadScript(b+'firebase-firestore-compat.js');
+  firebase.initializeApp(FIREBASE_CONFIG);
+  const fs=firebase.firestore();
+  DB={doc:p=>fs.doc(p),collection:p=>fs.collection(p)};
+  S.mode='fb';S.canWrite=false;
+  firebase.auth().onAuthStateChanged(u=>{S.fbUser=u||null;S.canWrite=!!u;renderShell();render(true);});
+  subscribeAll();
+}
+async function initStore(){
+  if(useFirebase()){
+    try{await initFirebase();renderShell();render();return;}
+    catch(e){console.error(e);toast('Firebase 연결 실패: '+(e&&e.message||e)+' · 로컬 모드로 실행합니다');}
+  }
+  let db=null;
+  try{ db=await getCap('db'); }catch(e){ db=null; }
+  if(db){
+    DB=db; S.mode='db';
+    try{const u=await getCap('user'); if(u&&u.can){const c=await u.can('data.write'); if(c===false) S.canWrite=false;}}catch(e){}
+    subscribeAll();
   }else{
     S.mode='local';
     const g=k=>{try{const v=localStorage.getItem('jjnb:'+k);return v?JSON.parse(v):null;}catch(e){return null;}};
@@ -365,6 +395,7 @@ async function initStore(){
   renderShell();render();
 }
 function onSnapErr(e){
+  if(e&&e.code==='permission-denied'){toast('데이터를 읽을 권한이 없습니다. Firestore 규칙을 확인하세요.');return;}
   if(e&&e.code==='revoked'){S.canWrite=false;toast('접근 권한이 변경되었습니다');}
   else toast('데이터 연결 오류: '+((e&&e.message)||(e&&e.code)||''));
 }
@@ -533,7 +564,11 @@ function renderShell(){
   const r=route();const base=r.indexOf('t-')===0?'tours':r;
   $('#nav').innerHTML=`<div class="navs">${NAV.filter(n=>canEdit()||n[0]!=='config').map(n=>`<a href="#${n[0]}" class="${base===n[0]?'on':''}">${n[1]}</a>`).join('')}</div>`+(canEdit()?`<a href="#new" class="newbtn ${base==='new'?'on':''}">+ 대회 개최</a>`:'');
   let mb='';
-  if(S.mode==='local')mb='<div class="modebar">로컬 모드: 이 기기 브라우저에만 저장됩니다 (게시된 페이지에서 열면 서버에 저장됩니다)</div>';
+  if(S.mode==='fb'){
+    if(S.fbUser)mb=`<div class="modebar ro">진행자 로그인: ${esc(S.fbUser.email||'')} · ${S.viewOnly?'<a href="#" data-act="viewOnly">진행자 모드로 전환</a> · ':''}<a href="#" data-act="logout">로그아웃</a></div>`;
+    else mb='<div class="modebar ro">관람 모드 · 실시간으로 대진 현황이 업데이트됩니다 · <a href="#" data-act="login">진행자 로그인</a></div>';
+  }
+  else if(S.mode==='local')mb='<div class="modebar">로컬 모드: 이 기기 브라우저에만 저장됩니다 (게시된 페이지에서 열면 서버에 저장됩니다)</div>';
   else if(!S.canWrite)mb='<div class="modebar ro">보기 전용 · 실시간으로 대진 현황이 업데이트됩니다</div>';
   else if(S.viewOnly)mb='<div class="modebar ro">관람 모드 (진행 버튼 숨김) · <a href="#" data-act="viewOnly">진행자 모드로 전환</a></div>';
   $('#modebar').innerHTML=mb;
@@ -935,7 +970,8 @@ function vConfig(){
     <div class="fld"><label>카카오톡 오픈채팅</label><input id="cf-kakao" value="${esc(st.kakao||KAKAO_URL)}"></div>
     <button class="btn pri" data-act="saveCfg">저장</button></div>
   <div class="card"><h3>화면</h3><div class="row"><button class="btn" data-act="viewOnly">${S.viewOnly?'진행자 모드로 전환':'관람 모드 (진행 버튼 숨기기)'}</button></div><div class="small muted" style="margin-top:6px">대형 화면에 띄울 때 관람 모드를 사용하세요. 이 기기에서만 적용됩니다.</div></div>
-  <div class="card"><h3>저장소</h3><div class="small">${S.mode==='db'?'✅ 서버(백엔드 DB)에 저장 · 모든 기기에서 실시간 동기화':'⚠️ 로컬 모드: 이 브라우저에만 저장됩니다'}</div></div>`;
+  <div class="card"><h3>저장소</h3><div class="small">${S.mode==='fb'?'✅ Firebase(Firestore)에 저장 · 모든 기기에서 실시간 동기화':S.mode==='db'?'✅ 서버(백엔드 DB)에 저장 · 모든 기기에서 실시간 동기화':'⚠️ 로컬 모드: 이 브라우저에만 저장됩니다'}</div>
+    ${S.mode==='fb'?`<div class="row" style="margin-top:10px"><button class="btn sm" data-act="ghPlayers">GitHub 백업에서 선수 명단 불러오기</button><button class="btn sm" data-act="ghResults">GitHub 백업에서 대회 결과 불러오기</button></div><div class="small muted" style="margin-top:6px">저장소 data/ 폴더의 백업 파일을 불러옵니다. 조별 대진까지 옮기려면 기존 페이지에서 [결과 내보내기] 엑셀을 받아 [대회 결과 → 결과 가져오기]를 쓰세요.</div>`:''}</div>`;
 }
 function uploadLogo(file){
   const img=new Image();const url=URL.createObjectURL(file);
@@ -958,7 +994,11 @@ $('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal();}
 function pickFile(accept,handler){let inp=$('#file-in');if(!inp){inp=document.createElement('input');inp.type='file';inp.id='file-in';inp.style.display='none';document.body.appendChild(inp);}inp.accept=accept;S._fileHandler=handler;inp.click();}
 async function saveFile(name,data){
   const dl=await getCap('downloads');
-  if(!dl){toast('이 화면에서는 파일 저장이 지원되지 않습니다');return;}
+  if(!dl){
+    try{const blob=data instanceof Blob?data:new Blob([data]);const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000);toast('파일을 저장했습니다');}
+    catch(e){toast('이 화면에서는 파일 저장이 지원되지 않습니다');}
+    return;
+  }
   try{await dl.save({filename:name,data});toast('파일을 저장했습니다');}
   catch(e){if(e&&e.code==='declined')return;toast('저장 실패: '+((e&&e.message)||(e&&e.code)||''));}
 }
@@ -1544,8 +1584,10 @@ ACT.resetAllDo=()=>{
   closeModal();render();toast(`대회 결과 ${ids.length}건을 모두 삭제했습니다`);
 };
 ACT.impResults=()=>pickFile('.xlsx,.xls,.csv',async file=>{
-  try{
-    const X=await needXLSX();const wb=await readSheetFile(file);
+  try{const X=await needXLSX();const wb=await readSheetFile(file);await importResultsWB(X,wb);}
+  catch(e){toast('파일을 읽을 수 없습니다: '+e.message);}
+});
+async function importResultsWB(X,wb){
     let tours=[];
     if(wb.Sheets['_data']){
       const parts={};X.utils.sheet_to_json(wb.Sheets['_data'],{defval:''}).forEach(r=>{(parts[r.id]=parts[r.id]||[])[+r.part]=String(r.data);});
@@ -1567,8 +1609,34 @@ ACT.impResults=()=>pickFile('.xlsx,.xls,.csv',async file=>{
     if(!(await ask(`대회 ${tours.length}건을 가져옵니다.${over?`\n(같은 ID ${over}건은 덮어씁니다)`:''}`,'가져오기')))return;
     for(const t of tours){S.tours[t.id]=t;queueWrite('tournaments/'+t.id,{json:JSON.stringify(t),updatedAt:Date.now()});}
     render();toast(`대회 ${tours.length}건을 가져왔습니다`);
-  }catch(e){toast('파일을 읽을 수 없습니다: '+e.message);}
-});
+}
+ACT.ghPlayers=async()=>{
+  try{const r=await fetch('data/players.json',{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const list=await r.json();
+    const rows=list.map(p=>({name:p.name,nick:p.nick||p.name,team:p.team||'',memo:p.memo||''})).filter(r=>r.name);showImport(rows,'GitHub 백업');}
+  catch(e){toast('백업 파일을 읽을 수 없습니다: '+e.message);}
+};
+ACT.ghResults=async()=>{
+  try{const r=await fetch('data/tournament_results.csv',{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const txt=(await r.text()).replace(/^\ufeff/,'');
+    const X=await needXLSX();await importResultsWB(X,X.read(txt,{type:'string'}));}
+  catch(e){toast('백업 파일을 읽을 수 없습니다: '+e.message);}
+};
+
+/* 진행자 로그인 (Firebase) */
+ACT.login=()=>{
+  openModal(`<h3>진행자 로그인</h3>
+    <div class="fld"><label>이메일</label><input id="lg-email" type="email" autocomplete="username"></div>
+    <div class="fld"><label>비밀번호</label><input id="lg-pw" type="password" autocomplete="current-password"></div>
+    <div class="mact"><button class="btn" data-act="close">취소</button><button class="btn pri" data-act="doLogin">로그인</button></div>`);
+  setTimeout(()=>{const i=$('#lg-email');i&&i.focus();},50);
+};
+ACT.doLogin=async()=>{
+  const em=$('#lg-email').value.trim(),pw=$('#lg-pw').value;
+  if(!em||!pw){toast('이메일과 비밀번호를 입력하세요');return;}
+  try{await firebase.auth().signInWithEmailAndPassword(em,pw);closeModal();S.viewOnly=false;renderShell();render();toast('로그인했습니다');}
+  catch(e){toast(e&&/wrong-password|invalid-credential|user-not-found|invalid-login/.test(e.code||'')?'이메일 또는 비밀번호가 맞지 않습니다':'로그인 실패: '+((e&&e.code)||e));}
+};
+ACT.logout=async()=>{try{await firebase.auth().signOut();toast('로그아웃했습니다');}catch(e){}};
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target&&e.target.id==='lg-pw')ACT.doLogin();});
 
 /* 설정 */
 ACT.saveCfg=()=>{saveSettings(Object.assign({},S.settings,{appUrl:$('#cf-url').value.trim(),band:$('#cf-band').value.trim()||BAND_URL,kakao:$('#cf-kakao').value.trim()||KAKAO_URL}));render();toast('저장했습니다');};

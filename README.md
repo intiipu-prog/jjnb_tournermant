@@ -18,4 +18,10 @@
   - 조별 대진 상세까지 백업하려면 앱의 [⬇ 결과 내보내기] 엑셀 파일을 `data/`에 올려 주세요.
 
 ## 운영 주소
-- 현재 운영: https://claude.ai/artifact/LGx4SbSjHoPNYNhAGWWMUJ
+- GitHub Pages (Firebase 저장): https://intiipu-prog.github.io/jjnb_tournermant/
+  - 누구나 로그인 없이 관람, 결과 입력은 [진행자 로그인] 후 가능 (Firebase Authentication 계정)
+- 기존 claude.ai 페이지: https://claude.ai/artifact/LGx4SbSjHoPNYNhAGWWMUJ
+
+## 저장소 동작
+- `*.github.io` 에서 열면 Firebase(Firestore)에 저장, claude.ai에서 열면 claude 서버 DB에 저장합니다 (같은 index.html).
+- Firestore 규칙: 읽기 모두 허용, 쓰기는 로그인한 진행자만.
