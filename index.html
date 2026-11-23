@@ -346,10 +346,10 @@ function writeError(e){
   else if(code==='unavailable'){toast('서버 연결이 불안정합니다. 잠시 후 다시 시도하세요.');}
   else toast('저장 실패: '+((e&&e.message)||code||'알 수 없는 오류'));
 }
-function savePlayers(list){S.players=list;render(true);queueWrite('app/players',{json:JSON.stringify(list),updatedAt:Date.now()});}
+function savePlayers(list){S.players=list;render(true);queueWrite('app/players',{json:JSON.stringify(list),updatedAt:Date.now()});ghSchedule();}
 function saveSettings(s){S.settings=s;renderShell();render(true);queueWrite('app/settings',{json:JSON.stringify(s),updatedAt:Date.now()});}
-function saveTour(t){t.updatedAt=Date.now();S.tours[t.id]=t;render(true);queueWrite('tournaments/'+t.id,{json:JSON.stringify(t),updatedAt:t.updatedAt});}
-function delTour(id){delete S.tours[id];render(true);queueDelete('tournaments/'+id);}
+function saveTour(t){t.updatedAt=Date.now();S.tours[t.id]=t;render(true);queueWrite('tournaments/'+t.id,{json:JSON.stringify(t),updatedAt:t.updatedAt});ghSchedule();}
+function delTour(id){delete S.tours[id];render(true);queueDelete('tournaments/'+id);ghSchedule();}
 
 function subscribeAll(){
     const slow=setTimeout(()=>{if(!S.loaded.tours){toast('서버 응답이 늦습니다. 연결을 확인 중…');}},10000);
@@ -971,6 +971,7 @@ function vConfig(){
     <div class="fld"><label>카카오톡 오픈채팅</label><input id="cf-kakao" value="${esc(st.kakao||KAKAO_URL)}"></div>
     <button class="btn pri" data-act="saveCfg">저장</button></div>
   <div class="card"><h3>화면</h3><div class="row"><button class="btn" data-act="viewOnly">${S.viewOnly?'진행자 모드로 전환':'관람 모드 (진행 버튼 숨기기)'}</button></div><div class="small muted" style="margin-top:6px">대형 화면에 띄울 때 관람 모드를 사용하세요. 이 기기에서만 적용됩니다.</div></div>
+  ${ghCardHTML()}
   <div class="card"><h3>저장소</h3><div class="small">${S.mode==='fb'?'✅ Firebase(Firestore)에 저장 · 모든 기기에서 실시간 동기화':S.mode==='db'?'✅ 서버(백엔드 DB)에 저장 · 모든 기기에서 실시간 동기화':'⚠️ 로컬 모드: 이 브라우저에만 저장됩니다'}</div>
     ${S.mode==='fb'?`<div class="row" style="margin-top:10px"><button class="btn sm" data-act="ghPlayers">GitHub 백업에서 선수 명단 불러오기</button><button class="btn sm" data-act="ghResults">GitHub 백업에서 대회 결과 불러오기</button></div><div class="small muted" style="margin-top:6px">저장소 data/ 폴더의 백업 파일을 불러옵니다. 조별 대진까지 옮기려면 기존 페이지에서 [결과 내보내기] 엑셀을 받아 [대회 결과 → 결과 가져오기]를 쓰세요.</div>`:''}</div>`;
 }
@@ -1654,7 +1655,7 @@ ACT.resetAll=()=>{
 ACT.resetAllDo=()=>{
   if(($('#ra-in').value||'').trim()!=='리셋'){toast("'리셋'을 정확히 입력하세요");return;}
   const ids=Object.keys(S.tours);
-  ids.forEach(id=>{delete S.tours[id];queueDelete('tournaments/'+id);});
+  ids.forEach(id=>{delete S.tours[id];queueDelete('tournaments/'+id);});ghSchedule();
   closeModal();render();toast(`대회 결과 ${ids.length}건을 모두 삭제했습니다`);
 };
 ACT.impResults=()=>pickFile('.xlsx,.xls,.csv',async file=>{
@@ -1682,14 +1683,95 @@ async function importResultsWB(X,wb){
     const over=tours.filter(t=>S.tours[t.id]).length;
     if(!(await ask(`대회 ${tours.length}건을 가져옵니다.${over?`\n(같은 ID ${over}건은 덮어씁니다)`:''}`,'가져오기')))return;
     for(const t of tours){S.tours[t.id]=t;queueWrite('tournaments/'+t.id,{json:JSON.stringify(t),updatedAt:Date.now()});}
-    render();toast(`대회 ${tours.length}건을 가져왔습니다`);
+    render();ghSchedule();toast(`대회 ${tours.length}건을 가져왔습니다`);
 }
 ACT.ghPlayers=async()=>{
   try{const r=await fetch('data/players.json',{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const list=await r.json();
     const rows=list.map(p=>({name:p.name,nick:p.nick||p.name,team:p.team||'',memo:p.memo||''})).filter(r=>r.name);showImport(rows,'GitHub 백업');}
   catch(e){toast('백업 파일을 읽을 수 없습니다: '+e.message);}
 };
+/* ================= GitHub 자동 백업 ================= */
+const GH_DEF={repo:'intiipu-prog/jjnb_tournermant',branch:'main',token:'',auto:true,last:0,lastErr:''};
+function ghCfg(){try{return Object.assign({},GH_DEF,JSON.parse(localStorage.getItem('jjnb:gh')||'{}'));}catch(e){return Object.assign({},GH_DEF);}}
+function ghSet(o){try{localStorage.setItem('jjnb:gh',JSON.stringify(Object.assign(ghCfg(),o)));}catch(e){}}
+function ghAvail(){return S.mode!=='db';}
+function b64(str){const by=new TextEncoder().encode(str);let bin='';for(let i=0;i<by.length;i+=0x8000)bin+=String.fromCharCode.apply(null,by.subarray(i,i+0x8000));return btoa(bin);}
+async function ghApi(path,opt){
+  const c=ghCfg();
+  const r=await fetch('https://api.github.com/repos/'+c.repo+path,Object.assign({},opt,{headers:Object.assign({'Accept':'application/vnd.github+json','Authorization':'Bearer '+c.token,'X-GitHub-Api-Version':'2022-11-28'},(opt||{}).headers||{})}));
+  return r;
+}
+async function ghPut(path,content,msg){
+  const c=ghCfg();const enc=b64(content);
+  let sha;const g=await ghApi('/contents/'+path.split('/').map(encodeURIComponent).join('/')+'?ref='+encodeURIComponent(c.branch));
+  if(g.ok){const j=await g.json();sha=j.sha;if(j.content&&j.content.replace(/\s/g,'')===enc)return false;}
+  else if(g.status!==404)throw new Error(ghErrText(g.status));
+  const r=await ghApi('/contents/'+path.split('/').map(encodeURIComponent).join('/'),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,content:enc,branch:c.branch,sha})});
+  if(!r.ok)throw new Error(ghErrText(r.status));
+  return true;
+}
+function ghErrText(st){return st===401?'토큰이 올바르지 않거나 만료되었습니다':st===403?'토큰에 쓰기 권한(Contents: Read and write)이 없습니다':st===404?'저장소를 찾을 수 없습니다 (토큰의 저장소 선택 확인)':st===409?'저장 충돌 — 잠시 후 다시 시도하세요':'GitHub 오류 '+st;}
+function resultsCSV(){
+  const q=v=>{v=String(v==null?'':v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
+  const nm=o=>o?(o.nick&&o.nick!==o.name?o.name+' / '+o.nick:o.name):'';
+  const rows=[['대회ID','대회명','일자','방식','상태','1위','2위','3위','4위','5위~']];
+  Object.values(S.tours).filter(t=>t.status==='done'||t.status==='cancelled').sort((a,b)=>(a.date||'').localeCompare(b.date||'')).forEach(t=>{
+    const r=t.result||[];const g=k=>nm(r.find(o=>o.rank===k));
+    rows.push([t.id,t.name,t.date,kindLabel(tKind(t))||'',t.status==='cancelled'?'취소':'종료',g(1),g(2),g(3),g(4),r.filter(o=>o.rank>4).sort((a,b)=>a.rank-b.rank).map(o=>o.rank+'. '+nm(o)).join('; ')]);
+  });
+  return '\ufeff'+rows.map(r=>r.map(q).join(',')).join('\n')+'\n';
+}
+let ghTimer=null,ghBusy=false;
+function ghSchedule(){
+  const c=ghCfg();if(!ghAvail()||!c.token||!c.auto||!S.canWrite)return;
+  clearTimeout(ghTimer);ghTimer=setTimeout(()=>ghBackup(false),30000);
+}
+async function ghBackup(manual){
+  const c=ghCfg();if(!c.token){if(manual)toast('먼저 GitHub 토큰을 저장하세요');return;}
+  if(ghBusy){ghSchedule();return;}ghBusy=true;
+  const stamp=new Date().toLocaleString('ko-KR');
+  try{
+    const players=JSON.stringify(S.players.map(p=>({id:p.id,name:p.name,nick:p.nick||p.name,team:p.team||'',memo:p.memo||''})),null,0).replace(/\},\{/g,'},\n{');
+    const full=JSON.stringify(Object.values(S.tours).sort((a,b)=>(a.date||'').localeCompare(b.date||'')));
+    let n=0;
+    if(await ghPut('data/players.json',players+'\n',`백업: 선수 명단 ${S.players.length}명 (${stamp})`))n++;
+    if(await ghPut('data/tournament_results.csv',resultsCSV(),`백업: 대회 결과 (${stamp})`))n++;
+    if(await ghPut('data/tournaments_full.json',full+'\n',`백업: 대회 전체 데이터 ${Object.keys(S.tours).length}건 (${stamp})`))n++;
+    ghSet({last:Date.now(),lastErr:''});
+    if(manual)toast(n?`GitHub 백업 완료 (${n}개 파일 갱신)`:'GitHub 백업 최신 상태입니다 (변경 없음)');
+  }catch(e){ghSet({lastErr:e.message});toast('GitHub 백업 실패: '+e.message);}
+  finally{ghBusy=false;if(route()==='config')render();}
+}
+function ghCardHTML(){
+  if(!ghAvail()||!canEdit())return '';
+  const c=ghCfg();
+  return `<div class="card"><h3>GitHub 자동 백업 <small>${c.token?'연결됨':'미연결'}</small></h3>
+    <div class="small muted" style="margin-bottom:10px">선수 명단·대회 결과가 바뀌면 30초 뒤 GitHub 저장소 data/ 폴더에 자동 저장합니다. 토큰은 <b>이 기기 브라우저에만</b> 저장되고 다른 곳에 올라가지 않습니다.</div>
+    <div class="fld"><label>저장소 (소유자/이름)</label><input id="gh-repo" value="${esc(c.repo)}"></div>
+    <div class="fld"><label>GitHub 토큰 ${c.token?'<span class="muted">(저장됨 · 바꿀 때만 입력)</span>':''}</label><input id="gh-token" type="password" autocomplete="off" placeholder="${c.token?'••••••••':'github_pat_...'}"></div>
+    <div class="row" style="margin-bottom:8px"><label class="row small" style="gap:6px;cursor:pointer"><input type="checkbox" id="gh-auto" ${c.auto?'checked':''}> 변경 시 자동 백업</label></div>
+    <div class="row"><button class="btn pri sm" data-act="ghSave">저장</button><button class="btn sm" data-act="ghTest">연결 확인</button><button class="btn sm dark" data-act="ghNow">지금 백업</button>${c.token?'<button class="btn sm red" data-act="ghForget">토큰 삭제</button>':''}</div>
+    <div class="small muted" style="margin-top:8px">${c.last?'마지막 백업: '+new Date(c.last).toLocaleString('ko-KR'):'아직 백업하지 않았습니다'}${c.lastErr?` · <span style="color:var(--red)">최근 오류: ${esc(c.lastErr)}</span>`:''}</div></div>`;
+}
+ACT.ghSave=()=>{const o={repo:$('#gh-repo').value.trim()||GH_DEF.repo,auto:$('#gh-auto').checked};const tk=$('#gh-token').value.trim();if(tk)o.token=tk;ghSet(o);render();toast('GitHub 설정을 저장했습니다');};
+ACT.ghForget=async()=>{if(!(await ask('이 기기에 저장된 GitHub 토큰을 삭제할까요?','삭제',true)))return;ghSet({token:''});render();};
+ACT.ghTest=async()=>{
+  const c=ghCfg();if(!c.token){toast('먼저 토큰을 입력하고 저장하세요');return;}
+  try{const r=await ghApi('');if(!r.ok)throw new Error(ghErrText(r.status));const j=await r.json();
+    toast(j.permissions&&j.permissions.push?`연결 성공: ${j.full_name} (쓰기 가능)`:'연결은 되지만 쓰기 권한이 없습니다');}
+  catch(e){toast('연결 실패: '+e.message);}
+};
+ACT.ghNow=()=>ghBackup(true);
+
 ACT.ghResults=async()=>{
+  try{const rf=await fetch('data/tournaments_full.json',{cache:'no-store'});
+    if(rf.ok){const arr=await rf.json();if(Array.isArray(arr)&&arr.length){
+      const over=arr.filter(t=>S.tours[t.id]).length;
+      if(!(await ask(`GitHub 전체 백업에서 대회 ${arr.length}건(조별 대진 포함)을 가져옵니다.${over?`\n(같은 ID ${over}건은 덮어씁니다)`:''}`,'가져오기')))return;
+      for(const t of arr){if(t&&t.id){S.tours[t.id]=t;queueWrite('tournaments/'+t.id,{json:JSON.stringify(t),updatedAt:Date.now()});}}
+      render();toast(`대회 ${arr.length}건을 가져왔습니다`);return;}}
+  }catch(e){}
+
   try{const r=await fetch('data/tournament_results.csv',{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const txt=(await r.text()).replace(/^\ufeff/,'');
     const X=await needXLSX();await importResultsWB(X,X.read(txt,{type:'string'}));}
   catch(e){toast('백업 파일을 읽을 수 없습니다: '+e.message);}
