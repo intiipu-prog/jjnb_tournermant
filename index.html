@@ -263,7 +263,39 @@ td.tot{font-weight:900;background:#fffaf0}
   .card{padding:13px}
   h2.pg{font-size:20px}
 }
-</style>
+/* ===== 모바일 최적화 ===== */
+@media (max-width:640px){
+  .wrap{padding:0 10px}
+  main{padding:12px 0 50px}
+  nav.tabs .navs{gap:0}
+  nav.tabs a{padding:11px 9px;font-size:14px}
+  nav.tabs a.newbtn{padding:7px 10px;font-size:13px;margin:5px 0}
+  nav.tabs a.newbtn .lg2{display:none}
+  .modebar{font-size:12px;padding:5px 10px}
+  .hide-m{display:none !important}
+  h2.pg{font-size:19px;gap:6px;margin-bottom:10px}
+  h2.pg .btn.sm{padding:6px 9px;font-size:12.5px}
+  .card{padding:12px;margin-bottom:10px}
+  .card h3{font-size:16px;margin-bottom:8px}
+  .rgrid,.tgrid{gap:10px}
+  .rc{padding:12px}
+  .rc .tt,.trc [style*="font-size:18px"]{font-size:17px !important}
+  .emptypic{margin-top:6px}
+  .emptypic img{max-height:88px !important}
+  .emptypic svg{max-width:210px !important}
+  .ttabs{gap:5px;margin-bottom:10px}
+  .ttabs button{padding:7px 11px;font-size:13.5px}
+  .ttabs input{min-width:150px !important;font-size:14px !important;padding:7px 12px !important}
+  .btn{padding:8px 12px;font-size:14px}
+  .btn.big{padding:12px 16px;font-size:16px}
+  .plc{padding:9px 10px}.plc .pln{font-size:16px}
+  .dashq{gap:10px}
+  .comm{gap:12px}
+  .mbox{padding:14px;border-radius:14px}
+  #modal{padding:3vh 8px}
+  table.tb{font-size:14px}
+  table.tb td,table.tb th{padding:7px 4px}
+}
 </head>
 <body>
 <header class="top">
@@ -571,7 +603,7 @@ const NAV=[['dash','대시보드'],['tours','대회 결과'],['players','선수 
 function renderShell(){
   $('#logo').innerHTML=S.settings.logo?`<img src="${esc(S.settings.logo)}" alt="JJNB 로고">`:DEFAULT_LOGO;
   const r=route();const base=r.indexOf('t-')===0?'tours':r;
-  $('#nav').innerHTML=`<div class="navs">${NAV.filter(n=>canEdit()||n[0]!=='config').map(n=>`<a href="#${n[0]}" class="${base===n[0]?'on':''}">${n[1]}</a>`).join('')}</div>`+(canEdit()?`<a href="#new" class="newbtn ${base==='new'?'on':''}">+ 대회 개최</a>`:'');
+  $('#nav').innerHTML=`<div class="navs">${NAV.filter(n=>canEdit()||n[0]!=='config').map(n=>`<a href="#${n[0]}" class="${base===n[0]?'on':''}">${n[1]}</a>`).join('')}</div>`+(canEdit()?`<a href="#new" class="newbtn ${base==='new'?'on':''}">+ <span class="lg2">대회 </span>개최</a>`:'');
   let mb='';
   if(S.mode==='fb'){
     if(S.fbUser)mb=`<div class="modebar ro">진행자 로그인: ${esc(S.fbUser.email||'')} · ${S.viewOnly?'<a href="#" data-act="viewOnly">진행자 모드로 전환</a> · ':''}<a href="#" data-act="logout">로그아웃</a></div>`;
@@ -642,7 +674,7 @@ function vDash(){
   const all=sortedTours();const rec=all.slice(0,3);
   const live=all.filter(t=>t.status==='active').length;
   let h='';
-  h+=`<div class="card"><h3>최근 대회 <small>최근 3개</small><span class="sp"></span>${canEdit()?'<button class="btn pri sm" data-act="nav" data-h="new">+ 대회 개최</button>':''}</h3>`;
+  h+=`<div class="card"><h3>최근 대회 <small>최근 3개</small><span class="sp"></span>${canEdit()?'<button class="btn pri sm hide-m" data-act="nav" data-h="new">+ 대회 개최</button>':''}</h3>`;
   if(!rec.length)h+=`<div class="empty">아직 대회가 없습니다.${canEdit()?'<br>선수 명단을 등록한 뒤 대회를 개최해 보세요.':''}</div>`;
   else h+=`<div class="rgrid">${rec.map(t=>`<div class="rc">
       <div class="row">${typeBadge(t)} ${statusBadge(t)}<span class="sp"></span><span class="small muted">${esc(t.date||'')}</span></div>
@@ -670,7 +702,7 @@ function communityCard(){
 function vTours(){
   const f=S.tab.tourFilter||'all';
   const all=sortedTours().filter(t=>f==='all'||t.status===f);
-  let h=`<h2 class="pg">대회 결과<span class="sp"></span>${canEdit()?`<button class="btn sm" data-act="expResults">⬇ 결과 내보내기</button><button class="btn sm" data-act="impResults">⬆ 결과 가져오기</button><button class="btn sm dark" data-act="resText">✎ 텍스트로 결과 입력</button><button class="btn sm red" data-act="resetAll">⚠ 전체 리셋</button><button class="btn pri sm" data-act="nav" data-h="new">+ 대회 개최</button>`:''}</h2>`;
+  let h=`<h2 class="pg">대회 결과<span class="sp"></span>${canEdit()?`<button class="btn sm" data-act="expResults">⬇ 결과 내보내기</button><button class="btn sm" data-act="impResults">⬆ 결과 가져오기</button><button class="btn sm dark" data-act="resText">✎ 텍스트로 결과 입력</button><button class="btn sm red" data-act="resetAll">⚠ 전체 리셋</button><button class="btn pri sm hide-m" data-act="nav" data-h="new">+ 대회 개최</button>`:''}</h2>`;
   h+=`<div class="ttabs">${[['all','전체'],['planned','예정'],['active','진행중'],['done','종료'],['cancelled','취소']].map(x=>`<button class="${f===x[0]?'on':''}" data-act="tourFilter" data-v="${x[0]}">${x[1]}</button>`).join('')}<input id="tr-q" value="${esc(S.tab.trq||'')}" placeholder="🔍 대회명·선수·날짜 검색" style="border:1px solid #d5d9df;border-radius:99px;padding:8px 14px;font-size:15px;min-width:200px;flex:1;max-width:320px"></div><div id="tr-none" class="card empty" style="display:none">검색 결과가 없습니다.</div>`;
   if(!all.length)return h+'<div class="card empty">대회가 없습니다.</div>';
   h+='<div class="tgrid">'+all.map(t=>`<div class="card trc" style="margin:0" data-s="${esc([t.name,t.date,(t.date||'').replace(/-/g,'.'),kindLabel(tKind(t)),...(t.result||[]).filter(o=>o.rank&&o.rank<=4).map(o=>o.name+' '+o.nick),...activeList(t).map(p=>(t.people[p]||{}).name||'')].join(' ').toLowerCase())}"><div class="row">${typeBadge(t)} ${statusBadge(t)}<span class="sp"></span><span class="small muted">${esc(t.date||'')}</span></div>
