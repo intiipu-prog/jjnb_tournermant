@@ -120,11 +120,10 @@ h2.pg .sp{flex:1}
 .plc .pln{line-height:1.3}
 .rgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 @media (max-width:640px){.rgrid{grid-template-columns:1fr}}
-.emptypic{position:relative;margin-top:10px;height:130px;border-radius:12px;overflow:hidden;background:#eef0f3;display:flex;align-items:center;justify-content:center}
+.emptypic{position:relative;margin-top:10px;height:130px;border-radius:12px;overflow:hidden;background:#fff;display:flex;align-items:center;justify-content:center}
 .emptypic .ep-bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:grayscale(1) contrast(.9);opacity:.32}
-.emptypic:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.15),rgba(255,255,255,.45))}
-.emptypic .ep-msg{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:20px;font-weight:900;color:#4b515b;letter-spacing:2px;text-shadow:0 1px 0 #fff}
-.emptypic .ep-flag{font-size:22px;filter:grayscale(1);opacity:.7}
+.emptypic .ep-msg{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:26px;font-weight:900;color:#4b515b;letter-spacing:2px;text-shadow:0 1px 0 #fff}
+.emptypic .ep-flag{font-size:24px;filter:grayscale(1);opacity:.7}
 .rc{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fff;position:relative}
 .rc .tt{font-size:18px;font-weight:900;margin:2px 0 4px}
 .podium{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;margin-top:8px;font-size:16px;align-items:center}
@@ -297,7 +296,7 @@ td.tot{font-weight:900;background:#fffaf0}
   .rc .tt,.trc [style*="font-size:18px"]{font-size:17px !important}
   .emptypic{margin-top:6px}
   .emptypic{height:110px}
-  .emptypic .ep-msg{font-size:17px}
+  .emptypic .ep-msg{font-size:22px}
   .ttabs{gap:5px;margin-bottom:10px}
   .ttabs button{padding:7px 11px;font-size:13.5px}
   .ttabs input{min-width:150px !important;font-size:14px !important;padding:7px 12px !important}
