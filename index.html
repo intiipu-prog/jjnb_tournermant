@@ -1006,10 +1006,7 @@ function vPlayers(){
     return (x.localeCompare(y,'ko')||a.name.localeCompare(b.name,'ko'))*so.dir;
   });
   const sth=(k,l)=>`<th class="sth ${so.k===k?'on':''}" data-act="plSort" data-k="${k}">${l}<span class="arw">${so.k===k?(so.dir>0?'▲':'▼'):'↕'}</span></th>`;
-  let h=`<h2 class="pg">선수 명단 <span class="badge">${list.length}명</span><span class="sp"></span>${ed?`<button class="btn sm dark" data-act="bulkText">✎ 텍스트로 일괄 입력</button><button class="btn pri sm" data-act="editPlayer">+ 선수 등록</button>`:''}</h2>`;
-  if(ed)h+=`<div class="card" style="padding:10px 12px"><div class="row" title="Excel·Google 스프레드시트 호환 · 열: 선수이름·닉네임·소속·메모">
-    <button class="btn sm" data-act="expPlayers" data-v="xlsx">⬇ 엑셀(.xlsx) 다운로드</button><button class="btn sm" data-act="expPlayers" data-v="csv">⬇ CSV 다운로드</button><button class="btn sm dark" data-act="impPlayers">⬆ 스프레드시트 가져오기</button></div>
-    </div>`;
+  let h=`<h2 class="pg">선수 명단 <span class="badge">${list.length}명</span><span class="sp"></span>${ed?`<button class="btn sm dark" data-act="plDataMenu">🗂 명단관리</button><button class="btn pri sm" data-act="editPlayer">+ 선수 등록</button>`:''}</h2>`;
   h+=`<div class="card"><div class="row" style="margin-bottom:10px"><span class="small muted">정렬</span><select id="pl-sort" style="border:1px solid #d5d9df;border-radius:10px;padding:8px 10px;background:#fff">${[['name','이름순'],['nick','닉네임순'],['team','소속순'],['memo','메모순'],['reg','등록순']].map(o=>`<option value="${o[0]}" ${so.k===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select><button class="btn sm" data-act="plSortDir">${so.dir>0?'▲ 오름차순':'▼ 내림차순'}</button><input id="pl-q" value="${esc(S.tab.plq||'')}" placeholder="이름·닉네임·소속 검색" style="flex:1;border:1px solid #d5d9df;border-radius:10px;padding:9px 12px"></div>
     <div class="plgrid" id="pl-tb">
     ${list.length?list.map(p=>`<div class="plc" data-s="${esc((p.name+' '+p.nick+' '+p.team+' '+(p.memo||'')).toLowerCase())}"><div class="plm"><div class="pln"><b>${esc(p.name)}</b> <span class="nk ${p.nick&&p.nick!==p.name?'blue':'same'}" style="font-weight:700">/ ${esc(p.nick||'')}</span></div><div class="small muted">${p.team?`<span class="badge">${esc(p.team)}</span> `:''}${esc(p.memo||'')}</div></div>${ed?`<div class="row" style="gap:4px;flex-shrink:0"><button class="btn sm" data-act="editPlayer" data-p="${p.id}">수정</button><button class="btn sm red" data-act="delPlayer" data-p="${p.id}">삭제</button></div>`:''}</div>`).join(''):`<div class="empty" style="grid-column:1/-1">등록된 선수가 없습니다.</div>`}
@@ -1749,6 +1746,16 @@ ACT.resetAllDo=()=>{
   ids.forEach(id=>{delete S.tours[id];queueDelete('tournaments/'+id);});ghSchedule();
   closeModal();render();toast(`대회 결과 ${ids.length}건을 모두 삭제했습니다`);
 };
+ACT.plDataMenu=()=>{
+  openModal(`<h3>🗂 명단관리</h3>
+    <div style="display:grid;gap:8px">
+      <button class="btn" style="justify-content:flex-start;padding:12px 14px" data-act="dmGo" data-v="expPlayers" data-x="xlsx">⬇ 엑셀(.xlsx) 다운로드 <span class="small muted" style="font-weight:500;margin-left:auto">Excel·구글 시트</span></button>
+      <button class="btn" style="justify-content:flex-start;padding:12px 14px" data-act="dmGo" data-v="expPlayers" data-x="csv">⬇ CSV 다운로드 <span class="small muted" style="font-weight:500;margin-left:auto">텍스트 표 형식</span></button>
+      <button class="btn" style="justify-content:flex-start;padding:12px 14px" data-act="dmGo" data-v="impPlayers">⬆ 스프레드시트 가져오기 <span class="small muted" style="font-weight:500;margin-left:auto">열: 선수이름·닉네임·소속·메모</span></button>
+      <button class="btn dark" style="justify-content:flex-start;padding:12px 14px" data-act="dmGo" data-v="bulkText">✎ 텍스트로 일괄 입력 <span class="small" style="font-weight:500;margin-left:auto;opacity:.7">한 줄에 한 명</span></button>
+    </div>
+    <div class="mact"><button class="btn" data-act="close">닫기</button></div>`);
+};
 ACT.dataMenu=()=>{
   openModal(`<h3>🗂 대회 결과 데이터</h3>
     <div style="display:grid;gap:8px">
@@ -1759,7 +1766,7 @@ ACT.dataMenu=()=>{
     </div>
     <div class="mact"><button class="btn" data-act="close">닫기</button></div>`);
 };
-ACT.dmGo=(d,b)=>{const f=ACT[d.v];if(d.v==='expResults'||d.v==='impResults')closeModal();if(f)f(d,b);};
+ACT.dmGo=(d,b)=>{const f=ACT[d.v];if(/^(expResults|impResults|expPlayers|impPlayers)$/.test(d.v))closeModal();if(f)f(d.x?Object.assign({},d,{v:d.x}):d,b);};
 ACT.impResults=()=>pickFile('.xlsx,.xls,.csv',async file=>{
   try{const X=await needXLSX();const wb=await readSheetFile(file);await importResultsWB(X,wb);}
   catch(e){toast('파일을 읽을 수 없습니다: '+e.message);}
