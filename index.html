@@ -147,7 +147,10 @@ h2.pg .sp{flex:1}
 .mx{background:#c9ced6;color:#333}
 
 /* heats */
-.sec{margin-bottom:18px}
+.sec{margin-bottom:30px}
+.sec+.sec,.flow+.sec{padding-top:20px;border-top:2px dashed #d5d9df}
+.sec .sec{margin-bottom:14px;padding-top:0;border-top:0}
+@media (max-width:640px){.sec{margin-bottom:22px}.sec+.sec,.flow+.sec{padding-top:14px}}
 .sec>h4{margin:0 0 8px;font-size:17px;font-weight:900;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .sec>h4 small{font-weight:500;color:var(--sub);font-size:13px}
 .heat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
