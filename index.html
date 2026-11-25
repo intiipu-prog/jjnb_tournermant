@@ -37,8 +37,10 @@ header.top{background:var(--dark);color:#fff;position:relative;overflow:hidden}
 nav.tabs a.qrbtn{flex-shrink:0;display:inline-flex;align-items:center;gap:5px;color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:9px;padding:7px 11px;margin:6px 0;font-size:14px;border-bottom-width:1px}
 nav.tabs a.qrbtn:hover{background:rgba(255,255,255,.1)}
 .show-m{display:none}
+.trk-paste{margin-top:8px;border:2px dashed #c9ced6;border-radius:10px;padding:12px;text-align:center;font-size:13.5px;color:var(--sub);background:#fafbfc;outline:none;cursor:text;min-height:44px}
+.trk-paste:focus{border-color:var(--blue);background:#f2f7ff;color:var(--ink)}
 .trk-img{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#f6f7f9;text-align:center}
-.trk-img img{display:block;width:100%;height:auto;max-height:70vh;object-fit:contain;background:#fff}
+.trk-img img{display:block;width:auto;max-width:100%;height:auto;max-height:70vh;margin:0 auto;object-fit:contain;background:#fff}
 .wtsel-box{background:#fffaf0;border:1px solid #f0d48a;border-radius:12px;padding:10px 12px;margin-bottom:10px}
 .wtx{border:0;background:none;color:#9a6b00;font-size:16px;font-weight:900;cursor:pointer;padding:0 0 0 4px;line-height:1}
 nav.tabs a.albtn.on{background:#ffc400;color:#14161b;border-color:#ffc400}
@@ -1463,12 +1465,27 @@ ACT.track=()=>{
   const st=S.settings;const u=(st.trackUrl||'').trim();const src=trackSrc();const ed=canEdit();
   openModal(`<h3>🏁 트랙정보</h3>
     ${ed?`<div class="fld"><label>트랙 주소 (이미지 링크)</label><div class="row" style="flex-wrap:nowrap;gap:6px"><input id="trk-url" value="${esc(u)}" placeholder="https://… 트랙 이미지 주소" style="flex:1;min-width:0"><button class="btn sm pri" data-act="trkSave">저장</button></div>
-      <div class="row small" style="margin-top:6px;gap:6px"><span class="muted">또는</span><label class="btn sm dark">이미지 파일 올리기<input type="file" id="trk-in" accept="image/*" style="display:none"></label>${st.trackImg?'<button class="btn sm red" data-act="trkRmImg">올린 이미지 삭제</button>':''}</div></div>`:(u&&!src?`<div class="small" style="margin-bottom:8px"><a href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a></div>`:'')}
+      <div class="row small" style="margin-top:6px;gap:6px"><span class="muted">또는</span><label class="btn sm dark">이미지 파일 올리기<input type="file" id="trk-in" accept="image/*" style="display:none"></label>${st.trackImg?'<button class="btn sm red" data-act="trkRmImg">올린 이미지 삭제</button>':''}</div>
+      <div class="trk-paste" id="trk-paste" contenteditable="true" spellcheck="false">📋 이미지를 복사한 뒤 여기를 누르고 <b>붙여넣기</b> (PC: Ctrl+V)</div></div>`:(u&&!src?`<div class="small" style="margin-bottom:8px"><a href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a></div>`:'')}
     <div class="trk-img">${src?`<a href="${esc(src)}" target="_blank" rel="noopener"><img id="trk-pic" src="${esc(src)}" alt="트랙 이미지"></a><div class="small muted" id="trk-err" style="display:none;padding:20px">이미지를 불러올 수 없습니다. 주소가 이미지 파일 링크인지 확인하세요.</div>`:'<div class="empty">등록된 트랙 이미지가 없습니다.</div>'}</div>
     <div class="mact"><button class="btn" data-act="close">닫기</button></div>`);
   const mb=$('#modal .mbox');if(mb)mb.style.maxWidth='880px';
   const im=$('#trk-pic');if(im)im.onerror=()=>{im.style.display='none';const e=$('#trk-err');if(e)e.style.display='block';};
 };
+document.addEventListener('paste',e=>{
+  if(!$('#trk-paste')||!canEdit())return;
+  const items=[...((e.clipboardData&&e.clipboardData.items)||[])];
+  const it=items.find(x=>x.kind==='file'&&/^image\//.test(x.type));
+  if(it){e.preventDefault();const f=it.getAsFile();if(f){toast('이미지를 붙여넣는 중…');uploadLogo(f,'trackImg');}return;}
+  if(e.target&&e.target.id==='trk-paste'){
+    e.preventDefault();
+    const html=e.clipboardData.getData('text/html')||'';const m=html.match(/<img[^>]+src=["']([^"']+)["']/i);
+    const txt=(m&&m[1])||(e.clipboardData.getData('text/plain')||'').trim();
+    if(/^data:image\//.test(txt)){fetch(txt).then(r=>r.blob()).then(b=>uploadLogo(b,'trackImg'));return;}
+    if(/^https?:\/\//i.test(txt)){$('#trk-url').value=txt;ACT.trkSave();return;}
+    toast('붙여넣은 내용에 이미지가 없습니다. 이미지를 복사한 뒤 다시 붙여넣어 주세요.');
+  }
+});
 ACT.trkSave=()=>{const v=$('#trk-url').value.trim();saveSettings(Object.assign({},S.settings,{trackUrl:v}));ACT.track();toast('트랙 주소를 저장했습니다');};
 ACT.trkRmImg=()=>{const s2=Object.assign({},S.settings);delete s2.trackImg;saveSettings(s2);ACT.track();};
 ACT.qrWatch=()=>{const u=watchUrl();openModal(`<h3>대진표 QR <small class="muted" style="font-weight:500">관람모드</small></h3><div class="qrbox"><div class="qr" id="qr-tour" data-qr="${esc(u)}" data-sz="240"></div><div class="small muted">스캔하면 진행 버튼이 숨겨진 관람모드로 실시간 대진표를 봅니다.</div><input readonly value="${esc(u)}" style="width:100%;border:1px solid #d5d9df;border-radius:10px;padding:9px;font-size:14px" onclick="this.select()"></div><div class="mact"><button class="btn" data-act="copyUrl" data-u="${esc(u)}">링크 복사</button><button class="btn dark" data-act="saveQR" data-q="qr-tour" data-n="JJNB_대진표_QR">QR 이미지 저장</button><button class="btn pri" data-act="close">닫기</button></div>`);};
