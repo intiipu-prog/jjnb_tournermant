@@ -119,7 +119,11 @@ h2.pg .sp{flex:1}
 .plc .small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
 .rgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 @media (max-width:860px){.rgrid{grid-template-columns:1fr}}
-.emptypic{margin-top:10px;opacity:.95}
+.emptypic{position:relative;margin-top:10px;height:130px;border-radius:12px;overflow:hidden;background:#eef0f3;display:flex;align-items:center;justify-content:center}
+.emptypic .ep-bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:grayscale(1) contrast(.9);opacity:.32}
+.emptypic:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.15),rgba(255,255,255,.45))}
+.emptypic .ep-msg{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:20px;font-weight:900;color:#4b515b;letter-spacing:2px;text-shadow:0 1px 0 #fff}
+.emptypic .ep-flag{font-size:22px;filter:grayscale(1);opacity:.7}
 .rc{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fff;position:relative}
 .rc .tt{font-size:18px;font-weight:900;margin:2px 0 4px}
 .podium{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;margin-top:8px;font-size:16px;align-items:center}
@@ -291,8 +295,8 @@ td.tot{font-weight:900;background:#fffaf0}
   .rc{padding:12px}
   .rc .tt,.trc [style*="font-size:18px"]{font-size:17px !important}
   .emptypic{margin-top:6px}
-  .emptypic img{max-height:88px !important}
-  .emptypic svg{max-width:210px !important}
+  .emptypic{height:110px}
+  .emptypic .ep-msg{font-size:17px}
   .ttabs{gap:5px;margin-bottom:10px}
   .ttabs button{padding:7px 11px;font-size:13.5px}
   .ttabs input{min-width:150px !important;font-size:14px !important;padding:7px 12px !important}
@@ -677,8 +681,8 @@ function progressText(t){
 const EMPTY_SVG=`<svg viewBox="0 0 320 120" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:300px;height:auto;display:block;margin:0 auto"><defs><pattern id="ck" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#d6dae0"/><rect x="6" y="6" width="6" height="6" fill="#d6dae0"/></pattern></defs><rect x="0" y="92" width="320" height="10" rx="5" fill="#eef0f3"/><rect x="246" y="20" width="3" height="74" fill="#c3c8cf"/><rect x="249" y="20" width="44" height="30" fill="url(#ck)" stroke="#c3c8cf"/><g transform="translate(40 52)"><path d="M10 34h120l-10-16h-26l-14-12H54L30 18H14z" fill="#e10600"/><rect x="58" y="10" width="26" height="8" rx="2" fill="#ffc400"/><path d="M0 34h140" stroke="#14161b" stroke-width="3"/><circle cx="32" cy="36" r="10" fill="#14161b"/><circle cx="32" cy="36" r="4" fill="#9aa0a9"/><circle cx="108" cy="36" r="10" fill="#14161b"/><circle cx="108" cy="36" r="4" fill="#9aa0a9"/><path d="M-30 20h22M-36 28h26M-26 12h16" stroke="#c3c8cf" stroke-width="3" stroke-linecap="round"/></g></svg>`;
 function emptyPic(t){
   const msg=t.status==='planned'?'대회 준비중':t.status==='cancelled'?'취소된 대회':t.status==='active'?'경기 진행중':'결과 없음';
-  const img=S.settings.emptyImg?`<img src="${esc(S.settings.emptyImg)}" alt="" style="max-width:100%;max-height:130px;display:block;margin:0 auto;border-radius:10px">`:EMPTY_SVG;
-  return `<div class="emptypic">${img}<div class="small muted" style="text-align:center;margin-top:6px">${msg}</div></div>`;
+  const bg=S.settings.emptyImg||('data:image/svg+xml;charset=utf-8,'+encodeURIComponent(EMPTY_SVG.replace(' style="width:100%;max-width:300px;height:auto;display:block;margin:0 auto"','').replace('<svg ','<svg preserveAspectRatio="xMidYMid slice" ')));
+  return `<div class="emptypic"><div class="ep-bg" style="background-image:url('${esc(bg)}')"></div><div class="ep-msg"><span class="ep-flag">🏁</span>${msg}</div></div>`;
 }
 function podiumHTML(t,max){
   const r=(t.result||[]).filter(o=>o.rank).slice(0,max||4);
