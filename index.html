@@ -715,8 +715,8 @@ function communityCard(){
 function vTours(){
   const f=S.tab.tourFilter||'all';
   const all=sortedTours().filter(t=>f==='all'||t.status===f);
-  let h=`<h2 class="pg">대회 결과<span class="sp"></span>${canEdit()?`<button class="btn sm" data-act="expResults">⬇ 결과 내보내기</button><button class="btn sm" data-act="impResults">⬆ 결과 가져오기</button><button class="btn sm dark" data-act="resText">✎ 텍스트로 결과 입력</button><button class="btn sm red" data-act="resetAll">⚠ 전체 리셋</button><button class="btn pri sm hide-m" data-act="nav" data-h="new">+ 대회 개최</button>`:''}</h2>`;
-  h+=`<div class="ttabs">${[['all','전체'],['planned','예정'],['active','진행중'],['done','종료'],['cancelled','취소']].map(x=>`<button class="${f===x[0]?'on':''}" data-act="tourFilter" data-v="${x[0]}">${x[1]}</button>`).join('')}<input id="tr-q" value="${esc(S.tab.trq||'')}" placeholder="🔍 대회명·선수·날짜 검색" style="border:1px solid #d5d9df;border-radius:99px;padding:8px 14px;font-size:15px;min-width:200px;flex:1;max-width:320px"></div><div id="tr-none" class="card empty" style="display:none">검색 결과가 없습니다.</div>`;
+  let h=`<h2 class="pg">대회 결과</h2>`;
+  h+=`<div class="ttabs">${[['all','전체'],['planned','예정'],['active','진행중'],['done','종료'],['cancelled','취소']].map(x=>`<button class="${f===x[0]?'on':''}" data-act="tourFilter" data-v="${x[0]}">${x[1]}</button>`).join('')}<input id="tr-q" value="${esc(S.tab.trq||'')}" placeholder="🔍 대회명·선수·날짜 검색" style="border:1px solid #d5d9df;border-radius:99px;padding:8px 14px;font-size:15px;min-width:200px;flex:1;max-width:320px">${canEdit()?'<span class="sp"></span><button class="btn sm dark" style="flex-shrink:0;border-radius:99px;padding:8px 16px" data-act="dataMenu">🗂 데이터</button>':''}</div><div id="tr-none" class="card empty" style="display:none">검색 결과가 없습니다.</div>`;
   if(!all.length)return h+'<div class="card empty">대회가 없습니다.</div>';
   h+='<div class="tgrid">'+all.map(t=>`<div class="card trc" style="margin:0" data-s="${esc([t.name,t.date,(t.date||'').replace(/-/g,'.'),kindLabel(tKind(t)),...(t.result||[]).filter(o=>o.rank&&o.rank<=4).map(o=>o.name+' '+o.nick),...activeList(t).map(p=>(t.people[p]||{}).name||'')].join(' ').toLowerCase())}"><div class="row">${typeBadge(t)} ${statusBadge(t)}<span class="sp"></span><span class="small muted">${esc(t.date||'')}</span></div>
     <div class="row" style="margin-top:6px"><div style="flex:1;min-width:200px"><div style="font-size:18px;font-weight:900">${tName(t)}</div><div class="small muted">참가 ${activeList(t).length}명 · ${esc(progressText(t))}</div>${t.status==='done'&&(t.result||[]).some(o=>o.rank)?podiumHTML(t,4):emptyPic(t)}</div>
@@ -1749,6 +1749,17 @@ ACT.resetAllDo=()=>{
   ids.forEach(id=>{delete S.tours[id];queueDelete('tournaments/'+id);});ghSchedule();
   closeModal();render();toast(`대회 결과 ${ids.length}건을 모두 삭제했습니다`);
 };
+ACT.dataMenu=()=>{
+  openModal(`<h3>🗂 대회 결과 데이터</h3>
+    <div style="display:grid;gap:8px">
+      <button class="btn" style="justify-content:flex-start;padding:12px 14px" data-act="dmGo" data-v="expResults">⬇ 결과 내보내기 <span class="small muted" style="font-weight:500;margin-left:auto">엑셀(.xlsx)로 백업</span></button>
+      <button class="btn" style="justify-content:flex-start;padding:12px 14px" data-act="dmGo" data-v="impResults">⬆ 결과 가져오기 <span class="small muted" style="font-weight:500;margin-left:auto">엑셀·CSV 파일 불러오기</span></button>
+      <button class="btn dark" style="justify-content:flex-start;padding:12px 14px" data-act="dmGo" data-v="resText">✎ 텍스트로 결과 입력 <span class="small" style="font-weight:500;margin-left:auto;opacity:.7">날짜·대회명·1~4위</span></button>
+      <button class="btn red" style="justify-content:flex-start;padding:12px 14px" data-act="dmGo" data-v="resetAll">⚠ 전체 리셋 <span class="small" style="font-weight:500;margin-left:auto;opacity:.8">모든 대회 결과 삭제</span></button>
+    </div>
+    <div class="mact"><button class="btn" data-act="close">닫기</button></div>`);
+};
+ACT.dmGo=(d,b)=>{const f=ACT[d.v];if(d.v==='expResults'||d.v==='impResults')closeModal();if(f)f(d,b);};
 ACT.impResults=()=>pickFile('.xlsx,.xls,.csv',async file=>{
   try{const X=await needXLSX();const wb=await readSheetFile(file);await importResultsWB(X,wb);}
   catch(e){toast('파일을 읽을 수 없습니다: '+e.message);}
