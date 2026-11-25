@@ -682,8 +682,7 @@ function progressText(t){
 const EMPTY_SVG=`<svg viewBox="0 0 320 120" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:300px;height:auto;display:block;margin:0 auto"><defs><pattern id="ck" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#d6dae0"/><rect x="6" y="6" width="6" height="6" fill="#d6dae0"/></pattern></defs><rect x="0" y="92" width="320" height="10" rx="5" fill="#eef0f3"/><rect x="246" y="20" width="3" height="74" fill="#c3c8cf"/><rect x="249" y="20" width="44" height="30" fill="url(#ck)" stroke="#c3c8cf"/><g transform="translate(40 52)"><path d="M10 34h120l-10-16h-26l-14-12H54L30 18H14z" fill="#e10600"/><rect x="58" y="10" width="26" height="8" rx="2" fill="#ffc400"/><path d="M0 34h140" stroke="#14161b" stroke-width="3"/><circle cx="32" cy="36" r="10" fill="#14161b"/><circle cx="32" cy="36" r="4" fill="#9aa0a9"/><circle cx="108" cy="36" r="10" fill="#14161b"/><circle cx="108" cy="36" r="4" fill="#9aa0a9"/><path d="M-30 20h22M-36 28h26M-26 12h16" stroke="#c3c8cf" stroke-width="3" stroke-linecap="round"/></g></svg>`;
 function emptyPic(t){
   const msg=t.status==='planned'?'대회 준비중':t.status==='cancelled'?'취소된 대회':t.status==='active'?'경기 진행중':'결과 없음';
-  const bg=S.settings.emptyImg||('data:image/svg+xml;charset=utf-8,'+encodeURIComponent(EMPTY_SVG.replace(' style="width:100%;max-width:300px;height:auto;display:block;margin:0 auto"','').replace('<svg ','<svg preserveAspectRatio="xMidYMid slice" ')));
-  return `<div class="emptypic"><div class="ep-bg" style="background-image:url('${esc(bg)}')"></div><div class="ep-msg"><span class="ep-flag">🏁</span>${msg}</div></div>`;
+  return `<div class="emptypic"><div class="ep-msg"><span class="ep-flag">🏁</span>${msg}</div></div>`;
 }
 function podiumHTML(t,max){
   const r=(t.result||[]).filter(o=>o.rank).slice(0,max||4);
@@ -1044,10 +1043,7 @@ function vConfig(){
   return `<h2 class="pg">설정</h2>
   <div class="cfgrow"><div class="cfcol"><div class="card" style="margin:0"><h3>배너 로고</h3><div class="row" style="align-items:center;gap:12px;flex-wrap:nowrap"><div style="background:var(--dark);padding:10px;border-radius:10px;flex-shrink:0">${st.logo?`<img src="${esc(st.logo)}" style="max-height:64px;max-width:160px;display:block">`:DEFAULT_LOGO}</div>
     <div style="display:flex;flex-direction:column;gap:6px;align-items:stretch"><label class="btn sm dark" style="justify-content:center">로고 이미지 업로드<input type="file" id="logo-in" accept="image/*" style="display:none"></label>${st.logo?'<button class="btn sm red" style="justify-content:center" data-act="rmLogo">기본 로고로</button>':''}</div></div>
-    <div class="small muted" style="margin-top:6px">PNG(투명 배경)를 권장합니다. 자동으로 축소되어 저장됩니다.</div>
-    <h3 style="margin-top:16px">결과 없는 대회 그림 <small>대시보드·대회 결과의 빈칸</small></h3>
-    <div class="row" style="align-items:center;gap:12px;flex-wrap:nowrap"><div style="width:160px;flex-shrink:0;border:1px solid var(--line);border-radius:10px;padding:6px;background:#fff">${st.emptyImg?`<img src="${esc(st.emptyImg)}" style="max-width:100%;max-height:90px;display:block;margin:0 auto">`:EMPTY_SVG}</div>
-    <div style="display:flex;flex-direction:column;gap:6px"><label class="btn sm dark" style="justify-content:center">그림 업로드<input type="file" id="empty-in" accept="image/*" style="display:none"></label>${st.emptyImg?'<button class="btn sm red" style="justify-content:center" data-act="rmEmpty">기본 그림으로</button>':''}</div></div></div>
+    <div class="small muted" style="margin-top:6px">PNG(투명 배경)를 권장합니다. 자동으로 축소되어 저장됩니다.</div></div>
   <div class="card" style="margin:0"><h3>화면</h3><div class="row"><button class="btn" data-act="viewOnly">${S.viewOnly?'진행자 모드로 전환':'관람 모드 (진행 버튼 숨기기)'}</button></div><div class="small muted" style="margin-top:6px">대형 화면에 띄울 때 관람 모드를 사용하세요. 이 기기에서만 적용됩니다.</div></div></div>
   <div class="card" style="margin:0"><h3>QR 링크</h3>
     <div class="fld"><label>대진표 페이지 주소 (참가자 QR에 사용)</label><input id="cf-url" value="${esc(st.appUrl||appUrl())}" placeholder="https://claude.ai/..."></div>
