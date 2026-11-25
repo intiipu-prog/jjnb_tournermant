@@ -118,8 +118,8 @@ h2.pg .sp{flex:1}
 .plc .pln{font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .plc .small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:0;line-height:1.35}
 .plc .pln{line-height:1.3}
-.rgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-@media (max-width:860px){.rgrid{grid-template-columns:1fr}}
+.rgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:640px){.rgrid{grid-template-columns:1fr}}
 .emptypic{position:relative;margin-top:10px;height:130px;border-radius:12px;overflow:hidden;background:#eef0f3;display:flex;align-items:center;justify-content:center}
 .emptypic .ep-bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:grayscale(1) contrast(.9);opacity:.32}
 .emptypic:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.15),rgba(255,255,255,.45))}
@@ -691,10 +691,10 @@ function podiumHTML(t,max){
   return `<div class="podium">${r.map(o=>`${medal(o.rank)}<div>${nmHTML(o)}</div>`).join('')}</div>`;
 }
 function vDash(){
-  const all=sortedTours();const rec=all.slice(0,3);
+  const all=sortedTours();const rec=all.slice(0,4);
   const live=all.filter(t=>t.status==='active').length;
   let h='';
-  h+=`<div class="card"><h3>최근 대회 <small>최근 3개</small><span class="sp"></span>${canEdit()?'<button class="btn pri sm hide-m" data-act="nav" data-h="new">+ 대회 개최</button>':''}</h3>`;
+  h+=`<div class="card"><h3>최근 대회 <small>최근 4개</small><span class="sp"></span>${canEdit()?'<button class="btn pri sm hide-m" data-act="nav" data-h="new">+ 대회 개최</button>':''}</h3>`;
   if(!rec.length)h+=`<div class="empty">아직 대회가 없습니다.${canEdit()?'<br>선수 명단을 등록한 뒤 대회를 개최해 보세요.':''}</div>`;
   else h+=`<div class="rgrid">${rec.map(t=>`<div class="rc">
       <div class="row">${typeBadge(t)} ${statusBadge(t)}<span class="sp"></span><span class="small muted">${esc(t.date||'')}</span></div>
