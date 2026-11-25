@@ -184,6 +184,7 @@ h2.pg .sp{flex:1}
 .flow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:#f8f9fb;border:1px dashed #cfd4da;border-radius:12px;padding:12px;margin:6px 0 18px}
 .flow .msg{flex:1;min-width:200px;font-weight:700}
 .fin-list{display:flex;gap:6px;flex-wrap:wrap}
+.rfin{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fff8e1;border:1px solid #f3d27a;border-radius:12px;padding:10px 14px;margin-bottom:16px}.rfin b{font-size:15px;white-space:nowrap}@media (max-width:640px){.rfin{padding:8px 10px;gap:6px;margin-bottom:12px}.rfin b{font-size:14px}}
 .chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:99px;padding:4px 10px;font-size:15px}
 .chip.gold{border-color:#f0c35a;background:#fffaf0}
 
@@ -899,7 +900,9 @@ function vRound(t,ri,ed){
   const isCur=ri===t.rounds.length-1&&!t.finals;const e=ed&&isCur;
   const szSel=(k,cur)=>`<span class="opt">${[3,2].map(n=>`<button class="${cur===n?'on':''}" style="padding:5px 10px;font-size:13px" data-act="setSize" ${rctx(t,ri,k)} data-v="${n}">${n}인 1조</button>`).join('')}</span>`;
   const qs=r.size||3,rs=r.repSize||qs,ms=(r.main&&r.main.size)||r.mainSize||t.opt.mainSize||3;
-  let h=`<div class="sec"><h4>예선 <small>${qs}인 1조 · 각 조 1위 본선 진출</small><span class="sp"></span>${e&&!r.rep&&!r.main?szSel('qual',qs):''}${e?`<button class="btn sm" data-act="reshuffle" ${rctx(t,ri,'qual')}>↻ 재편성</button>`:''}</h4>
+  const fl0=roundFinalists(t,r);
+  let h=r.main&&r.main.done?`<div class="rfin"><b>🏆 ${r.no}라운드 결승 진출</b><div class="fin-list">${fl0.length?fl0.map(p=>`<span class="chip gold">${tn(t,p)}</span>`).join(''):'<span class="muted">진출자 없음</span>'}</div></div>`:'';
+  h+=`<div class="sec"><h4>예선 <small>${qs}인 1조 · 각 조 1위 본선 진출</small><span class="sp"></span>${e&&!r.rep&&!r.main?szSel('qual',qs):''}${e?`<button class="btn sm" data-act="reshuffle" ${rctx(t,ri,'qual')}>↻ 재편성</button>`:''}</h4>
     <div class="heat-grid">${r.qual.heats.map((hh,i)=>heatCard(t,hh,`${i+1}조`,{kind:'adv',ed:e,ctx:rctx(t,ri,'qual')})).join('')}</div></div>`;
   const qd=stageDone(t,r.qual);
   if(r.rep){
