@@ -328,6 +328,17 @@ td.tot{font-weight:900;background:#fffaf0}
   table.tb{font-size:14px}
   table.tb td,table.tb th{padding:7px 4px}
 }
+.tmob{display:none}
+@media (max-width:640px){
+ .tstick{position:sticky;top:var(--navh,52px);z-index:15;background:var(--bg);margin:-4px -10px 8px;padding:6px 10px 2px;box-shadow:0 6px 8px -6px rgba(0,0,0,.18)}
+ .tstick .card.thead{padding:9px 11px;margin-bottom:7px}
+ .tstick .tdesk{display:none}.tstick .tmob{display:block}
+ .tstick .tmob .badge{flex-shrink:0;font-size:11px;padding:2px 7px}
+ .tstick .tmt{flex:1;min-width:0;font-size:16px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .tstick .tmore{flex-shrink:0;padding:4px 12px;font-size:16px;line-height:1}
+ .tstick .ttabs{margin-bottom:6px}
+ .tmenu{display:flex;flex-direction:column;gap:8px}.tmenu .btn{width:100%;padding:12px;font-size:15px}
+}
 </style>
 </head>
 <body>
@@ -674,6 +685,7 @@ function render(fromData){
     else html=vDash();
   }catch(e){console.error(e);html=`<div class="card">화면 오류: ${esc(e.message)}</div>`;}
   app.innerHTML=html;
+  try{const nv=document.querySelector('nav.tabs');if(nv)document.documentElement.style.setProperty('--navh',nv.offsetHeight+'px');}catch(e){}
   try{checkAlerts();}catch(e){console.error(e);}
   const all=Object.values(S.tours);
   $('#hstats').innerHTML=`<div class="lv"><b>${all.filter(t=>t.status==='active').length}</b><span>진행중</span></div><div><b>${all.filter(t=>t.status!=='cancelled').length}</b><span>전체 대회</span></div><div><b>${S.players.length}</b><span>등록 선수</span></div>`;
@@ -814,15 +826,19 @@ function vTour(id){
   const t=S.tours[id];
   if(!t)return S.loaded.tours?'<div class="card empty">대회를 찾을 수 없습니다. 삭제되었을 수 있습니다.</div>':'<div class="empty">불러오는 중…</div>';
   const ed=canEdit()&&t.status!=='cancelled';
-  let h=`<div class="card"><div class="row">${typeBadge(t)} ${statusBadge(t)}<span class="sp"></span><span class="small muted">${esc(t.date||'')}</span></div>
-    <div class="row" style="margin-top:6px"><div style="flex:1;min-width:180px"><div style="font-size:22px;font-weight:900">${tName(t)}</div>
-    <div class="small muted">참가 ${activeList(t).length}명${(t.removed||[]).length?` (제외 ${(t.removed||[]).length}명)`:''} · ${esc(progressText(t))}</div></div>
-    <div class="row">${tourUrl(t.id)?`<button class="btn sm" data-act="qr" data-t="${t.id}">QR 공유</button>`:''}
+  const btns=`${tourUrl(t.id)?`<button class="btn sm" data-act="qr" data-t="${t.id}">QR 공유</button>`:''}
     ${canEdit()?`<button class="btn sm" data-act="editTour" data-t="${t.id}">✎ 대회수정</button>`:''}
     ${ed?`<button class="btn sm" data-act="pm" data-t="${t.id}">참가자 추가/제외</button>`:''}
     ${canEdit()&&(t.status==='active'||t.status==='planned')?`<button class="btn sm red" data-act="cancelTour" data-t="${t.id}">대회 취소</button>`:''}
     ${canEdit()&&t.status==='cancelled'?`<button class="btn sm" data-act="restoreTour" data-t="${t.id}">취소 철회</button>`:''}
-    ${canEdit()?`<button class="btn sm red" data-act="delTour" data-t="${t.id}">삭제</button>`:''}</div></div></div>`;
+    ${canEdit()?`<button class="btn sm red" data-act="delTour" data-t="${t.id}">삭제</button>`:''}`;
+  S._tbtns=btns;
+  const mob=`<div class="tmob show-m"><div class="row" style="gap:6px;flex-wrap:nowrap">${typeBadge(t)}${statusBadge(t)}<b class="tmt">${tName(t)}</b>${btns.trim()?`<button class="btn sm tmore" data-act="tourMenu" data-t="${t.id}">⋯</button>`:''}</div>
+    <div class="small muted" style="margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t.date||'')} · 참가 ${activeList(t).length}명${(t.removed||[]).length?` (제외 ${(t.removed||[]).length})`:''} · ${esc(progressText(t))}</div></div>`;
+  let h=`<div class="card thead">${mob}<div class="tdesk"><div class="row">${typeBadge(t)} ${statusBadge(t)}<span class="sp"></span><span class="small muted">${esc(t.date||'')}</span></div>
+    <div class="row" style="margin-top:6px"><div style="flex:1;min-width:180px"><div style="font-size:22px;font-weight:900">${tName(t)}</div>
+    <div class="small muted">참가 ${activeList(t).length}명${(t.removed||[]).length?` (제외 ${(t.removed||[]).length}명)`:''} · ${esc(progressText(t))}</div></div>
+    <div class="row">${btns}</div></div></div></div>`;
   if(t.status==='cancelled')h+='<div class="banner-cxl">이 대회는 취소되었습니다. 명예의 전당에 반영되지 않습니다.</div>';
   if(isPlanned(t)){
     const ps=activeList(t);
@@ -832,7 +848,9 @@ function vTour(id){
       ${canEdit()?`<div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn pri big" data-act="startPlanned" data-t="${t.id}">▶ 대회 시작 (대진 편성)</button></div>`:''}</div>`;
   }
   if(t.type==='record')return h+`<div class="card"><h3>🏁 최종 결과 <small>대진 상세 없이 입력된 기록</small></h3>${rankGridHTML(t,t.result||[])}${canEdit()?`<div class="row" style="margin-top:10px"><button class="btn sm" data-act="editTour" data-t="${t.id}">✎ 대회수정 (입상자 변경)</button></div>`:''}</div>`;
-  return h+(t.type==='points'?vPoints(t,ed):vTournament(t,ed));
+  let body=t.type==='points'?vPoints(t,ed):vTournament(t,ed);let tabsH='';
+  const mm=body.match(/^<div class="ttabs">[\s\S]*?<\/div>/);if(mm){tabsH=mm[0];body=body.slice(tabsH.length);}
+  return `<div class="tstick">${h}${tabsH}</div>`+body;
 }
 function segBtns(list,cur,attrs){return `<div class="seg">${list.map(o=>`<button class="${o[2]||o[0]} ${cur===o[0]?'on':''}" data-v="${o[0]}" ${attrs}>${o[1]}</button>`).join('')}</div>`;}
 function heatCard(t,h,title,o){
@@ -1132,6 +1150,7 @@ document.addEventListener('click',e=>{
 ACT.__yes=()=>{const r=S._ask;S._ask=null;closeModal();r&&r(true);};
 ACT.__no=()=>{closeModal();};
 ACT.close=()=>closeModal();
+ACT.tourMenu=()=>{openModal(`<h3>대회 관리</h3><div class="tmenu">${S._tbtns||''}</div><div class="row" style="margin-top:12px;justify-content:flex-end"><button class="btn" data-act="close">닫기</button></div>`);};
 ACT.nav=d=>go(d.h);
 ACT.viewOnly=()=>{S.viewOnly=!S.viewOnly;renderShell();render();};
 ACT.tourFilter=d=>{S.tab.tourFilter=d.v;render();};
