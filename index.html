@@ -665,7 +665,7 @@ function drawQRs(root){
     if(!txt){el.innerHTML='<span class="small muted">링크 미설정</span>';return;}
     el.innerHTML='';
     if(window.QRCode){try{new QRCode(el,{text:txt,width:sz,height:sz,correctLevel:QRCode.CorrectLevel.M});}catch(e){el.textContent='QR 오류';}}
-    else el.innerHTML='<span class="small muted">QR 로딩 실패</span>';
+    else el.innerHTML=el.classList.contains('hq')?'<span style="display:block;width:44px;height:44px"></span>':'<span class="small muted">QR 로딩 실패</span>';
   });
 }
 
@@ -1010,9 +1010,9 @@ function vPlayers(){
   });
   const sth=(k,l)=>`<th class="sth ${so.k===k?'on':''}" data-act="plSort" data-k="${k}">${l}<span class="arw">${so.k===k?(so.dir>0?'▲':'▼'):'↕'}</span></th>`;
   let h=`<h2 class="pg">선수 명단 <span class="badge">${list.length}명</span><span class="sp"></span>${ed?`<button class="btn sm dark" data-act="bulkText">✎ 텍스트로 일괄 입력</button><button class="btn pri sm" data-act="editPlayer">+ 선수 등록</button>`:''}</h2>`;
-  if(ed)h+=`<div class="card"><h3>스프레드시트 <small>Excel·Google 스프레드시트 호환 (.xlsx / .csv)</small></h3><div class="row">
+  if(ed)h+=`<div class="card" style="padding:10px 12px"><div class="row" title="Excel·Google 스프레드시트 호환 · 열: 선수이름·닉네임·소속·메모">
     <button class="btn sm" data-act="expPlayers" data-v="xlsx">⬇ 엑셀(.xlsx) 다운로드</button><button class="btn sm" data-act="expPlayers" data-v="csv">⬇ CSV 다운로드</button><button class="btn sm dark" data-act="impPlayers">⬆ 스프레드시트 가져오기</button></div>
-    <div class="small muted" style="margin-top:8px">열 이름: 선수이름 · 닉네임 · 소속 · 메모. 구글 시트는 [파일 → 다운로드 → .xlsx 또는 .csv]로 받은 파일을 가져오세요.<br>PC 크롬·엣지에서는 내보낼 때 저장 위치(폴더)와 파일 이름을 직접 고를 수 있습니다.</div></div>`;
+    </div>`;
   h+=`<div class="card"><div class="row" style="margin-bottom:10px"><span class="small muted">정렬</span><select id="pl-sort" style="border:1px solid #d5d9df;border-radius:10px;padding:8px 10px;background:#fff">${[['name','이름순'],['nick','닉네임순'],['team','소속순'],['memo','메모순'],['reg','등록순']].map(o=>`<option value="${o[0]}" ${so.k===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select><button class="btn sm" data-act="plSortDir">${so.dir>0?'▲ 오름차순':'▼ 내림차순'}</button><input id="pl-q" value="${esc(S.tab.plq||'')}" placeholder="이름·닉네임·소속 검색" style="flex:1;border:1px solid #d5d9df;border-radius:10px;padding:9px 12px"></div>
     <div class="plgrid" id="pl-tb">
     ${list.length?list.map(p=>`<div class="plc" data-s="${esc((p.name+' '+p.nick+' '+p.team+' '+(p.memo||'')).toLowerCase())}"><div class="plm"><div class="pln"><b>${esc(p.name)}</b> <span class="nk ${p.nick&&p.nick!==p.name?'blue':'same'}" style="font-weight:700">/ ${esc(p.nick||'')}</span></div><div class="small muted">${p.team?`<span class="badge">${esc(p.team)}</span> `:''}${esc(p.memo||'')}</div></div>${ed?`<div class="row" style="gap:4px;flex-shrink:0"><button class="btn sm" data-act="editPlayer" data-p="${p.id}">수정</button><button class="btn sm red" data-act="delPlayer" data-p="${p.id}">삭제</button></div>`:''}</div>`).join(''):`<div class="empty" style="grid-column:1/-1">등록된 선수가 없습니다.</div>`}
