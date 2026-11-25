@@ -37,6 +37,15 @@ header.top{background:var(--dark);color:#fff;position:relative;overflow:hidden}
 nav.tabs a.qrbtn{flex-shrink:0;display:inline-flex;align-items:center;gap:5px;color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:9px;padding:7px 11px;margin:6px 0;font-size:14px;border-bottom-width:1px}
 nav.tabs a.qrbtn:hover{background:rgba(255,255,255,.1)}
 .show-m{display:none}
+nav.tabs a.albtn.on{background:#ffc400;color:#14161b;border-color:#ffc400}
+.modebar.al{background:#fff4cc;color:#5a4500}
+.modebar.al a{color:#8a5a00;font-weight:700}
+#alertpop{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:300;display:flex;flex-direction:column;gap:8px;width:min(440px,94vw)}
+.alcard{background:#fff;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.35);padding:14px 16px;border-left:6px solid #1d6fe0;animation:alin .3s ease}
+.alcard.now{border-left-color:#e10600;background:#fff6f5}
+.alcard .alt{font-size:18px;font-weight:900}
+.alcard .alb{font-size:14px;color:var(--sub);margin-top:2px}
+@keyframes alin{from{transform:translateY(-20px);opacity:0}to{transform:none;opacity:1}}
 @media (max-width:640px){.hcomm{display:none}.hcomm+.hstats{margin-left:auto}.show-m{display:block}nav.tabs a.qrbtn{padding:6px 8px;margin:5px 0}nav.tabs a.qrbtn span{display:none}}
 .hstats{margin-left:auto;display:flex;gap:6px;align-self:flex-start;margin-top:2px}
 .hstats div{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:4px 9px;text-align:center;min-width:54px}
@@ -329,6 +338,7 @@ td.tot{font-weight:900;background:#fffaf0}
 <main><div class="wrap" id="app"><div class="empty">불러오는 중…</div></div></main>
 <div id="modal"></div>
 <div id="toast"></div>
+<div id="alertpop"></div>
 
 <script>
 /* ================= 기본 설정 ================= */
@@ -621,8 +631,10 @@ function renderShell(){
   const hc=$('#hcomm');if(hc&&hc.dataset.k!==bu+'|'+ku){hc.dataset.k=bu+'|'+ku;hc.innerHTML=`<a href="${esc(bu)}" target="_blank" rel="noopener" title="밴드"><span class="hq" data-qr="${esc(bu)}" data-sz="44"></span><span>밴드</span></a><a href="${esc(ku)}" target="_blank" rel="noopener" title="카카오톡 오픈채팅"><span class="hq" data-qr="${esc(ku)}" data-sz="44"></span><span>오픈채팅</span></a>`;drawQRs(hc);}
   $('#logo').innerHTML=S.settings.logo?`<img src="${esc(S.settings.logo)}" alt="JJNB 로고">`:DEFAULT_LOGO;
   const r=route();const base=r.indexOf('t-')===0?'tours':r;
+  const wl=watchList();
+  const alBtn=`<a href="#" class="qrbtn albtn ${wl.length?'on':''}" data-act="watch" title="선수 차례 알림">🔔<span>${wl.length?`알림 ${wl.length}명`:'알림 신청'}</span></a>`;
   const qrBtn=watchUrl()?`<a href="#" class="qrbtn" data-act="qrWatch" title="대진표 QR (관람모드)"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm11-2h2v2h-2v-2zm-3 0h2v2h-2v-2zm3 3h2v2h-2v-2zm3-3h2v2h-2v-2zm0 3h2v5h-5v-2h3v-3zm-6 2h2v3h-2v-3z"/></svg><span>QR</span></a>`:'';
-  $('#nav').innerHTML=`<div class="navs">${NAV.filter(n=>canEdit()||n[0]!=='config').map(n=>`<a href="#${n[0]}" class="${base===n[0]?'on':''}">${n[1]}</a>`).join('')}</div>`+qrBtn+(canEdit()?`<a href="#new" class="newbtn ${base==='new'?'on':''}">+ <span class="lg2">대회 </span>개최</a>`:'');
+  $('#nav').innerHTML=`<div class="navs">${NAV.filter(n=>canEdit()||n[0]!=='config').map(n=>`<a href="#${n[0]}" class="${base===n[0]?'on':''}">${n[1]}</a>`).join('')}</div>`+alBtn+qrBtn+(canEdit()?`<a href="#new" class="newbtn ${base==='new'?'on':''}">+ <span class="lg2">대회 </span>개최</a>`:'');
   let mb='';
   if(S.mode==='fb'){
     if(S.fbUser)mb=`<div class="modebar ro">진행자 로그인: ${esc(S.fbUser.email||'')} · ${S.viewOnly?'<a href="#" data-act="viewOnly">진행자 모드로 전환</a> · ':''}<a href="#" data-act="logout">로그아웃</a></div>`;
@@ -631,6 +643,8 @@ function renderShell(){
   else if(S.mode==='local')mb='<div class="modebar">로컬 모드: 이 기기 브라우저에만 저장됩니다 (게시된 페이지에서 열면 서버에 저장됩니다)</div>';
   else if(!S.canWrite)mb='<div class="modebar ro">보기 전용 · 실시간으로 대진 현황이 업데이트됩니다</div>';
   else if(S.viewOnly)mb='<div class="modebar ro">관람 모드 (진행 버튼 숨김) · <a href="#" data-act="viewOnly">진행자 모드로 전환</a></div>';
+  if(wl.length){const nm=wl.map(id=>{const p=S.players.find(x=>x.id===id);return p?esc(nameTxt(p)):'';}).filter(Boolean).join(', ');
+    mb+=`<div class="modebar al">🔔 알림 대상 : <b>${nm||'-'}</b> · <a href="#" data-act="watch">변경</a> · <a href="#" data-act="watchOff">끄기</a>${typeof Notification!=='undefined'&&Notification.permission!=='granted'?' · <a href="#" data-act="notiPerm">기기 알림 허용</a>':''}</div>`;}
   $('#modebar').innerHTML=mb;
 }
 function render(fromData){
@@ -650,6 +664,7 @@ function render(fromData){
     else html=vDash();
   }catch(e){console.error(e);html=`<div class="card">화면 오류: ${esc(e.message)}</div>`;}
   app.innerHTML=html;
+  try{checkAlerts();}catch(e){console.error(e);}
   const all=Object.values(S.tours);
   $('#hstats').innerHTML=`<div class="lv"><b>${all.filter(t=>t.status==='active').length}</b><span>진행중</span></div><div><b>${all.filter(t=>t.status!=='cancelled').length}</b><span>전체 대회</span></div><div><b>${S.players.length}</b><span>등록 선수</span></div>`;
   drawQRs(app);
@@ -1799,6 +1814,91 @@ ACT.ghPlayers=async()=>{
     const rows=list.map(p=>({name:p.name,nick:p.nick||p.name,team:p.team||'',memo:p.memo||''})).filter(r=>r.name);showImport(rows,'GitHub 백업');}
   catch(e){toast('백업 파일을 읽을 수 없습니다: '+e.message);}
 };
+/* ================= 선수 차례 알림 ================= */
+function watchList(){try{const a=JSON.parse(localStorage.getItem('jjnb:watch')||'[]');return Array.isArray(a)?a:[];}catch(e){return [];}}
+function setWatch(a){try{localStorage.setItem('jjnb:watch',JSON.stringify(a));}catch(e){}}
+S.alerted={};
+function heatQueue(t){
+  const q=[];if(t.status!=='active')return q;
+  if(t.type==='tournament'){
+    if(t.finals){const f=t.finals;
+      if(f.stage1&&!f.upper)f.stage1.heats.forEach((h,i)=>q.push({h,label:`결승라운드 1차 ${i+1}조`}));
+      const lowLab=(()=>{const uh=finalsUpperHeat(f);return uh?(act(t,uh).length+1)+'위 결정전':'순위 결정전';})();
+      [['lower',lowLab],['upper','최종 결승']].forEach(([k,lab])=>{const ch=f[k];if(!ch||ch.done)return;const st=ch.stages[ch.stages.length-1];if(st)st.heats.forEach((h,i)=>q.push({h,label:st.kind==='rank'?lab:`${lab} 예선 ${i+1}조`}));});
+    }else{const R=t.rounds[t.rounds.length-1];if(R){
+      if(!R.main){R.qual.heats.forEach((h,i)=>q.push({h,label:`${R.no}라운드 예선 ${i+1}조`}));if(R.rep)R.rep.heats.forEach((h,i)=>q.push({h,label:`${R.no}라운드 패자부활전 ${i+1}조`}));}
+      else if(!R.main.done){const st=R.main.stages[R.main.stages.length-1];if(st)st.heats.forEach((h,i)=>q.push({h,label:st.kind==='rank'?`${R.no}라운드 본선 최종전`:`${R.no}라운드 본선 ${i+1}조`}));}
+    }}
+    return q.filter(x=>!resolved(t,x.h)&&act(t,x.h).length);
+  }
+  if(t.type==='points'&&t.pts&&t.pts.seeds){
+    const P=t.pts;
+    if(P.final){if(!resolved(t,P.final))q.push({h:P.final,label:'결승'});}
+    else{const last=P.heats[P.heats.length-1];
+      if(last&&!svHeatDone(t,last)){q.push({h:last,label:`서바이벌 ${P.heats.length}경기`});
+        const rem=svRemaining(t);if(rem.length>=4)q.push({h:{id:'svnext'+P.heats.length,players:[rem[rem.length-4]],res:{}},label:rem.length===4?'결승':`서바이벌 ${P.heats.length+1}경기`});}}
+  }
+  return q;
+}
+function checkAlerts(){
+  const W=watchList();if(!W.length)return;
+  Object.values(S.tours).forEach(t=>{
+    if(t.status!=='active')return;
+    const q=heatQueue(t);if(!q.length)return;
+    W.forEach(pid=>{
+      if(!t.people[pid]||!isActive(t,pid))return;
+      let ev=null;
+      if(act(t,q[0].h).includes(pid))ev={k:'now',x:q[0]};
+      else if(q[1]&&act(t,q[1].h).includes(pid))ev={k:'next',x:q[1]};
+      if(!ev)return;
+      const key=t.id+'|'+pid+'|'+ev.x.h.id+'|'+ev.k;if(S.alerted[key])return;S.alerted[key]=1;
+      const p=t.people[pid];const nm=p.nick&&p.nick!==p.name?`${p.name}(${p.nick})`:p.name;
+      fireAlert(ev.k==='now'?`🏁 '${nm}' 선수 경기 차례입니다!`:`⏱ '${nm}' 선수 다음 경기 준비 바랍니다.`,`${t.name} · ${ev.x.label}`,ev.k,t.id,t.id+'|'+pid);
+    });
+  });
+}
+let audioCtx=null;
+function beep(k){try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();
+  const seq=k==='now'?[880,0,880,0,1175]:[660,0,880];let t0=audioCtx.currentTime;
+  seq.forEach(f=>{if(f){const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=f;o.type='sine';g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(.3,t0+.02);g.gain.exponentialRampToValueAtTime(.0001,t0+.18);o.connect(g);g.connect(audioCtx.destination);o.start(t0);o.stop(t0+.2);}t0+=.2;});}catch(e){}}
+function fireAlert(title,body,k,tid,who){
+  const box=$('#alertpop');const id='al'+uid();
+  if(who)box.querySelectorAll('.alcard').forEach(c=>{if(c.dataset.who===who)c.remove();});
+  const el=document.createElement('div');el.className='alcard '+k;el.id=id;if(who)el.dataset.who=who;
+  el.innerHTML=`<div class="alt">${esc(title)}</div><div class="alb">${esc(body)}</div><div class="row" style="justify-content:flex-end;gap:6px;margin-top:8px"><button class="btn sm" data-act="alView" data-t="${esc(tid)}" data-id="${id}">대진표 보기</button><button class="btn sm dark" data-act="alClose" data-id="${id}">확인</button></div>`;
+  box.prepend(el);
+  beep(k);try{navigator.vibrate&&navigator.vibrate(k==='now'?[300,120,300,120,500]:[250,100,250]);}catch(e){}
+  try{if(typeof Notification!=='undefined'&&Notification.permission==='granted'){const n=new Notification(title,{body,tag:id,renotify:true,requireInteraction:k==='now'});n.onclick=()=>{try{window.focus();}catch(e){}go('t-'+tid);n.close();};}}catch(e){}
+}
+ACT.alClose=d=>{const e=document.getElementById(d.id);e&&e.remove();};
+ACT.alView=d=>{ACT.alClose(d);go('t-'+d.t);};
+ACT.watchOff=()=>{setWatch([]);S.alerted={};renderShell();toast('알림을 껐습니다');};
+ACT.notiPerm=async()=>{try{const r=await Notification.requestPermission();renderShell();toast(r==='granted'?'기기 알림을 허용했습니다':'기기 알림이 허용되지 않았습니다 (페이지 팝업으로만 알립니다)');}catch(e){toast('이 브라우저는 기기 알림을 지원하지 않습니다');}};
+ACT.watch=()=>{
+  const live=Object.values(S.tours).filter(t=>t.status==='active'||t.status==='planned');
+  const inLive=new Set(live.flatMap(t=>activeList(t)));
+  const W=new Set(watchList());
+  const list=S.players.slice().sort((a,b)=>(inLive.has(b.id)-inLive.has(a.id))||a.name.localeCompare(b.name,'ko'));
+  openModal(`<h3>🔔 알림 신청</h3>
+    <div class="small muted" style="margin-bottom:8px">알림 받을 선수를 고르세요. 이 기기에서 대진표를 열어 두면, 그 선수의 <b>앞 경기</b>가 시작될 때 "다음 경기 준비" 알림, <b>본인 경기 차례</b>에 "경기 차례" 알림이 뜹니다.</div>
+    <input id="wt-q" placeholder="이름·닉네임 검색" style="width:100%;border:1px solid #d5d9df;border-radius:10px;padding:9px 12px;margin-bottom:8px">
+    <div class="pick" id="wt-pick" style="max-height:340px">${list.map(p=>`<label class="${W.has(p.id)?'sel':''}" data-s="${esc((p.name+' '+p.nick).toLowerCase())}"><input type="checkbox" data-wid="${p.id}" ${W.has(p.id)?'checked':''}>${nmHTML(p)}${inLive.has(p.id)?' <span class="badge live" style="margin-left:auto">참가중</span>':''}</label>`).join('')||'<div class="empty">선수 명단이 비어 있습니다</div>'}</div>
+    <div class="mact"><button class="btn" data-act="close">취소</button><button class="btn pri" data-act="watchSave">알림 신청</button></div>`);
+};
+document.addEventListener('input',e=>{if(e.target.id==='wt-q'){const q=e.target.value.trim().toLowerCase();document.querySelectorAll('#wt-pick label').forEach(l=>{l.style.display=!q||l.dataset.s.indexOf(q)>=0?'':'none';});}});
+document.addEventListener('change',e=>{const w=e.target.dataset&&e.target.dataset.wid;if(w)e.target.closest('label').classList.toggle('sel',e.target.checked);});
+ACT.watchSave=async()=>{
+  const ids=[...document.querySelectorAll('#wt-pick input[data-wid]')].filter(i=>i.checked).map(i=>i.dataset.wid);
+  setWatch(ids);S.alerted={};closeModal();
+  try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();audioCtx.resume();}catch(e){}
+  if(ids.length&&typeof Notification!=='undefined'&&Notification.permission==='default'){try{await Notification.requestPermission();}catch(e){}}
+  renderShell();
+  if(!ids.length){toast('알림 대상이 없습니다');return;}
+  const nm=ids.map(id=>{const p=S.players.find(x=>x.id===id);return p?nameTxt(p):'';}).filter(Boolean).join(', ');
+  toast('알림 신청 완료 · 참가자 : '+nm);
+  checkAlerts();
+};
+
 /* ================= GitHub 자동 백업 ================= */
 const GH_DEF={repo:'intiipu-prog/jjnb_tournermant',branch:'main',token:'',auto:true,last:0,lastErr:''};
 function ghCfg(){try{return Object.assign({},GH_DEF,JSON.parse(localStorage.getItem('jjnb:gh')||'{}'));}catch(e){return Object.assign({},GH_DEF);}}
