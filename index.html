@@ -834,7 +834,7 @@ function vTours(){
   if(!all.length)return h+'<div class="card empty">대회가 없습니다.</div>';
   h+='<div class="tgrid">'+all.map(t=>`<div class="card trc" style="margin:0" data-s="${esc([t.name,t.date,(t.date||'').replace(/-/g,'.'),kindLabel(tKind(t)),...(t.result||[]).filter(o=>o.rank&&o.rank<=4).map(o=>o.name+' '+o.nick),...activeList(t).map(p=>(t.people[p]||{}).name||'')].join(' ').toLowerCase())}"><div class="row">${typeBadge(t)} ${statusBadge(t)}<span class="sp"></span><span class="small muted">${esc(t.date||'')}</span></div>
     <div class="row" style="margin-top:6px;flex-wrap:nowrap;align-items:flex-start"><div style="flex:1;min-width:0"><div style="font-size:18px;font-weight:900">${tName(t)}</div><div class="small muted">참가 ${activeList(t).length}명 · ${esc(progressText(t))}</div></div>
-    <div class="row" style="gap:4px;flex-wrap:nowrap;flex-shrink:0"><button class="btn sm dark" data-act="nav" data-h="t-${t.id}">대진표</button>${canEdit()&&t.type==='record'?`<button class="btn sm" data-act="editTour" data-t="${t.id}">✎ 수정</button>`:''}${canEdit()?`<button class="btn sm red" style="padding:5px 9px;font-weight:900" title="삭제" data-act="delTour" data-t="${t.id}">✕</button>`:''}</div></div>
+    <div class="row" style="gap:4px;flex-wrap:nowrap;flex-shrink:0"><button class="btn sm dark" data-act="nav" data-h="t-${t.id}">대진표</button>${canEdit()&&t.type==='record'?`<button class="btn sm" data-act="editTour" data-t="${t.id}">✎ 수정</button>`:''}${canEdit()?`<button class="btn sm" style="color:#7b818a;border-color:#d5d9df;background:#f6f7f9" data-act="delTour" data-t="${t.id}">삭제</button>`:''}</div></div>
     ${t.status==='done'&&(t.result||[]).some(o=>o.rank)?podiumHTML(t,4):emptyPic(t)}</div>`).join('')+'</div>';
   return h;
 }
@@ -2068,6 +2068,7 @@ function fireAlert(title,body,k,tid,who){
 }
 ACT.alClose=d=>{const e=document.getElementById(d.id);e&&e.remove();};
 ACT.alView=d=>{ACT.alClose(d);go('t-'+d.t);};
+ACT.watchCancel=async()=>{const n=watchList().length;if(!(await ask(`신청된 ${n}명의 알림을 모두 취소할까요?`,'알림 취소',true))){ACT.watch();return;}setWatch([]);S.alerted={};closeModal();renderShell();toast('알림을 취소했습니다');};
 ACT.watchOff=()=>{setWatch([]);S.alerted={};renderShell();toast('알림을 껐습니다');};
 ACT.notiPerm=async()=>{try{const r=await Notification.requestPermission();renderShell();toast(r==='granted'?'기기 알림을 허용했습니다':'기기 알림이 허용되지 않았습니다 (페이지 팝업으로만 알립니다)');}catch(e){toast('이 브라우저는 기기 알림을 지원하지 않습니다');}};
 ACT.watch=()=>{
@@ -2077,10 +2078,10 @@ ACT.watch=()=>{
   const list=S.players.slice().sort((a,b)=>(W.has(b.id)-W.has(a.id))||(inLive.has(b.id)-inLive.has(a.id))||a.name.localeCompare(b.name,'ko'));
   openModal(`<h3>🔔 알림 신청</h3>
     <div class="small muted" style="margin-bottom:8px">알림 받을 선수를 고르세요. 이 기기에서 대진표를 열어 두면, 그 선수의 <b>앞 경기</b>가 시작될 때 "다음 경기 준비" 알림, <b>본인 경기 차례</b>에 "경기 차례" 알림이 뜹니다.</div>
-    <div class="wtsel-box"><div class="small" style="font-weight:900;margin-bottom:6px">🔔 신청된 선수 <span id="wt-cnt" class="muted" style="font-weight:500"></span></div><div class="fin-list" id="wt-sel"></div></div>
+    <div class="wtsel-box"><div class="small row" style="font-weight:900;margin-bottom:6px;gap:6px">🔔 신청된 선수 <span id="wt-cnt" class="muted" style="font-weight:500"></span><span class="sp"></span><button class="btn sm" id="wt-clr" data-act="wtClr" style="padding:2px 8px;font-size:11.5px;display:none">전체 해제</button></div><div class="fin-list" id="wt-sel"></div></div>
     <input id="wt-q" placeholder="이름·닉네임 검색" style="width:100%;border:1px solid #d5d9df;border-radius:10px;padding:9px 12px;margin-bottom:8px">
     <div class="pick" id="wt-pick" style="max-height:340px">${list.map(p=>`<label class="${W.has(p.id)?'sel':''}" data-s="${esc((p.name+' '+p.nick).toLowerCase())}"><input type="checkbox" data-wid="${p.id}" ${W.has(p.id)?'checked':''}>${nmHTML(p)}${inLive.has(p.id)?' <span class="badge live" style="margin-left:auto">참가중</span>':''}</label>`).join('')||'<div class="empty">선수 명단이 비어 있습니다</div>'}</div>
-    <div class="mact"><button class="btn" data-act="close">취소</button><button class="btn pri" data-act="watchSave">알림 신청</button></div>`);
+    <div class="mact">${watchList().length?'<button class="btn red" data-act="watchCancel" style="margin-right:auto">🔕 알림 취소</button>':''}<button class="btn" data-act="close">닫기</button><button class="btn pri" data-act="watchSave">알림 신청</button></div>`);
   wtSelRender();
 };
 function wtSelRender(){
@@ -2088,7 +2089,9 @@ function wtSelRender(){
   const ids=[...document.querySelectorAll('#wt-pick input[data-wid]')].filter(i=>i.checked).map(i=>i.dataset.wid);
   box.innerHTML=ids.length?ids.map(id=>{const p=S.players.find(x=>x.id===id);return p?`<span class="chip gold">${nmHTML(p)}<button class="wtx" data-act="wtRm" data-id="${id}" title="해제">×</button></span>`:'';}).join(''):'<span class="small muted">아직 신청된 선수가 없습니다. 아래에서 선택하세요.</span>';
   const c=$('#wt-cnt');if(c)c.textContent=ids.length?ids.length+'명':'';
+  const cl=$('#wt-clr');if(cl)cl.style.display=ids.length?'':'none';
 }
+ACT.wtClr=()=>{document.querySelectorAll('#wt-pick input[data-wid]').forEach(i=>{i.checked=false;i.closest('label').classList.remove('sel');});wtSelRender();};
 ACT.wtRm=d=>{const i=document.querySelector(`#wt-pick input[data-wid="${d.id}"]`);if(i){i.checked=false;i.closest('label').classList.remove('sel');}wtSelRender();};
 document.addEventListener('input',e=>{if(e.target.id==='wt-q'){const q=e.target.value.trim().toLowerCase();document.querySelectorAll('#wt-pick label').forEach(l=>{l.style.display=!q||l.dataset.s.indexOf(q)>=0?'':'none';});}});
 document.addEventListener('change',e=>{const w=e.target.dataset&&e.target.dataset.wid;if(w){e.target.closest('label').classList.toggle('sel',e.target.checked);wtSelRender();}});
