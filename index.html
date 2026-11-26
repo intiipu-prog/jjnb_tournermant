@@ -125,6 +125,8 @@ h2.pg .sp{flex:1}
 @media (max-width:760px){.dashq{grid-template-columns:1fr}}
 .tgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 @media (max-width:760px){.tgrid{grid-template-columns:1fr}}
+.tprog{min-width:0}.tp-d{flex:0 1 300px;margin:0 10px}.tp-top{display:flex;align-items:baseline;gap:6px;font-size:12.5px;color:var(--sub);margin-bottom:5px}.tp-top b{font-size:17px;color:var(--text,#111);font-weight:900}.tp-top .tp-n{margin-left:auto;font-size:12px}.tp-bar{height:9px;background:#e9ecf0;border-radius:99px;overflow:hidden}.tp-bar i{display:block;height:100%;background:linear-gradient(90deg,#e30000,#ff7a00);border-radius:99px;transition:width .4s}
+.tp-m{margin-top:6px}.tp-m .tp-top{margin-bottom:3px;font-size:11.5px}.tp-m .tp-top b{font-size:13px}.tp-m .tp-bar{height:6px}
 .plbar{gap:6px;flex-wrap:nowrap}.plbar>*{height:32px;box-sizing:border-box;margin:0}.plbar select{border:1px solid #d5d9df;border-radius:8px;padding:0 8px;background:#fff;font-size:13px;width:92px;flex-shrink:0}.plbar .btn{padding:0 10px;font-size:12.5px;border-radius:8px;flex-shrink:0;display:inline-flex;align-items:center}.plbar input{border:1px solid #d5d9df;border-radius:8px;padding:0 10px;font-size:13px;width:240px;min-width:0;flex:0 1 240px}.plbar .small{flex-shrink:0;display:inline-flex;align-items:center}
 .plgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
 @media (max-width:1250px){.plgrid{grid-template-columns:repeat(4,minmax(0,1fr))}}
@@ -715,6 +717,16 @@ function drawQRs(root){
 
 /* ================= 대시보드 ================= */
 function sortedTours(){return Object.values(S.tours).sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.createdAt||0)-(a.createdAt||0));}
+function tProgress(t){
+  if(t.status==='planned'||t.status==='cancelled'||t.type==='record')return null;
+  let done,total;
+  if(t.type==='points'){total=2;done=t.result?2:(t.pts&&t.pts.seeds?1:0);}
+  else{total=(t.opt.rounds||1)+1;done=(t.rounds||[]).filter(r=>roundDone(t,r)).length;if(t.result)done=total;}
+  if(t.status==='done')done=total;
+  return {done,total,pct:Math.round(done/total*100)};
+}
+function progHTML(t,cls){const g=tProgress(t);if(!g)return '';const unit=t.type==='points'?'단계':'라운드';
+  return `<div class="tprog ${cls||''}"><div class="tp-top"><span>대회 진행률</span><b>${g.pct}%</b><span class="tp-n">${g.done}/${g.total} ${unit}${t.type==='points'?'':' (결승 포함)'}</span></div><div class="tp-bar"><i style="width:${g.pct}%"></i></div></div>`;}
 function progressText(t){
   if(t.status==='cancelled')return '취소된 대회';
   if(t.status==='planned')return '예정 대회';
@@ -842,11 +854,11 @@ function vTour(id){
     ${canEdit()?`<button class="btn sm red" data-act="delTour" data-t="${t.id}">삭제</button>`:''}`;
   S._tbtns=btns;
   const mob=`<div class="tmob show-m"><div class="row" style="gap:6px;flex-wrap:nowrap">${typeBadge(t)}${statusBadge(t)}<b class="tmt">${tName(t)}</b>${btns.trim()?`<button class="btn sm tmore" data-act="tourMenu" data-t="${t.id}">⋯</button>`:''}</div>
-    <div class="small muted" style="margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t.date||'')} · 참가 ${activeList(t).length}명${(t.removed||[]).length?` (제외 ${(t.removed||[]).length})`:''} · ${esc(progressText(t))}</div></div>`;
+    <div class="small muted" style="margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t.date||'')} · 참가 ${activeList(t).length}명${(t.removed||[]).length?` (제외 ${(t.removed||[]).length})`:''} · ${esc(progressText(t))}</div>${progHTML(t,'tp-m')}</div>`;
   let h=`<div class="card thead">${mob}<div class="tdesk"><div class="row">${typeBadge(t)} ${statusBadge(t)}<span class="sp"></span><span class="small muted">${esc(t.date||'')}</span></div>
     <div class="row" style="margin-top:6px"><div style="flex:1;min-width:180px"><div style="font-size:22px;font-weight:900">${tName(t)}</div>
     <div class="small muted">참가 ${activeList(t).length}명${(t.removed||[]).length?` (제외 ${(t.removed||[]).length}명)`:''} · ${esc(progressText(t))}</div></div>
-    <div class="row">${btns}</div></div></div></div>`;
+    ${progHTML(t,'tp-d')}<div class="row">${btns}</div></div></div></div>`;
   if(t.status==='cancelled')h+='<div class="banner-cxl">이 대회는 취소되었습니다. 명예의 전당에 반영되지 않습니다.</div>';
   if(isPlanned(t)){
     const ps=activeList(t);
