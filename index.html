@@ -350,6 +350,7 @@ td.tot{font-weight:900;background:#fffaf0}
  .tmenu{display:flex;flex-direction:column;gap:8px}.tmenu .btn{width:100%;padding:12px;font-size:15px}
 }
 .livebox{margin-top:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px}.lsteps{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px}.ls{border:1px solid var(--line);background:#fff;border-radius:99px;padding:5px 11px;font-size:13px;font-weight:700;color:#9aa0a8;white-space:nowrap}.ls.done{color:#1a7f37;border-color:#bfe3c8;background:#f1fbf3}.ls.cur{background:var(--dark);border-color:var(--dark);color:#fff}.ls .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);margin-left:5px;vertical-align:middle}.tp-live .tp-top b{font-size:22px}.tp-live .tp-bar{height:11px}
+.trk-row .trk-paste{flex:1;min-width:0;margin:0!important;padding:6px 10px!important;min-height:0!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;justify-content:center}.trk-row .trk-paste span{overflow:hidden;text-overflow:ellipsis}
 #topbar{position:sticky;top:0;z-index:30}.tstick{position:sticky;top:var(--navh,152px);z-index:15;background:var(--bg);margin:-10px -6px 8px;padding:10px 6px 2px;box-shadow:0 8px 8px -8px rgba(0,0,0,.18)}.tstick .card.thead{margin-bottom:8px}.tstick .ttabs{margin-bottom:8px}#topbar nav.tabs{position:static}
 </style>
 </head>
@@ -1579,8 +1580,7 @@ ACT.track=()=>{
   const st=S.settings;const u=(st.trackUrl||'').trim();const src=trackSrc();const ed=canEdit();
   openModal(`<h3>🏁 트랙정보</h3>
     ${ed?`<div class="fld"><label>트랙 주소 (이미지 링크)</label><div class="row" style="flex-wrap:nowrap;gap:6px"><input id="trk-url" value="${esc(u)}" placeholder="https://… 트랙 이미지 주소" style="flex:1;min-width:0"><button class="btn sm pri" data-act="trkSave">저장</button></div>
-      <div class="row small" style="margin-top:6px;gap:6px"><span class="muted">또는</span><label class="btn sm dark">이미지 파일 올리기<input type="file" id="trk-in" accept="image/*" style="display:none"></label>${st.trackImg?'<button class="btn sm red" data-act="trkRmImg">올린 이미지 삭제</button>':''}</div>
-      <div class="trk-paste" id="trk-paste" contenteditable="true" spellcheck="false">📋 이미지를 복사한 뒤 여기를 누르고 <b>붙여넣기</b> (PC: Ctrl+V)</div></div>`:(u&&!src?`<div class="small" style="margin-bottom:8px"><a href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a></div>`:'')}
+      <div class="row small trk-row" style="margin-top:6px;gap:6px;flex-wrap:nowrap"><label class="btn sm dark" style="flex-shrink:0">이미지<input type="file" id="trk-in" accept="image/*" style="display:none"></label>${st.trackImg?'<button class="btn sm red" style="flex-shrink:0" data-act="trkRmImg">삭제</button>':''}<div class="trk-paste" id="trk-paste" contenteditable="true" spellcheck="false"><span>📋 이미지 <b>붙여넣기</b> (Ctrl+V)</span></div></div></div>`:(u&&!src?`<div class="small" style="margin-bottom:8px"><a href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a></div>`:'')}
     <div class="trk-img">${src?`<a href="${esc(src)}" target="_blank" rel="noopener"><img id="trk-pic" src="${esc(src)}" alt="트랙 이미지"></a><div class="small muted" id="trk-err" style="display:none;padding:20px">이미지를 불러올 수 없습니다. 주소가 이미지 파일 링크인지 확인하세요.</div>`:'<div class="empty">등록된 트랙 이미지가 없습니다.</div>'}</div>
     <div class="mact"><button class="btn" data-act="close">닫기</button></div>`);
   const mb=$('#modal .mbox');if(mb)mb.style.maxWidth='880px';
