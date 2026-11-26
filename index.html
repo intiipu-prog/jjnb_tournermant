@@ -349,10 +349,11 @@ td.tot{font-weight:900;background:#fffaf0}
  .tstick .ttabs{margin-bottom:6px}
  .tmenu{display:flex;flex-direction:column;gap:8px}.tmenu .btn{width:100%;padding:12px;font-size:15px}
 }
+#topbar{position:sticky;top:0;z-index:30}#topbar nav.tabs{position:static}
 </style>
 </head>
 <body>
-<header class="top">
+<div id="topbar"><header class="top">
   <div class="wrap banner">
     <div class="logo" id="logo"></div>
     <div>
@@ -363,7 +364,7 @@ td.tot{font-weight:900;background:#fffaf0}
   </div>
 </header>
 <div class="stripe"></div>
-<nav class="tabs"><div class="wrap" id="nav"></div></nav>
+<nav class="tabs"><div class="wrap" id="nav"></div></nav></div>
 <div id="modebar"></div>
 <main><div class="wrap" id="app"><div class="empty">불러오는 중…</div></div></main>
 <div id="modal"></div>
@@ -695,7 +696,7 @@ function render(fromData){
     else html=vDash();
   }catch(e){console.error(e);html=`<div class="card">화면 오류: ${esc(e.message)}</div>`;}
   app.innerHTML=html;
-  try{const nv=document.querySelector('nav.tabs');if(nv)document.documentElement.style.setProperty('--navh',nv.offsetHeight+'px');}catch(e){}
+  try{const nv=document.getElementById('topbar');if(nv)document.documentElement.style.setProperty('--navh',nv.offsetHeight+'px');}catch(e){}
   try{checkAlerts();}catch(e){console.error(e);}
   const all=Object.values(S.tours);
   $('#hstats').innerHTML=`<div class="lv"><b>${all.filter(t=>t.status==='active').length}</b><span>진행중</span></div><div><b>${all.filter(t=>t.status!=='cancelled').length}</b><span>전체 대회</span></div><div><b>${S.players.length}</b><span>등록 선수</span></div>`;
@@ -2155,6 +2156,8 @@ ACT.rmLogo=()=>{const s=Object.assign({},S.settings);delete s.logo;saveSettings(
 /* 시작 */
 renderShell();
 initStore();
+
+try{const tb=document.getElementById('topbar');const setH=()=>document.documentElement.style.setProperty('--navh',tb.offsetHeight+'px');if(window.ResizeObserver)new ResizeObserver(setH).observe(tb);window.addEventListener('resize',setH);setH();}catch(e){}
 </script>
 </body>
 </html>
