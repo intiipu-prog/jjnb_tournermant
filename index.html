@@ -834,7 +834,7 @@ function vTours(){
   if(!all.length)return h+'<div class="card empty">대회가 없습니다.</div>';
   h+='<div class="tgrid">'+all.map(t=>`<div class="card trc" style="margin:0" data-s="${esc([t.name,t.date,(t.date||'').replace(/-/g,'.'),kindLabel(tKind(t)),...(t.result||[]).filter(o=>o.rank&&o.rank<=4).map(o=>o.name+' '+o.nick),...activeList(t).map(p=>(t.people[p]||{}).name||'')].join(' ').toLowerCase())}"><div class="row">${typeBadge(t)} ${statusBadge(t)}<span class="sp"></span><span class="small muted">${esc(t.date||'')}</span></div>
     <div class="row" style="margin-top:6px;flex-wrap:nowrap;align-items:flex-start"><div style="flex:1;min-width:0"><div style="font-size:18px;font-weight:900">${tName(t)}</div><div class="small muted">참가 ${activeList(t).length}명 · ${esc(progressText(t))}</div></div>
-    <div class="row" style="gap:4px;flex-wrap:nowrap;flex-shrink:0"><button class="btn sm dark" data-act="nav" data-h="t-${t.id}">대진표</button>${canEdit()&&t.type==='record'?`<button class="btn sm" data-act="editTour" data-t="${t.id}">✎ 수정</button>`:''}${canEdit()?`<button class="btn sm" style="color:#7b818a;border-color:#d5d9df;background:#f6f7f9" data-act="delTour" data-t="${t.id}">삭제</button>`:''}</div></div>
+    <div class="row" style="gap:4px;flex-wrap:nowrap;flex-shrink:0"><button class="btn sm dark" data-act="nav" data-h="t-${t.id}">대진표</button>${canEdit()&&t.type==='record'?`<button class="btn sm" title="수정" data-act="editTour" data-t="${t.id}">✎</button>`:''}${canEdit()?`<button class="btn sm" style="color:#7b818a;border-color:#d5d9df;background:#f6f7f9" data-act="delTour" data-t="${t.id}">삭제</button>`:''}</div></div>
     ${t.status==='done'&&(t.result||[]).some(o=>o.rank)?podiumHTML(t,4):emptyPic(t)}</div>`).join('')+'</div>';
   return h;
 }
