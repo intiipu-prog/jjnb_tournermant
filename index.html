@@ -717,16 +717,55 @@ function drawQRs(root){
 
 /* ================= 대시보드 ================= */
 function sortedTours(){return Object.values(S.tours).sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.createdAt||0)-(a.createdAt||0));}
+function tHeats(t){/* [{h,kind}] 대진 구조 순서대로 */
+  const o=[];const ch=c=>{if(c)c.stages.forEach(st=>st.heats.forEach(h=>o.push({h,kind:st.kind})));};
+  (t.rounds||[]).forEach(r=>{r.qual.heats.forEach(h=>o.push({h,kind:'adv'}));if(r.rep)r.rep.heats.forEach(h=>o.push({h,kind:'adv'}));ch(r.main);});
+  const f=t.finals;if(f){if(f.stage1)f.stage1.heats.forEach(h=>o.push({h,kind:'adv'}));ch(f.upper);ch(f.lower);}
+  return o;
+}
+function isGame(t,h){return act(t,h).length>=2;}
+function simTourTotal(t){/* 표준 규칙대로 결승라운드까지 남은 경기를 가상으로 진행해 전체 경기 수 계산 */
+  const c=clone(t);
+  for(let it=0;it<400;it++){
+    autoProgress(c);if(c.result)break;
+    const u=tHeats(c).find(x=>act(c,x.h).length&&!resolved(c,x.h));
+    if(u){const a=act(c,u.h);a.forEach((p,i)=>{u.h.res[p]=u.kind==='rank'?i+1:(i===0?'W':'L');});continue;}
+    const R=c.rounds[c.rounds.length-1];
+    if(R&&!R.main){const pool=qualWinners(c,R).concat(R.rep?R.rep.heats.flatMap(x=>winners(c,x)):[]);R.main=chainStart(c,pool,R.mainSize||c.opt.mainSize||3,R.qualCount||c.opt.qualCount||2);continue;}
+    if(c.finals)break;
+    if(R&&R.main&&!R.main.done)break;
+    if(c.rounds.length<c.opt.rounds&&nextPool(c).length){const prev=R||{};const size=prev.size||c.opt.qualSize||3;c.rounds.push({no:c.rounds.length+1,size,repSize:prev.repSize||size,mainSize:prev.mainSize||c.opt.mainSize||3,qual:{heats:makeGroups(nextPool(c),size).map(newHeat)},rep:null,main:null,qualCount:c.opt.qualCount||2});continue;}
+    const F=allFinalists(c);if(!F.length)break;
+    const size=S.tab['fs'+c.id]||c.opt.finalSize||3;const f={size,stage1:null,upper:null,lower:null};
+    if(F.length<=3)f.upper={size,N:null,stages:[{kind:'rank',heats:[newHeat(F)]}],done:false,result:[]};else f.stage1={heats:makeGroups(F,size).map(newHeat)};
+    c.finals=f;
+  }
+  return tHeats(c).filter(x=>isGame(c,x.h)).length;
+}
 function tProgress(t){
   if(t.status==='planned'||t.status==='cancelled'||t.type==='record')return null;
   let done,total;
-  if(t.type==='points'){total=2;done=t.result?2:(t.pts&&t.pts.seeds?1:0);}
-  else{total=(t.opt.rounds||1)+1;done=(t.rounds||[]).filter(r=>roundDone(t,r)).length;if(t.result)done=total;}
-  if(t.status==='done')done=total;
-  return {done,total,pct:Math.round(done/total*100)};
+  try{
+    if(t.type==='points'){
+      const P=t.pts||{heats:[]};const n=activeList(t).length;const lg=totalMatches(t);
+      const svDone=(P.heats||[]).filter(h=>isGame(t,h)&&svHeatDone(t,h)).length;
+      let svTotal;
+      if(!P.seeds)svTotal=Math.max(0,n-3)+(n>=2?1:0);
+      else{const rem=svRemaining(t).length;const cur=(P.heats||[]).filter(h=>isGame(t,h)).length;const last=(P.heats||[])[P.heats.length-1];const lastOpen=!P.final&&last&&!svHeatDone(t,last);
+        svTotal=P.final?cur+(act(t,P.final).length>=2?1:0):cur+Math.max(0,rem-3-(lastOpen?1:0))+(rem>=2?1:0);}
+      const fin=P.final&&act(t,P.final).length>=2&&resolved(t,P.final)?1:0;
+      done=playedMatches(t)+svDone+fin;total=lg+svTotal;
+    }else{
+      done=tHeats(t).filter(x=>isGame(t,x.h)&&resolved(t,x.h)).length;
+      total=t.result?done:simTourTotal(t);
+    }
+  }catch(e){console.error(e);return null;}
+  if(t.status==='done')done=total=Math.max(done,total);
+  total=Math.max(total,done,1);
+  return {done,total,pct:Math.floor(done/total*100)};
 }
-function progHTML(t,cls){const g=tProgress(t);if(!g)return '';const unit=t.type==='points'?'단계':'라운드';
-  return `<div class="tprog ${cls||''}"><div class="tp-top"><span>대회 진행률</span><b>${g.pct}%</b><span class="tp-n">${g.done}/${g.total} ${unit}${t.type==='points'?'':' (결승 포함)'}</span></div><div class="tp-bar"><i style="width:${g.pct}%"></i></div></div>`;}
+function progHTML(t,cls){const g=tProgress(t);if(!g)return '';
+  return `<div class="tprog ${cls||''}"><div class="tp-top"><span>대회 진행률</span><b>${g.pct}%</b><span class="tp-n">${g.done}/${g.total} 경기 (결승 포함 예상)</span></div><div class="tp-bar"><i style="width:${g.pct}%"></i></div></div>`;}
 function progressText(t){
   if(t.status==='cancelled')return '취소된 대회';
   if(t.status==='planned')return '예정 대회';
