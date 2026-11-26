@@ -351,6 +351,7 @@ td.tot{font-weight:900;background:#fffaf0}
 }
 .livebox{margin-top:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px}.lsteps{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px}.ls{border:1px solid var(--line);background:#fff;border-radius:99px;padding:5px 11px;font-size:13px;font-weight:700;color:#9aa0a8;white-space:nowrap}.ls.done{color:#1a7f37;border-color:#bfe3c8;background:#f1fbf3}.ls.cur{background:var(--dark);border-color:var(--dark);color:#fff}.ls .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);margin-left:5px;vertical-align:middle}.tp-live .tp-top b{font-size:22px}.tp-live .tp-bar{height:11px}
 .trk-row .trk-paste{flex:1;min-width:0;margin:0!important;padding:6px 10px!important;min-height:0!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;justify-content:center}.trk-row .trk-paste span{overflow:hidden;text-overflow:ellipsis}
+.pmopt button{padding:5px 10px;font-size:12.5px}.pmopt button.on{background:#1e6fe0;border-color:#1e6fe0;color:#fff}
 #topbar{position:sticky;top:0;z-index:30}.tstick{position:sticky;top:var(--navh,152px);z-index:15;background:var(--bg);margin:-10px -6px 8px;padding:10px 6px 2px;box-shadow:0 8px 8px -8px rgba(0,0,0,.18)}.tstick .card.thead{margin-bottom:8px}.tstick .ttabs{margin-bottom:8px}#topbar nav.tabs{position:static}
 </style>
 </head>
@@ -499,6 +500,7 @@ function onSnapErr(e){
 }
 
 /* ================= 대진 엔진 공통 ================= */
+function applyPending(t){const pr=t.pendRm||[];if(!pr.length)return;t.removed=(t.removed||[]).filter(x=>!pr.includes(x)).concat(pr);t.pendRm=[];}
 function newHeat(players){return {id:uid(),players:players.slice(),res:{}};}
 function isActive(t,p){return !(t.removed||[]).includes(p);}
 function activeList(t){return t.active.filter(p=>isActive(t,p));}
@@ -530,6 +532,7 @@ function chainAdvance(t,ch){
   if(!ch||ch.done)return;
   const last=ch.stages[ch.stages.length-1];if(!last||!stageDone(t,last))return;
   if(last.kind==='rank'){ch.done=true;ch.result=rankOrder(t,last.heats[0]).ranked;return;}
+  applyPending(t);
   const w=last.heats.flatMap(h=>winners(t,h));
   if(!w.length){ch.done=true;ch.result=[];return;}
   if(ch.N&&w.length<=ch.N){ch.done=true;ch.result=w;return;}
@@ -548,6 +551,7 @@ function roundFinalists(t,r){
 function allFinalists(t){const o=[];(t.rounds||[]).forEach(r=>roundFinalists(t,r).forEach(p=>{if(!o.includes(p))o.push(p);}));return o;}
 function nextPool(t){const f=allFinalists(t);return activeList(t).filter(p=>!f.includes(p));}
 function startRound(t){
+  applyPending(t);
   const pool=nextPool(t);
   if(!pool.length){toast('다음 라운드에 참가할 선수가 없습니다');return false;}
   const prev=t.rounds[t.rounds.length-1]||{};
@@ -561,6 +565,7 @@ function finalsUpperHeat(f){const u=f&&f.upper;if(!u)return null;const l=u.stage
 function finalsProgress(t){
   const f=t.finals;if(!f)return false;
   if(f.stage1&&!f.upper&&stageDone(t,f.stage1)){
+    applyPending(t);
     const w=f.stage1.heats.flatMap(h=>winners(t,h)),l=f.stage1.heats.flatMap(h=>losers(t,h));
     f.upper=chainStart(t,w,f.size,null);f.lower=l.length?chainStart(t,l,f.size,null):null;
   }
@@ -1382,10 +1387,10 @@ ACT.setSize=async d=>{
     ch.size=n;r.mainSize=n;const pool=st.heats.flatMap(h=>act(t,h));st.heats=makeGroups(pool,n).map(newHeat);}
   autoProgress(t);saveTour(t);toast(`${n}인 1조로 편성했습니다`);
 };
-ACT.startRep=d=>{const t=T(d);const r=t.rounds[+d.r];const pool=qualLosers(t,r);if(!pool.length){toast('패자부활전 대상자가 없습니다');return;}r.rep={heats:makeGroups(pool,r.repSize||r.size||3).map(newHeat)};saveTour(t);};
+ACT.startRep=d=>{const t=T(d);const r=t.rounds[+d.r];applyPending(t);const pool=qualLosers(t,r);if(!pool.length){toast('패자부활전 대상자가 없습니다');return;}r.rep={heats:makeGroups(pool,r.repSize||r.size||3).map(newHeat)};saveTour(t);};
 ACT.cancelRep=async d=>{const t=T(d);const r=t.rounds[+d.r];if(r.rep.heats.some(hasRes)&&!(await ask('패자부활전을 취소할까요? 입력된 결과가 삭제됩니다.','취소',true)))return;r.rep=null;saveTour(t);};
 ACT.startMain=d=>{
-  const t=T(d);const r=t.rounds[+d.r];
+  const t=T(d);const r=t.rounds[+d.r];applyPending(t);
   const pool=qualWinners(t,r).concat(r.rep?r.rep.heats.flatMap(x=>winners(t,x)):[]);
   if(!pool.length){toast('본선 진출자가 없습니다. (이 라운드는 결승 진출자 없음)');}
   r.main=chainStart(t,pool,r.mainSize||t.opt.mainSize||3,r.qualCount||2);saveTour(t);
@@ -1411,7 +1416,7 @@ ACT.setFSize=async d=>{
   autoProgress(t);saveTour(t);toast(`${n}인 1조로 편성했습니다`);
 };
 ACT.makeFinals=d=>{
-  const t=T(d);const F=allFinalists(t);if(!F.length)return;
+  const t=T(d);applyPending(t);const F=allFinalists(t);if(!F.length)return;
   const size=S.tab['fs'+t.id]||t.opt.finalSize||3;t.opt.finalSize=size;
   const f={size,stage1:null,upper:null,lower:null};
   if(F.length<=3)f.upper={size,N:null,stages:[{kind:'rank',heats:[newHeat(shuffle(F))]}],done:false,result:[]};
@@ -1612,9 +1617,12 @@ function pmRender(tid){
   const act=activeList(t),rm=t.removed||[];
   const others=S.players.filter(p=>!t.active.includes(p.id)).sort((a,b)=>a.name.localeCompare(b.name,'ko'));
   const q=($('#pm-q')||{}).value||'';
-  openModal(`<h3 class="row">참가자 추가 / 제외<span class="sp"></span><button class="btn sm dark" data-act="pmText" data-t="${tid}">✎ 텍스트로 입력</button></h3>
+  const pm=pmMode(t),pend=t.pendRm||[];
+  const modeSel=pm!=='legacy'?`<div class="opt pmopt">${[['now','즉시 & 재편성'],['next','다음 조 편성 시 반영']].map(x=>`<button class="${pm===x[0]?'on':''}" data-act="pmMode" data-t="${tid}" data-v="${x[0]}">${x[1]}</button>`).join('')}</div>`:'';
+  openModal(`<h3 class="row" style="flex-wrap:wrap;gap:6px">참가자 추가 / 제외<span class="sp"></span>${modeSel}<button class="btn sm dark" data-act="pmText" data-t="${tid}">✎ 텍스트로 입력</button></h3>
+    ${pm!=='legacy'?`<div class="small muted" style="margin:-4px 0 4px">${pm==='now'?'추가·제외 즉시 현재 진행 중인 조를 다시 편성합니다 (현재 조 결과 초기화).':'현재 조는 그대로 두고, 다음 조를 편성할 때 반영합니다.'}</div>`:''}
     <div style="font-weight:900;margin:8px 0 4px">참가 중 (${act.length})</div>
-    <div class="pick" style="max-height:220px">${act.map(p=>`<div class="row" style="padding:8px 12px;border-bottom:1px solid #f0f1f3">${tn(t,p)}<span class="sp"></span><button class="btn sm red" data-act="pmRemove" data-t="${tid}" data-p="${p}">제외</button></div>`).join('')}</div>
+    <div class="pick" style="max-height:220px">${act.map(p=>pend.includes(p)?`<div class="row" style="padding:8px 12px;border-bottom:1px solid #f0f1f3;background:#fff7f6">${tn(t,p)}<span class="badge" style="background:#ffe7e6;color:var(--red);margin-left:6px">다음 편성 시 제외</span><span class="sp"></span><button class="btn sm" data-act="pmUnpend" data-t="${tid}" data-p="${p}">취소</button></div>`:`<div class="row" style="padding:8px 12px;border-bottom:1px solid #f0f1f3">${tn(t,p)}<span class="sp"></span><button class="btn sm red" data-act="pmRemove" data-t="${tid}" data-p="${p}">제외</button></div>`).join('')}</div>
     ${rm.length?`<div style="font-weight:900;margin:12px 0 4px">제외됨 (${rm.length})</div><div class="pick" style="max-height:150px">${rm.map(p=>`<div class="row" style="padding:8px 12px;border-bottom:1px solid #f0f1f3;opacity:.7">${tn(t,p)}<span class="sp"></span><button class="btn sm" data-act="pmRestore" data-t="${tid}" data-p="${p}">복귀</button></div>`).join('')}</div>`:''}
     <div style="font-weight:900;margin:12px 0 4px">명단에서 추가</div>
     <div class="row" style="margin-bottom:6px"><input id="pm-q" value="${esc(q)}" placeholder="검색" style="flex:1;border:1px solid #d5d9df;border-radius:10px;padding:8px 12px"><button class="btn sm" data-act="pmNew" data-t="${tid}">+ 새 선수</button></div>
@@ -1629,6 +1637,7 @@ function addToTour(t,pid){
   t.removed=(t.removed||[]).filter(x=>x!==pid);
   let msg='참가자를 추가했습니다';
   if(isPlanned(t))msg='참가 예정자로 추가했습니다';
+  else if(t.type==='tournament'&&pmMode(t)!=='legacy'){msg=pmMode(t)==='now'?'참가자를 추가했습니다':'다음 조 편성 때부터 참가합니다';}
   else if(t.type==='tournament'&&!t.finals){
     const r=t.rounds[t.rounds.length-1];
     if(r&&!r.main){
@@ -1641,8 +1650,46 @@ function addToTour(t,pid){
   else if(t.type==='tournament'&&t.finals)msg='결승라운드가 진행 중이라 대진에는 반영되지 않습니다';
   toast(msg);
 }
-ACT.pmAdd=d=>{const t=T(d);addToTour(t,d.p);autoProgress(t);saveTour(t);pmRender(d.t);};
-ACT.pmRemove=d=>{const t=T(d);t.removed=(t.removed||[]).filter(x=>x!==d.p);t.removed.push(d.p);autoProgress(t);saveTour(t);pmRender(d.t);toast('제외했습니다');};
+function pmMode(t){return t&&t.type==='tournament'&&t.status==='active'?(S._pmApply||'next'):'legacy';}
+function curStage(t){
+  if(t.type!=='tournament'||t.status!=='active')return null;
+  if(t.finals){const f=t.finals;return f.stage1&&!f.upper?{k:'f1',heats:f.stage1.heats}:null;}
+  const r=t.rounds[t.rounds.length-1];if(!r)return null;
+  if(!r.main)return {k:'qual',r,heats:r.qual.heats.concat(r.rep?r.rep.heats:[])};
+  if(!r.main.done){const st=r.main.stages[r.main.stages.length-1];return st?{k:'main',r,st,heats:st.heats}:null;}
+  return null;
+}
+function reshuffleCur(t,extra){
+  const c=curStage(t);if(!c)return false;extra=(extra||[]).filter(p=>isActive(t,p));
+  if(c.k==='qual'){const r=c.r;const pool=r.qual.heats.flatMap(h=>act(t,h));extra.forEach(p=>{if(!pool.includes(p))pool.push(p);});r.qual={heats:makeGroups(pool,r.size||3).map(newHeat)};r.rep=null;return true;}
+  if(c.k==='f1'){const f=t.finals;const pool=f.stage1.heats.flatMap(h=>act(t,h));if(pool.length<=3){f.stage1=null;f.upper={size:f.size,N:null,stages:[{kind:'rank',heats:[newHeat(shuffle(pool))]}],done:false,result:[]};}else f.stage1={heats:makeGroups(pool,f.size).map(newHeat)};return true;}
+  const ch=c.r.main;const pool=c.st.heats.flatMap(h=>act(t,h));ch.stages.pop();ch.done=false;ch.result=[];
+  if(!pool.length){ch.done=true;return true;}
+  if(ch.N&&pool.length<=ch.N&&!ch.stages.length){ch.done=true;ch.result=pool.slice();return true;}
+  if(pool.length<=3)ch.stages.push({kind:'rank',heats:[newHeat(shuffle(pool))]});else ch.stages.push({kind:'adv',heats:makeGroups(pool,ch.size).map(newHeat)});
+  return true;
+}
+async function pmConfirmNow(t){const c=curStage(t);if(c&&c.heats.some(hasRes))return ask('즉시 재편성하면 현재 진행 중인 조의 입력된 결과가 초기화됩니다. 계속할까요?','재편성',true);return true;}
+async function pmApplyAdd(t,ids){
+  const m=pmMode(t);
+  if(m==='now'&&!(await pmConfirmNow(t)))return false;
+  ids.forEach(id=>addToTour(t,id));
+  if(m==='now'){const c=curStage(t);if(c&&c.k==='qual'){reshuffleCur(t,ids);toast('추가하고 현재 예선을 재편성했습니다');}else toast('현재 단계는 예선이 아니라 다음 라운드부터 편성됩니다');}
+  return true;
+}
+async function pmApplyRemove(t,ids){
+  const m=pmMode(t);
+  if(m==='next'){t.pendRm=(t.pendRm||[]).filter(x=>!ids.includes(x)).concat(ids);toast('다음 조 편성 때 제외됩니다');return true;}
+  if(m==='now'&&!(await pmConfirmNow(t)))return false;
+  t.pendRm=(t.pendRm||[]).filter(x=>!ids.includes(x));
+  t.removed=(t.removed||[]).filter(x=>!ids.includes(x)).concat(ids);
+  if(m==='now'&&reshuffleCur(t))toast('제외하고 현재 조를 재편성했습니다');else toast('제외했습니다');
+  return true;
+}
+ACT.pmMode=d=>{S._pmApply=d.v;pmRender(d.t);};
+ACT.pmUnpend=d=>{const t=T(d);t.pendRm=(t.pendRm||[]).filter(x=>x!==d.p);saveTour(t);pmRender(d.t);toast('제외 예정을 취소했습니다');};
+ACT.pmAdd=async d=>{const t=T(d);if(!(await pmApplyAdd(t,[d.p])))return pmRender(d.t);autoProgress(t);saveTour(t);pmRender(d.t);};
+ACT.pmRemove=async d=>{const t=T(d);if(!(await pmApplyRemove(t,[d.p])))return pmRender(d.t);autoProgress(t);saveTour(t);pmRender(d.t);};
 ACT.pmRestore=d=>{const t=T(d);t.removed=(t.removed||[]).filter(x=>x!==d.p);autoProgress(t);saveTour(t);pmRender(d.t);toast('복귀했습니다');};
 ACT.pmText=d=>{
   const t=S.tours[d.t];if(!t)return;
@@ -1666,15 +1713,15 @@ function matchInTour(t,e){
   return ids.find(p=>P(p).name===e.name)||ids.find(p=>P(p).nick===e.name)||null;
 }
 ACT.pmTextMode=d=>{S._pmMode=d.v;ACT.pmText(d);};
-ACT.pmTextGo=d=>{
+ACT.pmTextGo=async d=>{
   const es=parseEntrants($('#pt-ta').value);if(!es.length){toast('입력된 선수가 없습니다');return;}
   if((S._pmMode||'add')==='rm'){
     const t=T(d);const hit=[],miss=[];
     es.forEach(e=>{const p=matchInTour(t,e);if(p){if(!hit.includes(p))hit.push(p);}else miss.push(e.raw);});
     if(!hit.length){toast('대회 참가자 중 일치하는 선수가 없습니다');return;}
-    hit.forEach(p=>{t.removed=(t.removed||[]).filter(x=>x!==p);t.removed.push(p);});
+    if(!(await pmApplyRemove(t,hit)))return pmRender(d.t);
     autoProgress(t);saveTour(t);S._ptTxt='';pmRender(d.t);
-    toast(`${hit.length}명을 제외했습니다${miss.length?` · 못 찾음: ${miss.join(', ')}`:''}`);
+    if(miss.length)toast(`${hit.length}명 처리 · 못 찾음: ${miss.join(', ')}`);
     return;
   }
   const found=[],miss=[];es.forEach(e=>{const p=matchEntrant(e);if(p){if(!found.includes(p.id))found.push(p.id);}else miss.push(e);});
@@ -1686,7 +1733,7 @@ ACT.pmTextGo=d=>{
     <div class="small muted">명단에 있는 ${found.length}명은 그대로 추가됩니다.</div>
     <div class="mact"><button class="btn" data-act="pmText" data-t="${d.t}">← 다시 입력</button><button class="btn" data-act="pmTextApply" data-t="${d.t}" data-v="0">추가 안 함 (명단에 있는 선수만)</button><button class="btn pri" data-act="pmTextApply" data-t="${d.t}" data-v="1">선수 추가하고 참가</button></div>`);
 };
-function pmTextApply(tid,addMissing){
+async function pmTextApply(tid,addMissing){
   const ids=S._ptFound.slice();
   if(addMissing&&S._ptMiss.length){
     const list=S.players.slice();
@@ -1694,12 +1741,13 @@ function pmTextApply(tid,addMissing){
     savePlayers(list);
   }
   const t=clone(S.tours[tid]);let n=0;
-  ids.forEach(id=>{if(t.active.includes(id)&&isActive(t,id))return;addToTour(t,id);n++;});
+  const add=ids.filter(id=>!(t.active.includes(id)&&isActive(t,id)));n=add.length;
+  if(n&&!(await pmApplyAdd(t,add)))return pmRender(tid);
   autoProgress(t);saveTour(t);S._ptTxt='';S._ptFound=S._ptMiss=null;pmRender(tid);
-  toast(n?`${n}명을 참가자로 추가했습니다`:'이미 참가 중인 선수입니다');
+  if(!n)toast('이미 참가 중인 선수입니다');
 }
 ACT.pmTextApply=d=>pmTextApply(d.t,d.v==='1');
-ACT.pmNew=d=>playerModal(null,p=>{const t=clone(S.tours[d.t]);addToTour(t,p.id);autoProgress(t);saveTour(t);pmRender(d.t);});
+ACT.pmNew=d=>playerModal(null,async p=>{const t=clone(S.tours[d.t]);if(!(await pmApplyAdd(t,[p.id])))return pmRender(d.t);autoProgress(t);saveTour(t);pmRender(d.t);});
 
 /* 선수 */
 function playerModal(id,after){
