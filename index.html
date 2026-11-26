@@ -125,7 +125,7 @@ h2.pg .sp{flex:1}
 @media (max-width:760px){.dashq{grid-template-columns:1fr}}
 .tgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 @media (max-width:760px){.tgrid{grid-template-columns:1fr}}
-.tprog{min-width:0}.tdrow{flex-wrap:nowrap}.tdtitle{flex:0 0 auto;min-width:0;max-width:45%}.tdtitle>div{overflow:hidden;text-overflow:ellipsis}.tdrow>.row{flex-wrap:nowrap;flex-shrink:0}.tp-d{flex:1 1 220px;min-width:130px;max-width:320px;margin:0 12px}@media (max-width:980px){.tdrow{flex-wrap:wrap}.tdtitle{max-width:none}.tdrow>.row{flex-wrap:wrap}}.tp-top{display:flex;align-items:baseline;gap:6px;font-size:12.5px;color:var(--sub);margin-bottom:5px}.tp-top b{font-size:17px;color:var(--text,#111);font-weight:900}.tp-top .tp-n{margin-left:auto;font-size:12px}.tp-bar{height:9px;background:#e9ecf0;border-radius:99px;overflow:hidden}.tp-bar i{display:block;height:100%;background:linear-gradient(90deg,#e30000,#ff7a00);border-radius:99px;transition:width .4s}
+.tprog{min-width:0}.tdrow{flex-wrap:nowrap;gap:10px}.tdtitle{flex:0 1 auto;min-width:120px;max-width:40%}.tdrow .btn.sm{padding:6px 9px;font-size:12.5px}.tdrow>.row{gap:4px}.tp-top{white-space:nowrap}.tp-d .tp-x{display:none}.tp-live .tp-l::before{content:'대회 '}.tp-m .tp-l::before{content:'대회 '}.tdtitle>div{overflow:hidden;text-overflow:ellipsis}.tdrow>.row{flex-wrap:nowrap;flex-shrink:0}.tp-d{flex:1 1 200px;min-width:120px;max-width:300px;margin:0 4px}@media (max-width:980px){.tdrow{flex-wrap:wrap}.tdtitle{max-width:none}.tdrow>.row{flex-wrap:wrap}}.tp-top{display:flex;align-items:baseline;gap:6px;font-size:12.5px;color:var(--sub);margin-bottom:5px}.tp-top b{font-size:17px;color:var(--text,#111);font-weight:900}.tp-top .tp-n{margin-left:auto;font-size:12px}.tp-bar{height:9px;background:#e9ecf0;border-radius:99px;overflow:hidden}.tp-bar i{display:block;height:100%;background:linear-gradient(90deg,#e30000,#ff7a00);border-radius:99px;transition:width .4s}
 .tp-m{margin-top:6px}.tp-m .tp-top{margin-bottom:3px;font-size:11.5px}.tp-m .tp-top b{font-size:13px}.tp-m .tp-bar{height:6px}
 .plbar{gap:6px;flex-wrap:nowrap}.plbar>*{height:32px;box-sizing:border-box;margin:0}.plbar select{border:1px solid #d5d9df;border-radius:8px;padding:0 8px;background:#fff;font-size:13px;width:92px;flex-shrink:0}.plbar .btn{padding:0 10px;font-size:12.5px;border-radius:8px;flex-shrink:0;display:inline-flex;align-items:center}.plbar input{border:1px solid #d5d9df;border-radius:8px;padding:0 10px;font-size:13px;width:240px;min-width:0;flex:0 1 240px}.plbar .small{flex-shrink:0;display:inline-flex;align-items:center}
 .plgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
@@ -773,7 +773,7 @@ function tProgress(t){
   return {done,total,pct:Math.floor(done/total*100)};
 }
 function progHTML(t,cls){const g=tProgress(t);if(!g)return '';
-  return `<div class="tprog ${cls||''}"><div class="tp-top"><span>대회 진행률</span><b>${g.pct}%</b><span class="tp-n">${g.done}/${g.total} 경기 (결승 포함 예상)</span></div><div class="tp-bar"><i style="width:${g.pct}%"></i></div></div>`;}
+  return `<div class="tprog ${cls||''}"><div class="tp-top" title="결승라운드까지 예상 ${g.total}경기 중 ${g.done}경기 완료"><span class="tp-l">진행률</span><b>${g.pct}%</b><span class="tp-n">${g.done}/${g.total}경기<span class="tp-x"> (결승 포함 예상)</span></span></div><div class="tp-bar"><i style="width:${g.pct}%"></i></div></div>`;}
 function progressText(t){
   if(t.status==='cancelled')return '취소된 대회';
   if(t.status==='planned')return '예정 대회';
