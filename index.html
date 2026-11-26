@@ -2068,7 +2068,7 @@ function fireAlert(title,body,k,tid,who){
 }
 ACT.alClose=d=>{const e=document.getElementById(d.id);e&&e.remove();};
 ACT.alView=d=>{ACT.alClose(d);go('t-'+d.t);};
-ACT.watchCancel=async()=>{const n=watchList().length;if(!(await ask(`신청된 ${n}명의 알림을 모두 취소할까요?`,'알림 취소',true))){ACT.watch();return;}setWatch([]);S.alerted={};closeModal();renderShell();toast('알림을 취소했습니다');};
+ACT.watchCancel=async()=>{const n=watchList().length;if(!n){toast('신청된 알림이 없습니다');return;}if(!(await ask(`신청된 ${n}명의 알림을 모두 취소할까요?`,'알림 취소',true))){ACT.watch();return;}setWatch([]);S.alerted={};closeModal();renderShell();toast('알림을 취소했습니다');};
 ACT.watchOff=()=>{setWatch([]);S.alerted={};renderShell();toast('알림을 껐습니다');};
 ACT.notiPerm=async()=>{try{const r=await Notification.requestPermission();renderShell();toast(r==='granted'?'기기 알림을 허용했습니다':'기기 알림이 허용되지 않았습니다 (페이지 팝업으로만 알립니다)');}catch(e){toast('이 브라우저는 기기 알림을 지원하지 않습니다');}};
 ACT.watch=()=>{
@@ -2081,7 +2081,7 @@ ACT.watch=()=>{
     <div class="wtsel-box"><div class="small row" style="font-weight:900;margin-bottom:6px;gap:6px">🔔 신청된 선수 <span id="wt-cnt" class="muted" style="font-weight:500"></span><span class="sp"></span><button class="btn sm" id="wt-clr" data-act="wtClr" style="padding:2px 8px;font-size:11.5px;display:none">전체 해제</button></div><div class="fin-list" id="wt-sel"></div></div>
     <input id="wt-q" placeholder="이름·닉네임 검색" style="width:100%;border:1px solid #d5d9df;border-radius:10px;padding:9px 12px;margin-bottom:8px">
     <div class="pick" id="wt-pick" style="max-height:340px">${list.map(p=>`<label class="${W.has(p.id)?'sel':''}" data-s="${esc((p.name+' '+p.nick).toLowerCase())}"><input type="checkbox" data-wid="${p.id}" ${W.has(p.id)?'checked':''}>${nmHTML(p)}${inLive.has(p.id)?' <span class="badge live" style="margin-left:auto">참가중</span>':''}</label>`).join('')||'<div class="empty">선수 명단이 비어 있습니다</div>'}</div>
-    <div class="mact">${watchList().length?'<button class="btn red" data-act="watchCancel" style="margin-right:auto">🔕 알림 취소</button>':''}<button class="btn" data-act="close">닫기</button><button class="btn pri" data-act="watchSave">알림 신청</button></div>`);
+    <div class="mact"><button class="btn red" data-act="watchCancel" style="margin-right:auto">🔕 알림 취소</button><button class="btn" data-act="close">닫기</button><button class="btn pri" data-act="watchSave">알림 신청</button></div>`);
   wtSelRender();
 };
 function wtSelRender(){
