@@ -1532,7 +1532,6 @@ function pmRender(tid){
   const others=S.players.filter(p=>!t.active.includes(p.id)).sort((a,b)=>a.name.localeCompare(b.name,'ko'));
   const q=($('#pm-q')||{}).value||'';
   openModal(`<h3 class="row">참가자 추가 / 제외<span class="sp"></span><button class="btn sm dark" data-act="pmText" data-t="${tid}">✎ 텍스트로 입력</button></h3>
-    <div class="small muted" style="margin-bottom:8px">제외된 선수는 남은 경기·다음 라운드·결승에서 빠집니다. 추가된 선수는 진행 중인 예선(또는 다음 라운드)에 편성됩니다.</div>
     <div style="font-weight:900;margin:8px 0 4px">참가 중 (${act.length})</div>
     <div class="pick" style="max-height:220px">${act.map(p=>`<div class="row" style="padding:8px 12px;border-bottom:1px solid #f0f1f3">${tn(t,p)}<span class="sp"></span><button class="btn sm red" data-act="pmRemove" data-t="${tid}" data-p="${p}">제외</button></div>`).join('')}</div>
     ${rm.length?`<div style="font-weight:900;margin:12px 0 4px">제외됨 (${rm.length})</div><div class="pick" style="max-height:150px">${rm.map(p=>`<div class="row" style="padding:8px 12px;border-bottom:1px solid #f0f1f3;opacity:.7">${tn(t,p)}<span class="sp"></span><button class="btn sm" data-act="pmRestore" data-t="${tid}" data-p="${p}">복귀</button></div>`).join('')}</div>`:''}
