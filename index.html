@@ -349,6 +349,7 @@ td.tot{font-weight:900;background:#fffaf0}
  .tstick .ttabs{margin-bottom:6px}
  .tmenu{display:flex;flex-direction:column;gap:8px}.tmenu .btn{width:100%;padding:12px;font-size:15px}
 }
+.livebox{margin-top:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px}.lsteps{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px}.ls{border:1px solid var(--line);background:#fff;border-radius:99px;padding:5px 11px;font-size:13px;font-weight:700;color:#9aa0a8;white-space:nowrap}.ls.done{color:#1a7f37;border-color:#bfe3c8;background:#f1fbf3}.ls.cur{background:var(--dark);border-color:var(--dark);color:#fff}.ls .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);margin-left:5px;vertical-align:middle}.tp-live .tp-top b{font-size:22px}.tp-live .tp-bar{height:11px}
 #topbar{position:sticky;top:0;z-index:30}.tstick{position:sticky;top:var(--navh,152px);z-index:15;background:var(--bg);margin:-10px -6px 8px;padding:10px 6px 2px;box-shadow:0 8px 8px -8px rgba(0,0,0,.18)}.tstick .card.thead{margin-bottom:8px}.tstick .ttabs{margin-bottom:8px}#topbar nav.tabs{position:static}
 </style>
 </head>
@@ -776,7 +777,17 @@ function progressText(t){
   const n=t.rounds.length;return n?`${n}라운드 진행중 / 총 ${t.opt.rounds}라운드`:'준비중';
 }
 const EMPTY_SVG=`<svg viewBox="0 0 320 120" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:300px;height:auto;display:block;margin:0 auto"><defs><pattern id="ck" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#d6dae0"/><rect x="6" y="6" width="6" height="6" fill="#d6dae0"/></pattern></defs><rect x="0" y="92" width="320" height="10" rx="5" fill="#eef0f3"/><rect x="246" y="20" width="3" height="74" fill="#c3c8cf"/><rect x="249" y="20" width="44" height="30" fill="url(#ck)" stroke="#c3c8cf"/><g transform="translate(40 52)"><path d="M10 34h120l-10-16h-26l-14-12H54L30 18H14z" fill="#e10600"/><rect x="58" y="10" width="26" height="8" rx="2" fill="#ffc400"/><path d="M0 34h140" stroke="#14161b" stroke-width="3"/><circle cx="32" cy="36" r="10" fill="#14161b"/><circle cx="32" cy="36" r="4" fill="#9aa0a9"/><circle cx="108" cy="36" r="10" fill="#14161b"/><circle cx="108" cy="36" r="4" fill="#9aa0a9"/><path d="M-30 20h22M-36 28h26M-26 12h16" stroke="#c3c8cf" stroke-width="3" stroke-linecap="round"/></g></svg>`;
+function liveSteps(t){
+  let st=[];
+  if(t.type==='points'){const P=t.pts||{};const c=t.result?2:(P.seeds?1:0);st=[['1단계 리그',0],['2단계 서바이벌',1],['최종 결과',2]].map(([l,i])=>({l,s:i<c?'done':i===c?'cur':''}));}
+  else{const R=t.opt.rounds||1;const cur=t.result?R+1:t.finals?R:Math.max(0,(t.rounds||[]).length-1);
+    for(let i=0;i<R;i++){const r=(t.rounds||[])[i];st.push({l:`${i+1}라운드`,s:(r&&roundDone(t,r)&&i<cur)||i<cur?'done':i===cur?'cur':''});}
+    st.push({l:'결승라운드',s:cur>R?'done':cur===R?'cur':''});st.push({l:'최종 결과',s:t.result?'cur':''});}
+  return `<div class="lsteps">${st.map(x=>`<span class="ls ${x.s}">${x.s==='done'?'✓ ':''}${x.l}${x.s==='cur'&&!t.result?'<i class="dot"></i>':''}</span>`).join('')}</div>`;
+}
+function livePic(t){return `<div class="livebox">${liveSteps(t)}${progHTML(t,'tp-live')}</div>`;}
 function emptyPic(t){
+  if(t.status==='active'&&t.type!=='record')return livePic(t);
   const msg=t.status==='planned'?'대회 준비중':t.status==='cancelled'?'취소된 대회':t.status==='active'?'경기 진행중':'결과 없음';
   return `<div class="emptypic"><div class="ep-msg">${msg}</div></div>`;
 }
