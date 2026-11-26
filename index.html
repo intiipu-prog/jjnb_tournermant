@@ -1415,7 +1415,7 @@ ACT.svReset=async d=>{
 /* 대회 관리 */
 ACT.editTour=d=>{
   const t=S.tours[d.t];if(!t)return;
-  S._et={rounds:t.opt?t.opt.rounds:3,qualCount:t.opt?t.opt.qualCount||2:2,size:t.opt?t.opt.qualSize||3:3,kind:t.kind||'tournament'};
+  S._et={rounds:t.opt?t.opt.rounds:3,qualCount:t.opt?t.opt.qualCount||2:2,size:t.opt?t.opt.qualSize||3:3,kind:t.kind||'tournament',type:t.type};
   etRender(t);
 };
 function etRender(t){
@@ -1423,9 +1423,13 @@ function etRender(t){
   const ob=(k,vals,dis)=>`<div class="opt">${vals.map(v=>`<button class="${E[k]===v[0]?'on':''}" ${dis&&dis(v[0])?'disabled':''} data-act="etOpt" data-t="${t.id}" data-k="${k}" data-v="${v[0]}">${v[1]}</button>`).join('')}</div>`;
   const nm=($('#et-name')||{}).value, dt=($('#et-date')||{}).value;
   let body='';
-  if(t.type==='tournament'){
-    const minR=Math.max(2,t.rounds.length);const fin=!!t.finals;
-    body=`<div class="fld"><label>라운드 수 ${fin?'<span class="muted">(결승라운드 진행 중에는 변경 불가)</span>':`<span class="muted">(현재 ${t.rounds.length}라운드 진행)</span>`}</label>${ob('rounds',[[2,'2회'],[3,'3회'],[4,'4회'],[5,'5회']],v=>fin||v<minR)}</div>
+  if(t.type!=='record'){
+    const chg=E.type!==t.type;const started=(t.type==='tournament'?(t.rounds||[]).length:(t.pts&&(Object.keys(t.pts.res||{}).length||t.pts.seeds)))||t.result;
+    body+=`<div class="fld"><label>진행 방식</label>${ob('type',[['tournament','토너먼트'],['points','포인트전']])}${chg&&started?'<div class="small" style="color:var(--red);margin-top:6px">⚠ 진행 방식을 바꾸면 지금까지의 대진과 결과가 모두 지워지고, 같은 참가자로 처음부터 새로 편성됩니다.</div>':''}</div>`;
+  }
+  if(E.type==='tournament'&&t.type!=='record'){
+    const chg=E.type!==t.type;const minR=chg?2:Math.max(2,t.rounds.length);const fin=!chg&&!!t.finals;
+    body+=`<div class="fld"><label>라운드 수 ${fin?'<span class="muted">(결승라운드 진행 중에는 변경 불가)</span>':chg?'':`<span class="muted">(현재 ${t.rounds.length}라운드 진행)</span>`}</label>${ob('rounds',[[2,'2회'],[3,'3회'],[4,'4회'],[5,'5회']],v=>fin||v<minR)}</div>
       <div class="fld"><label>라운드별 결승라운드 진출 인원 <span class="muted">(진행 중인 라운드 본선과 이후 라운드에 적용)</span></label>${ob('qualCount',[[1,'1명'],[2,'2명']])}</div>
       <div class="fld"><label>조 구성 <span class="muted">(다음에 편성되는 경기부터 적용)</span></label>${ob('size',[[3,'3인 1조'],[2,'2인 1조']])}</div>`;
   }else if(t.type==='record'){
@@ -1441,10 +1445,20 @@ function etRender(t){
     <div class="mact"><button class="btn" data-act="close">취소</button><button class="btn pri" data-act="etSave" data-t="${t.id}">저장</button></div>`);
 }
 ACT.etOpt=d=>{let v=d.v;if(/^\d+$/.test(v))v=+v;S._et[d.k]=v;etRender(S.tours[d.t]);};
-ACT.etSave=d=>{
+ACT.etSave=async d=>{
   const t=T(d);const E=S._et;
   const name=$('#et-name').value.trim();if(!name){toast('대회명을 입력하세요');return;}
   const dv=($('#et-date').value||'').trim();const nd=dv?normDate(dv):t.date;if(!nd){toast('일자를 확인하세요 (예: 2026-11-22)');return;}
+  if(t.type!=='record'&&E.type!==t.type){
+    const started=(t.type==='tournament'?(t.rounds||[]).length:(t.pts&&(Object.keys(t.pts.res||{}).length||t.pts.seeds)))||t.result;
+    const nm2=E.type==='points'?'포인트전':'토너먼트';
+    if(started){const nameEl=$('#et-name').value,dateEl=$('#et-date').value;if(!(await ask(`진행 방식을 '${nm2}'(으)로 바꿀까요?\n지금까지의 대진과 결과가 모두 지워지고 같은 참가자로 새로 편성됩니다.`,'변경',true))){etRender(t);$('#et-name').value=nameEl;$('#et-date').value=dateEl;return;}}
+    t.name=name;t.date=nd;t.type=E.type;t.result=null;delete S.tab[t.id];
+    if(t.status==='done')t.status='active';
+    if(E.type==='tournament'){const sz=E.size||3;t.opt={rounds:E.rounds||3,qualCount:E.qualCount||2,qualSize:sz,mainSize:sz,finalSize:sz};t.rounds=[];t.finals=null;delete t.pts;if(t.status==='active'&&activeList(t).length>=2)startRound(t);}
+    else{t.pts={res:{},tie:[],seeds:null,heats:[],final:null};delete t.rounds;delete t.finals;}
+    S._et=null;closeModal();saveTour(t);toast(`진행 방식을 ${nm2}(으)로 바꿨습니다`);return;
+  }
   t.name=name;t.date=nd;
   if(t.type==='tournament'){
     if(!t.finals)t.opt.rounds=Math.max(E.rounds,t.rounds.length);
