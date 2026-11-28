@@ -421,6 +421,53 @@ td.tot{font-weight:900;background:#fffaf0}
 /* 본선 안쪽 단계 구분 제거 */
 .sec.s-main .sec.s-main{background:transparent;border-left:0;border-radius:0;padding:0;margin-top:10px}
 .sec.s-main .sec.s-main>h4{color:inherit;filter:none}
+
+/* ===== 색상 설정 반영 ===== */
+.sec.s-qual{--sc:var(--c-qual,#3aa760);background:color-mix(in srgb,var(--sc) 11%,#fff)}
+.sec.s-rep{--sc:var(--c-rep,#f08a24);background:color-mix(in srgb,var(--sc) 11%,#fff)}
+.sec.s-main{--sc:var(--c-main,#3b7de0);background:color-mix(in srgb,var(--sc) 11%,#fff)}
+.sec.s-main .sec.s-main{background:transparent}
+.clrrow{display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid #f0f1f3;flex-wrap:wrap}.clrrow:first-of-type{border-top:0}
+.clrname{width:112px;font-weight:800;font-size:14px;flex:none}
+.clrin{width:44px;height:34px;padding:0;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;flex:none}
+.clrpal{display:flex;gap:5px;flex-wrap:wrap}.clrpal .sw{width:24px;height:24px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #cfd4db;padding:0}.clrpal .sw.on{box-shadow:0 0 0 2px #14161b}
+.clrprev{margin-left:auto;border-left:6px solid var(--sc);background:color-mix(in srgb,var(--sc) 11%,#fff);border-radius:10px;padding:6px 12px;font-weight:900;font-size:13px;color:var(--sc);min-width:136px;white-space:nowrap}
+.clrprev span{filter:brightness(.82)}
+/* ===== 결승라운드 대진표 (토너먼트 브래킷) ===== */
+.bkt{background:#171b24;border-radius:16px;padding:14px 14px 16px;margin-bottom:14px;color:#eef0f4}
+.bk-tools{display:flex;align-items:center;gap:8px;margin-bottom:12px}.bk-ttl{font-weight:900;font-size:16px;margin-right:auto}
+.bk-scroll{overflow-x:auto;padding-bottom:8px}
+.bk-main{display:flex;align-items:stretch;width:max-content;min-width:100%}
+.bk-col{display:flex;flex-direction:column;width:236px;flex:none}
+.bk-h{padding:0 2px 8px;margin-bottom:12px;border-bottom:3px solid var(--cc,#888)}
+.bk-h b{display:block;font-size:15px;color:var(--cc);filter:brightness(1.3)}
+.bk-h small{display:block;color:#aab2c3;font-size:11.5px;margin-top:2px}
+.bk-ctl{margin-top:7px;display:flex;gap:6px;flex-wrap:wrap}
+.bk-col.c-f1{--cc:var(--c-f1,#8a5cf0)}.bk-col.c-fin{--cc:var(--c-fin,#e0ab00)}.bk-col.c-low{--cc:var(--c-low,#e8590c)}
+.bk-cards{display:flex;flex-direction:column;justify-content:space-around;gap:14px;flex:1}
+.bk-link{width:36px;flex:none;position:relative}
+.bk-br{display:flex;flex-direction:column;gap:26px;flex:none}
+.bk-brow{display:flex;flex-direction:column}
+.bk-rl{font-weight:900;font-size:13px;color:#dfe3ea;margin:0 0 8px;padding-left:2px}.bk-rl small{color:#8e97aa;font-weight:500;margin-left:6px}
+.bk-row{display:flex;align-items:stretch}
+.bk-wait{align-self:center;margin-left:24px;color:#8e97aa;font-size:13px;line-height:1.6;border:2px dashed #3a4254;border-radius:12px;padding:16px 18px;flex:none}
+.bkt .heat{background:#262c39;border:1px solid #394155;box-shadow:none;color:#f1f3f7;border-radius:12px}
+.bkt .heat.ok{border-color:#3fae6a;box-shadow:inset 0 3px 0 var(--green)}
+.bkt .heat.blue.ok,.bkt .heat.final{background:#232d44;border-color:#4a7ed0;box-shadow:inset 0 3px 0 var(--blue)}
+.bkt .heat .hh{color:#f1f3f7}.bkt .heat.blue .hh>span:first-child{color:#8fb9ff}
+.bkt .heat .hh .badge{background:#3a4254;color:#cfd5e0}.bkt .heat .hh .badge.done{background:#1f5c3a;color:#9ef0c0}
+.bkt .heat .dqall{background:transparent;border-color:#7a3b3b;color:#ff8f8b}
+.bkt .heat .hp{border-top-color:#394155}
+.bkt .heat .nm,.bkt .heat .nm b{color:#fff}.bkt .heat .nk{color:#9aa3b5}.bkt .heat .nk.blue{color:#79adff}
+.bkt .heat .hp.win .pn{color:#5be08e}
+.bkt .heat .seg button{background:#323a4b;border-color:#434c60;color:#cfd5e0}
+.bkt .heat .seg button.on.W{background:var(--green);border-color:var(--green);color:#fff}
+.bkt .heat .seg button.on.L{background:#6b7280;border-color:#6b7280;color:#fff}
+.bkt .heat .seg button.on.D{background:var(--red);border-color:var(--red);color:#fff}
+.bkt .heat .seg button.on.R{background:var(--yel);border-color:#e0ab00;color:#222}
+.bkt .btn{background:#2d3444;border-color:#434c60;color:#e6e9ef}.bkt .btn.red{background:transparent;border-color:#8a3d3d;color:#ff8f8b}
+.bkt .opt button{background:#2d3444;border-color:#434c60;color:#cfd5e0}.bkt .opt button.on{background:#eef0f4;border-color:#eef0f4;color:#14161b}
+@media (max-width:520px){.bk-col{width:218px}.bk-link{width:26px}.bkt{padding:10px 8px 12px;border-radius:12px}}
 </style>
 </head>
 <body>
@@ -754,7 +801,22 @@ function renderShell(){
     mb+=`<div class="modebar al">🔔 알림 대상 : <b>${nm||'-'}</b> · <a href="#" data-act="watch">변경</a> · <a href="#" data-act="watchOff">끄기</a>${typeof Notification!=='undefined'&&Notification.permission!=='granted'?' · <a href="#" data-act="notiPerm">기기 알림 허용</a>':''}</div>`;}
   $('#modebar').innerHTML=mb;
 }
+function drawBracketLinks(){
+  document.querySelectorAll('.bk-link').forEach(L=>{
+    const lr=L.getBoundingClientRect();if(!lr.height)return;
+    const q=id=>[...document.querySelectorAll('.bk-col[data-col="'+id+'"] .heat')];
+    const A=q(L.dataset.from),B=L.dataset.to.split(',').flatMap(q);
+    const mid=el=>{const r=el.getBoundingClientRect();return r.top+r.height/2-lr.top;};
+    const ya=A.map(mid),yb=B.map(mid),all=ya.concat(yb);if(!all.length)return;
+    const w=lr.width,bx=Math.round(w/2);let d='';
+    ya.forEach(y=>d+='M0 '+y+'H'+bx);yb.forEach(y=>d+='M'+bx+' '+y+'H'+w);
+    d+='M'+bx+' '+Math.min(...all)+'V'+Math.max(...all);
+    L.innerHTML='<svg width="'+w+'" height="'+lr.height+'" style="position:absolute;left:0;top:0"><path d="'+d+'" fill="none" stroke="#7d8798" stroke-width="2" stroke-linecap="round"/></svg>';
+  });
+}
+window.addEventListener('resize',()=>requestAnimationFrame(drawBracketLinks));
 function render(fromData){
+  applyColors();
   const r=route();
   if(fromData&&(r==='new'||r==='config'))return;
   if(S.mode==='init')return;
@@ -776,6 +838,7 @@ function render(fromData){
   const all=Object.values(S.tours);
   $('#hstats').innerHTML=`<div class="lv"><b>${all.filter(t=>t.status==='active').length}</b><span>진행중</span></div><div><b>${all.filter(t=>t.status!=='cancelled').length}</b><span>전체 대회</span></div><div><b>${S.players.length}</b><span>등록 선수</span></div>`;
   drawQRs(app);
+  requestAnimationFrame(drawBracketLinks);
   if(r==='players')applyPlayerFilter();
   if(r==='hof')applyHofFilter();
   if(r==='tours')applyTourFilter();
@@ -1094,25 +1157,42 @@ function vFinals(t,ed){
       <button class="btn pri" data-act="makeFinals" data-t="${t.id}" ${F.length?'':'disabled'}>결승라운드 대진표 작성</button>`:''}</div>`;
   }
   const e=ed;let h='';
+  let cid=0;const nid=()=>'bkc'+(++cid);
+  const colHTML=(id,cls,title,sub,ctl,cards)=>`<div class="bk-col ${cls}" data-col="${id}"><div class="bk-h"><b>${title}</b>${sub?`<small>${sub}</small>`:''}${ctl?`<div class="bk-ctl">${ctl}</div>`:''}</div><div class="bk-cards">${cards}</div></div>`;
+  const linkHTML=(from,to)=>`<div class="bk-link" data-from="${from}" data-to="${to}"></div>`;
+  const uh=finalsUpperHeat(f);const off=uh?act(t,uh).length+1:null;
+  const lowLabel=off?`${off}위 결정전`:'순위 결정전';
+  const rowHTML=(ch,part,label,offset,cls,ccls)=>{
+    if(!ch||!ch.stages.length)return null;
+    const ids=[];let parts='';
+    ch.stages.forEach((st,si)=>{
+      const id=nid();ids.push(id);const isRank=st.kind==='rank';
+      const title=isRank?label:`${label} 예선 ${si+1}단계`;
+      const sub=isRank?'':`${ch.size}인 1조 · 각 조 1위 진출`;
+      const ctl=(!isRank&&e&&si===ch.stages.length-1&&!ch.done)?fszSel(t,part,si,ch.size):'';
+      const cards=isRank?heatCard(t,st.heats[0],label,{kind:'rank',ed:e,offset,ctx:fctx(t,part,si),cls}):st.heats.map((hh,i)=>heatCard(t,hh,`${i+1}조`,{kind:'adv',ed:e,ctx:fctx(t,part,si)})).join('');
+      if(si)parts+=linkHTML(ids[si-1],id);
+      parts+=colHTML(id,ccls,title,sub,ctl,cards);
+    });
+    return {html:`<div class="bk-row">${parts}</div>`,first:ids[0]};
+  };
+  let col1='',id1=null;
   if(f.stage1){
-    h+=`<div class="sec s-f1"><h4>결승라운드 1차 <small>${f.size}인 1조 · 1위 최종결승 / 나머지 순위결정전</small><span class="sp"></span>${e&&!f.upper?fszSel(t,'f1',null,f.size):''}${e&&!f.upper?`<button class="btn sm" data-act="reshuffle" ${fctx(t,'f1')}>↻ 재편성</button>`:''}${e?`<button class="btn sm red" data-act="resetFinals" data-t="${t.id}">결승 대진 초기화</button>`:''}</h4>
-      <div class="heat-grid">${f.stage1.heats.map((hh,i)=>heatCard(t,hh,`${i+1}조`,{kind:'adv',ed:e,ctx:fctx(t,'f1')})).join('')}</div></div>`;
-  }else if(e){h+=`<div class="row" style="justify-content:flex-end;margin-bottom:8px"><button class="btn sm red" data-act="resetFinals" data-t="${t.id}">결승 대진 초기화</button></div>`;}
-  if(f.upper||f.lower){
-    const uh=finalsUpperHeat(f);const off=uh?act(t,uh).length+1:null;
-    const chainHTML=(ch,part,label,offset,cls)=>{
-      if(!ch)return `<div class="muted small">해당 없음</div>`;
-      if(!ch.stages.length)return '<div class="muted small">대상자 없음</div>';
-      return ch.stages.map((st,si)=>st.kind==='rank'?heatCard(t,st.heats[0],label,{kind:'rank',ed:e,offset,ctx:fctx(t,part,si),cls}):
-        `<div class="row small muted" style="margin:4px 0">${label} 예선 ${si+1}단계 (${ch.size}인 1조 · 각 조 1위 진출)<span class="sp"></span>${e&&si===ch.stages.length-1&&!ch.done?fszSel(t,part,si,ch.size):''}</div><div class="heat-grid">${st.heats.map((hh,i)=>heatCard(t,hh,`${i+1}조`,{kind:'adv',ed:e,ctx:fctx(t,part,si)})).join('')}</div>`).join('<div style="height:8px"></div>');
-    };
-    const lowLabel=off?`${off}위 결정전`:'순위 결정전';
-    h+=`<div class="sec s-fin"><h4>${f.lower?lowLabel+' → ':''}최종 결승 <small>순위결정전을 먼저 진행합니다</small></h4>
-      <div class="grid2" style="grid-template-columns:1fr 1fr;gap:10px">
-        <div>${f.lower?`<div class="small" style="font-weight:900;margin-bottom:6px">① ${lowLabel}</div>${chainHTML(f.lower,'low',lowLabel,off||1,'blue')}`:'<div class="small muted">순위결정전 없음</div>'}</div>
-        <div><div class="small" style="font-weight:900;margin-bottom:6px">${f.lower?'②':''} 최종 결승</div>${chainHTML(f.upper,'up','최종 결승',1,'blue')}</div>
-      </div></div>`;
+    id1=nid();
+    col1=colHTML(id1,'c-f1','결승라운드 1차',`${f.size}인 1조 · 1위 최종결승 / 나머지 순위결정전`,`${e&&!f.upper?fszSel(t,'f1',null,f.size):''}${e&&!f.upper?`<button class="btn sm" data-act="reshuffle" ${fctx(t,'f1')}>↻ 재편성</button>`:''}`,f.stage1.heats.map((hh,i)=>heatCard(t,hh,`${i+1}조`,{kind:'adv',ed:e,ctx:fctx(t,'f1')})).join(''));
   }
+  const ur=f.upper?rowHTML(f.upper,'up','최종 결승',1,'blue','c-fin'):null;
+  const lr=f.lower?rowHTML(f.lower,'low',lowLabel,off||1,'blue','c-low'):null;
+  const brs=[];
+  if(ur)brs.push(`<div class="bk-brow"><div class="bk-rl">🏆 최종 결승${lr?' <small>순위결정전을 먼저 진행합니다</small>':''}</div>${ur.html}</div>`);
+  if(lr)brs.push(`<div class="bk-brow"><div class="bk-rl">① ${lowLabel} <small>먼저 진행</small></div>${lr.html}</div>`);
+  let main='';
+  if(f.stage1){
+    main=col1;
+    if(brs.length)main+=linkHTML(id1,[ur&&ur.first,lr&&lr.first].filter(Boolean).join(','))+`<div class="bk-br">${brs.join('')}</div>`;
+    else main+=`<div class="bk-wait">1차 조 결과를 모두 입력하면<br>최종 결승·순위결정전이 편성됩니다</div>`;
+  }else main=`<div class="bk-br">${brs.join('')||'<div class="bk-wait">대상자 없음</div>'}</div>`;
+  h+=`<div class="bkt">${e?`<div class="bk-tools"><span class="bk-ttl">🏆 결승라운드 대진</span><button class="btn sm red" data-act="resetFinals" data-t="${t.id}">결승 대진 초기화</button></div>`:`<div class="bk-tools"><span class="bk-ttl">🏆 결승라운드 대진</span></div>`}<div class="bk-scroll"><div class="bk-main">${main}</div></div></div>`;
   if(t.result)h+=`<div class="flow"><div class="msg">🏁 결승라운드 종료 — 최종 결과가 확정되었습니다.</div><button class="btn pri" data-act="ttab" data-t="${t.id}" data-v="res">최종 결과 보기</button></div>`;
   return h;
 }
@@ -1225,9 +1305,21 @@ function vHof(){
 }
 
 /* ================= 설정 ================= */
+var STAGE_DEF=[['qual','예선','#3aa760'],['rep','패자부활전','#f08a24'],['main','본선','#3b7de0'],['f1','결승라운드 1차','#8a5cf0'],['low','순위결정전','#e8590c'],['fin','최종 결승','#e0ab00']];
+var STAGE_PAL=['#3aa760','#2f9e8f','#3b7de0','#6c63ff','#8a5cf0','#d6409f','#e8590c','#f08a24','#e0ab00','#868e96'];
+function stageColor(k){const c=((S.settings||{}).stageColors||{})[k];const d=STAGE_DEF.find(x=>x[0]===k);return c||(d?d[2]:'#888888');}
+function applyColors(){try{STAGE_DEF.forEach(x=>document.documentElement.style.setProperty('--c-'+x[0],stageColor(x[0])));}catch(e){}}
+function setStageColor(k,v){const c=Object.assign({},S.settings.stageColors||{},{[k]:v});saveSettings(Object.assign({},S.settings,{stageColors:c}));applyColors();render();}
+document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.sc;if(k)document.documentElement.style.setProperty('--c-'+k,e.target.value);});
+document.addEventListener('change',e=>{const k=e.target.dataset&&e.target.dataset.sc;if(k)setStageColor(k,e.target.value);});
+function colorTabHTML(){
+  return `<div class="card"><h3>단계별 구분 색상</h3><div class="small muted" style="margin-bottom:10px">예선·패자부활전·본선·결승라운드의 배경색과 제목색을 고릅니다. 모든 기기에 같이 적용됩니다.</div>
+   ${STAGE_DEF.map(x=>{const k=x[0],l=x[1],c=stageColor(k);return `<div class="clrrow"><div class="clrname">${l}</div><input type="color" class="clrin" data-sc="${k}" value="${c}"><div class="clrpal">${STAGE_PAL.map(p=>`<button class="sw ${p.toLowerCase()===c.toLowerCase()?'on':''}" style="background:${p}" data-act="scSet" data-k="${k}" data-v="${p}" title="${p}"></button>`).join('')}</div><div class="clrprev" style="--sc:${c}"><span>${l}</span></div></div>`;}).join('')}
+   <div class="row" style="margin-top:12px"><button class="btn sm" data-act="scReset">기본 색상으로</button></div></div>`;
+}
 function vConfig(){
   const st=S.settings;const tab=S.tab.cfg||'logo';
-  const tabs=[['logo','로고'],['link','링크'],['data','데이터'],['view','화면']];
+  const tabs=[['logo','로고'],['link','링크'],['color','색상'],['data','데이터'],['view','화면']];
   const bar=`<div class="cfgtabs">${tabs.map(x=>`<button class="${tab===x[0]?'on':''}" data-act="cfgTab" data-v="${x[0]}">${x[1]}</button>`).join('')}</div>`;
   let body='';
   if(tab==='logo')body=`<div class="card"><h3>배너 로고</h3><div class="row" style="align-items:center;gap:12px"><div style="background:var(--dark);padding:10px;border-radius:10px;max-width:100%">${st.logo?`<img src="${esc(st.logo)}" style="max-height:64px;max-width:160px;display:block">`:DEFAULT_LOGO}</div>
@@ -1238,6 +1330,7 @@ function vConfig(){
     <div class="fld"><label>밴드 주소</label><input id="cf-band" value="${esc(st.band||BAND_URL)}"></div>
     <div class="fld"><label>카카오톡 오픈채팅</label><input id="cf-kakao" value="${esc(st.kakao||KAKAO_URL)}"></div>
     <button class="btn pri" data-act="saveCfg">저장</button></div>`;
+  else if(tab==='color')body=colorTabHTML();
   else if(tab==='data')body=`${ghCardHTML()}
   <div class="card"><h3>저장소</h3><div class="small">${S.mode==='fb'?'✅ Firebase(Firestore)에 저장 · 모든 기기에서 실시간 동기화':S.mode==='db'?'✅ 서버(백엔드 DB)에 저장 · 모든 기기에서 실시간 동기화':'⚠️ 로컬 모드: 이 브라우저에만 저장됩니다'}</div>
     ${S.mode==='fb'?`<div class="row" style="margin-top:10px"><button class="btn sm" data-act="ghPlayers">GitHub 백업에서 선수 명단 불러오기</button><button class="btn sm" data-act="ghResults">GitHub 백업에서 대회 결과 불러오기</button></div><div class="small muted" style="margin-top:6px">저장소 data/ 폴더의 백업 파일을 불러옵니다. 조별 대진까지 옮기려면 기존 페이지에서 [결과 내보내기] 엑셀을 받아 [대회 결과 → 결과 가져오기]를 쓰세요.</div>`:''}</div>`;
@@ -2169,6 +2262,8 @@ function wtSelRender(){
 }
 ACT.wtClr=()=>{document.querySelectorAll('#wt-pick input[data-wid]').forEach(i=>{i.checked=false;i.closest('label').classList.remove('sel');});wtSelRender();};
 ACT.cfgTab=d=>{S.tab.cfg=d.v;render();};
+ACT.scSet=d=>setStageColor(d.k,d.v);
+ACT.scReset=()=>{saveSettings(Object.assign({},S.settings,{stageColors:{}}));applyColors();render();toast('기본 색상으로 되돌렸습니다');};
 ACT.wtRm=d=>{const i=document.querySelector(`#wt-pick input[data-wid="${d.id}"]`);if(i){i.checked=false;i.closest('label').classList.remove('sel');}wtSelRender();};
 document.addEventListener('input',e=>{if(e.target.id==='wt-q'){const q=e.target.value.trim().toLowerCase();document.querySelectorAll('#wt-pick label').forEach(l=>{l.style.display=!q||l.dataset.s.indexOf(q)>=0?'':'none';});}});
 document.addEventListener('change',e=>{const w=e.target.dataset&&e.target.dataset.wid;if(w){e.target.closest('label').classList.toggle('sel',e.target.checked);wtSelRender();}});
