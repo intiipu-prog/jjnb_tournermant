@@ -434,40 +434,49 @@ td.tot{font-weight:900;background:#fffaf0}
 .clrprev{margin-left:auto;border-left:6px solid var(--sc);background:color-mix(in srgb,var(--sc) 11%,#fff);border-radius:10px;padding:6px 12px;font-weight:900;font-size:13px;color:var(--sc);min-width:136px;white-space:nowrap}
 .clrprev span{filter:brightness(.82)}
 /* ===== 결승라운드 대진표 (토너먼트 브래킷) ===== */
-.bkt{background:#171b24;border-radius:16px;padding:14px 14px 16px;margin-bottom:14px;color:#eef0f4}
+.bkt{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 14px 16px;margin-bottom:14px;--bkl:#b4bcc9}
 .bk-tools{display:flex;align-items:center;gap:8px;margin-bottom:12px}.bk-ttl{font-weight:900;font-size:16px;margin-right:auto}
 .bk-scroll{overflow-x:auto;padding-bottom:8px}
 .bk-main{display:flex;align-items:stretch;width:max-content;min-width:100%}
 .bk-col{display:flex;flex-direction:column;width:236px;flex:none}
 .bk-h{padding:0 2px 8px;margin-bottom:12px;border-bottom:3px solid var(--cc,#888)}
-.bk-h b{display:block;font-size:15px;color:var(--cc);filter:brightness(1.3)}
-.bk-h small{display:block;color:#aab2c3;font-size:11.5px;margin-top:2px}
+.bk-h b{display:block;font-size:15px;color:var(--cc);filter:brightness(.82)}
+.bk-h small{display:block;color:var(--gray);font-size:11.5px;margin-top:2px}
 .bk-ctl{margin-top:7px;display:flex;gap:6px;flex-wrap:wrap}
 .bk-col.c-f1{--cc:var(--c-f1,#8a5cf0)}.bk-col.c-fin{--cc:var(--c-fin,#e0ab00)}.bk-col.c-low{--cc:var(--c-low,#e8590c)}
 .bk-cards{display:flex;flex-direction:column;justify-content:space-around;gap:14px;flex:1}
-.bk-link{width:36px;flex:none;position:relative}
+.bk-link{width:36px;flex:none;position:relative;color:var(--bkl)}
 .bk-br{display:flex;flex-direction:column;gap:26px;flex:none}
 .bk-brow{display:flex;flex-direction:column}
-.bk-rl{font-weight:900;font-size:13px;color:#dfe3ea;margin:0 0 8px;padding-left:2px}.bk-rl small{color:#8e97aa;font-weight:500;margin-left:6px}
+.bk-rl{font-weight:900;font-size:13px;margin:0 0 8px;padding-left:2px}.bk-rl small{color:var(--gray);font-weight:500;margin-left:6px}
 .bk-row{display:flex;align-items:stretch}
-.bk-wait{align-self:center;margin-left:24px;color:#8e97aa;font-size:13px;line-height:1.6;border:2px dashed #3a4254;border-radius:12px;padding:16px 18px;flex:none}
-.bkt .heat{background:#262c39;border:1px solid #394155;box-shadow:none;color:#f1f3f7;border-radius:12px}
-.bkt .heat.ok{border-color:#3fae6a;box-shadow:inset 0 3px 0 var(--green)}
-.bkt .heat.blue.ok,.bkt .heat.final{background:#232d44;border-color:#4a7ed0;box-shadow:inset 0 3px 0 var(--blue)}
-.bkt .heat .hh{color:#f1f3f7}.bkt .heat.blue .hh>span:first-child{color:#8fb9ff}
-.bkt .heat .hh .badge{background:#3a4254;color:#cfd5e0}.bkt .heat .hh .badge.done{background:#1f5c3a;color:#9ef0c0}
-.bkt .heat .dqall{background:transparent;border-color:#7a3b3b;color:#ff8f8b}
-.bkt .heat .hp{border-top-color:#394155}
-.bkt .heat .nm,.bkt .heat .nm b{color:#fff}.bkt .heat .nk{color:#9aa3b5}.bkt .heat .nk.blue{color:#79adff}
-.bkt .heat .hp.win .pn{color:#5be08e}
-.bkt .heat .seg button{background:#323a4b;border-color:#434c60;color:#cfd5e0}
-.bkt .heat .seg button.on.W{background:var(--green);border-color:var(--green);color:#fff}
-.bkt .heat .seg button.on.L{background:#6b7280;border-color:#6b7280;color:#fff}
-.bkt .heat .seg button.on.D{background:var(--red);border-color:var(--red);color:#fff}
-.bkt .heat .seg button.on.R{background:var(--yel);border-color:#e0ab00;color:#222}
-.bkt .btn{background:#2d3444;border-color:#434c60;color:#e6e9ef}.bkt .btn.red{background:transparent;border-color:#8a3d3d;color:#ff8f8b}
-.bkt .opt button{background:#2d3444;border-color:#434c60;color:#cfd5e0}.bkt .opt button.on{background:#eef0f4;border-color:#eef0f4;color:#14161b}
+.bk-wait{align-self:center;margin-left:24px;color:var(--gray);font-size:13px;line-height:1.6;border:2px dashed #d5d9df;border-radius:12px;padding:16px 18px;flex:none}
+/* 다크 템플릿 */
+.bkt.dk{background:#171b24;border-color:#171b24;color:#eef0f4;--bkl:#7d8798}
+.bkt.dk .bk-h b{filter:brightness(1.3)}.bkt.dk .bk-h small,.bkt.dk .bk-rl small,.bkt.dk .bk-wait{color:#8e97aa}.bkt.dk .bk-rl{color:#dfe3ea}.bkt.dk .bk-wait{border-color:#3a4254}
+.bkt.dk .heat{background:#262c39;border:1px solid #394155;box-shadow:none;color:#f1f3f7}
+.bkt.dk .heat.ok{border-color:#3fae6a;box-shadow:inset 0 3px 0 var(--green)}
+.bkt.dk .heat.blue.ok,.bkt.dk .heat.final{background:#232d44;border-color:#4a7ed0;box-shadow:inset 0 3px 0 var(--blue)}
+.bkt.dk .heat .hh{color:#f1f3f7}.bkt.dk .heat.blue .hh>span:first-child{color:#8fb9ff}
+.bkt.dk .heat .hh .badge{background:#3a4254;color:#cfd5e0}.bkt.dk .heat .hh .badge.done{background:#1f5c3a;color:#9ef0c0}
+.bkt.dk .heat .dqall{background:transparent;border-color:#7a3b3b;color:#ff8f8b}
+.bkt.dk .heat .hp{border-top-color:#394155}
+.bkt.dk .heat .nm,.bkt.dk .heat .nm b{color:#fff}.bkt.dk .heat .nk{color:#9aa3b5}.bkt.dk .heat .nk.blue{color:#79adff}
+.bkt.dk .heat .hp.win .pn{color:#5be08e}
+.bkt.dk .heat .seg button{background:#323a4b;border-color:#434c60;color:#cfd5e0}
+.bkt.dk .heat .seg button.on.W{background:var(--green);border-color:var(--green);color:#fff}
+.bkt.dk .heat .seg button.on.L{background:#6b7280;border-color:#6b7280;color:#fff}
+.bkt.dk .heat .seg button.on.D{background:var(--red);border-color:var(--red);color:#fff}
+.bkt.dk .heat .seg button.on.R{background:var(--yel);border-color:#e0ab00;color:#222}
+.bkt.dk .btn{background:#2d3444;border-color:#434c60;color:#e6e9ef}.bkt.dk .btn.red{background:transparent;border-color:#8a3d3d;color:#ff8f8b}
+.bkt.dk .opt button{background:#2d3444;border-color:#434c60;color:#cfd5e0}.bkt.dk .opt button.on{background:#eef0f4;border-color:#eef0f4;color:#14161b}
 @media (max-width:520px){.bk-col{width:218px}.bk-link{width:26px}.bkt{padding:10px 8px 12px;border-radius:12px}}
+/* 템플릿 */
+.tplgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.tplc{border:2px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff}.tplc.on{border-color:#14161b}
+.tplc h4{margin:0 0 6px;font-size:14.5px;display:flex;align-items:center;gap:6px}
+.tpld{display:flex;gap:4px;margin:6px 0 8px}.tpld i{width:22px;height:22px;border-radius:50%;display:block;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
+.tplc small{color:var(--gray)}
 </style>
 </head>
 <body>
@@ -811,7 +820,7 @@ function drawBracketLinks(){
     const w=lr.width,bx=Math.round(w/2);let d='';
     ya.forEach(y=>d+='M0 '+y+'H'+bx);yb.forEach(y=>d+='M'+bx+' '+y+'H'+w);
     d+='M'+bx+' '+Math.min(...all)+'V'+Math.max(...all);
-    L.innerHTML='<svg width="'+w+'" height="'+lr.height+'" style="position:absolute;left:0;top:0"><path d="'+d+'" fill="none" stroke="#7d8798" stroke-width="2" stroke-linecap="round"/></svg>';
+    L.innerHTML='<svg width="'+w+'" height="'+lr.height+'" style="position:absolute;left:0;top:0"><path d="'+d+'" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
   });
 }
 window.addEventListener('resize',()=>requestAnimationFrame(drawBracketLinks));
@@ -1192,7 +1201,7 @@ function vFinals(t,ed){
     if(brs.length)main+=linkHTML(id1,[ur&&ur.first,lr&&lr.first].filter(Boolean).join(','))+`<div class="bk-br">${brs.join('')}</div>`;
     else main+=`<div class="bk-wait">1차 조 결과를 모두 입력하면<br>최종 결승·순위결정전이 편성됩니다</div>`;
   }else main=`<div class="bk-br">${brs.join('')||'<div class="bk-wait">대상자 없음</div>'}</div>`;
-  h+=`<div class="bkt">${e?`<div class="bk-tools"><span class="bk-ttl">🏆 결승라운드 대진</span><button class="btn sm red" data-act="resetFinals" data-t="${t.id}">결승 대진 초기화</button></div>`:`<div class="bk-tools"><span class="bk-ttl">🏆 결승라운드 대진</span></div>`}<div class="bk-scroll"><div class="bk-main">${main}</div></div></div>`;
+  h+=`<div class="bkt ${(S.settings&&S.settings.bkTheme)==='dark'?'dk':''}">${e?`<div class="bk-tools"><span class="bk-ttl">🏆 결승라운드 대진</span><button class="btn sm red" data-act="resetFinals" data-t="${t.id}">결승 대진 초기화</button></div>`:`<div class="bk-tools"><span class="bk-ttl">🏆 결승라운드 대진</span></div>`}<div class="bk-scroll"><div class="bk-main">${main}</div></div></div>`;
   if(t.result)h+=`<div class="flow"><div class="msg">🏁 결승라운드 종료 — 최종 결과가 확정되었습니다.</div><button class="btn pri" data-act="ttab" data-t="${t.id}" data-v="res">최종 결과 보기</button></div>`;
   return h;
 }
@@ -1309,9 +1318,25 @@ var STAGE_DEF=[['qual','예선','#3aa760'],['rep','패자부활전','#f08a24'],[
 var STAGE_PAL=['#3aa760','#2f9e8f','#3b7de0','#6c63ff','#8a5cf0','#d6409f','#e8590c','#f08a24','#e0ab00','#868e96'];
 function stageColor(k){const c=((S.settings||{}).stageColors||{})[k];const d=STAGE_DEF.find(x=>x[0]===k);return c||(d?d[2]:'#888888');}
 function applyColors(){try{STAGE_DEF.forEach(x=>document.documentElement.style.setProperty('--c-'+x[0],stageColor(x[0])));}catch(e){}}
-function setStageColor(k,v){const c=Object.assign({},S.settings.stageColors||{},{[k]:v});saveSettings(Object.assign({},S.settings,{stageColors:c}));applyColors();render();}
+function setStageColor(k,v){const c=Object.assign({},S.settings.stageColors||{},{[k]:v});saveSettings(Object.assign({},S.settings,{stageColors:c,template:''}));applyColors();render();}
 document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.sc;if(k)document.documentElement.style.setProperty('--c-'+k,e.target.value);});
 document.addEventListener('change',e=>{const k=e.target.dataset&&e.target.dataset.sc;if(k)setStageColor(k,e.target.value);});
+var TPLS=[
+ {id:'basic',name:'기본',bk:'light',c:{qual:'#3aa760',rep:'#f08a24',main:'#3b7de0',f1:'#8a5cf0',low:'#e8590c',fin:'#e0ab00'},d:'밝은 화면 · 기본 색상'},
+ {id:'worldcup',name:'월드컵',bk:'dark',c:{qual:'#1c7ed6',rep:'#f59f00',main:'#3b5bdb',f1:'#7048e8',low:'#e8590c',fin:'#f1c40f'},d:'결승 대진표를 어두운 월드컵풍으로'},
+ {id:'pastel',name:'파스텔',bk:'light',c:{qual:'#74c69d',rep:'#f4a261',main:'#74a8f7',f1:'#b197fc',low:'#f78f7a',fin:'#f2cc5b'},d:'부드러운 색감'},
+ {id:'vivid',name:'비비드',bk:'light',c:{qual:'#12b886',rep:'#fd7e14',main:'#228be6',f1:'#7950f2',low:'#f03e3e',fin:'#fab005'},d:'선명한 원색'},
+ {id:'mono',name:'모노톤',bk:'light',c:{qual:'#495057',rep:'#868e96',main:'#343a40',f1:'#6c757d',low:'#adb5bd',fin:'#212529'},d:'흑백 · 인쇄용'}
+];
+function userTpls(){return (S.settings&&S.settings.userTpls)||[];}
+function applyTpl(t){saveSettings(Object.assign({},S.settings,{stageColors:Object.assign({},t.c),bkTheme:t.bk,template:t.id}));applyColors();render();toast(`'${t.name}' 템플릿을 적용했습니다`);}
+function tplTabHTML(){
+  const cur=S.settings.template||(((S.settings.stageColors&&Object.keys(S.settings.stageColors).length)||S.settings.bkTheme)?'':'basic');
+  const card=t=>`<div class="tplc ${cur===t.id?'on':''}"><h4>${esc(t.name)}${cur===t.id?'<span class="badge done">적용중</span>':''}</h4><div class="tpld">${STAGE_DEF.map(x=>`<i style="background:${t.c[x[0]]}" title="${x[1]}"></i>`).join('')}</div><small>${esc(t.d||'')}${t.bk==='dark'?' · 어두운 결승 대진표':''}</small><div class="row" style="margin-top:8px;gap:6px"><button class="btn sm ${cur===t.id?'':'dark'}" data-act="tplApply" data-id="${t.id}">${cur===t.id?'다시 적용':'적용'}</button>${t.u?`<button class="btn sm" data-act="tplDel" data-id="${t.id}">삭제</button>`:''}</div></div>`;
+  return `<div class="card"><h3>화면 템플릿</h3><div class="small muted" style="margin-bottom:10px">단계별 색상과 결승 대진표 모양을 한 번에 바꿉니다. 모든 기기에 같이 적용됩니다.</div><div class="tplgrid">${TPLS.map(card).join('')}</div></div>
+  <div class="card"><h3>내 템플릿</h3>${userTpls().length?`<div class="tplgrid" style="margin-bottom:12px">${userTpls().map(card).join('')}</div>`:'<div class="small muted" style="margin-bottom:10px">저장된 내 템플릿이 없습니다.</div>'}
+  <div class="row" style="gap:6px"><input id="tpl-name" placeholder="템플릿 이름" maxlength="14" style="flex:1;min-width:120px;border:1px solid #d5d9df;border-radius:10px;padding:8px 12px"><button class="btn pri" data-act="tplSave">현재 색상·모양 저장</button></div><div class="small muted" style="margin-top:6px">[색상] 탭에서 고른 색과 지금 적용된 결승 대진표 모양을 내 템플릿으로 저장합니다.</div></div>`;
+}
 function colorTabHTML(){
   return `<div class="card"><h3>단계별 구분 색상</h3><div class="small muted" style="margin-bottom:10px">예선·패자부활전·본선·결승라운드의 배경색과 제목색을 고릅니다. 모든 기기에 같이 적용됩니다.</div>
    ${STAGE_DEF.map(x=>{const k=x[0],l=x[1],c=stageColor(k);return `<div class="clrrow"><div class="clrname">${l}</div><input type="color" class="clrin" data-sc="${k}" value="${c}"><div class="clrpal">${STAGE_PAL.map(p=>`<button class="sw ${p.toLowerCase()===c.toLowerCase()?'on':''}" style="background:${p}" data-act="scSet" data-k="${k}" data-v="${p}" title="${p}"></button>`).join('')}</div><div class="clrprev" style="--sc:${c}"><span>${l}</span></div></div>`;}).join('')}
@@ -1334,7 +1359,7 @@ function vConfig(){
   else if(tab==='data')body=`${ghCardHTML()}
   <div class="card"><h3>저장소</h3><div class="small">${S.mode==='fb'?'✅ Firebase(Firestore)에 저장 · 모든 기기에서 실시간 동기화':S.mode==='db'?'✅ 서버(백엔드 DB)에 저장 · 모든 기기에서 실시간 동기화':'⚠️ 로컬 모드: 이 브라우저에만 저장됩니다'}</div>
     ${S.mode==='fb'?`<div class="row" style="margin-top:10px"><button class="btn sm" data-act="ghPlayers">GitHub 백업에서 선수 명단 불러오기</button><button class="btn sm" data-act="ghResults">GitHub 백업에서 대회 결과 불러오기</button></div><div class="small muted" style="margin-top:6px">저장소 data/ 폴더의 백업 파일을 불러옵니다. 조별 대진까지 옮기려면 기존 페이지에서 [결과 내보내기] 엑셀을 받아 [대회 결과 → 결과 가져오기]를 쓰세요.</div>`:''}</div>`;
-  else body=`<div class="card"><h3>화면</h3><div class="row"><button class="btn" data-act="viewOnly">${S.viewOnly?'진행자 모드로 전환':'관람 모드 (진행 버튼 숨기기)'}</button></div><div class="small muted" style="margin-top:6px">대형 화면에 띄울 때 관람 모드를 사용하세요. 이 기기에서만 적용됩니다.</div></div>`;
+  else body=tplTabHTML();
   return `<h2 class="pg">설정</h2>${bar}<div style="max-width:760px">${body}</div>`;
 }
 function uploadLogo(file,key){
@@ -2264,6 +2289,13 @@ ACT.wtClr=()=>{document.querySelectorAll('#wt-pick input[data-wid]').forEach(i=>
 ACT.cfgTab=d=>{S.tab.cfg=d.v;render();};
 ACT.scSet=d=>setStageColor(d.k,d.v);
 ACT.scReset=()=>{saveSettings(Object.assign({},S.settings,{stageColors:{}}));applyColors();render();toast('기본 색상으로 되돌렸습니다');};
+ACT.tplApply=d=>{const t=TPLS.concat(userTpls()).find(x=>x.id===d.id);if(t)applyTpl(t);};
+ACT.tplSave=()=>{const inp=$('#tpl-name');const nm=((inp&&inp.value)||'').trim();if(!nm){toast('템플릿 이름을 입력하세요');return;}
+  const list=userTpls().slice();if(list.length>=8){toast('내 템플릿은 최대 8개까지 저장됩니다');return;}
+  const c={};STAGE_DEF.forEach(x=>c[x[0]]=stageColor(x[0]));const id='u'+Date.now().toString(36);
+  list.push({id,name:nm,bk:(S.settings.bkTheme==='dark'?'dark':'light'),c,d:'내 템플릿',u:1});
+  saveSettings(Object.assign({},S.settings,{userTpls:list,template:id}));render();toast('내 템플릿으로 저장했습니다');};
+ACT.tplDel=async d=>{if(!(await ask('이 템플릿을 삭제할까요?','삭제',true)))return;const list=userTpls().filter(x=>x.id!==d.id);saveSettings(Object.assign({},S.settings,{userTpls:list,template:S.settings.template===d.id?'':S.settings.template}));render();};
 ACT.wtRm=d=>{const i=document.querySelector(`#wt-pick input[data-wid="${d.id}"]`);if(i){i.checked=false;i.closest('label').classList.remove('sel');}wtSelRender();};
 document.addEventListener('input',e=>{if(e.target.id==='wt-q'){const q=e.target.value.trim().toLowerCase();document.querySelectorAll('#wt-pick label').forEach(l=>{l.style.display=!q||l.dataset.s.indexOf(q)>=0?'':'none';});}});
 document.addEventListener('change',e=>{const w=e.target.dataset&&e.target.dataset.wid;if(w){e.target.closest('label').classList.toggle('sel',e.target.checked);wtSelRender();}});
