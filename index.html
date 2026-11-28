@@ -1435,7 +1435,7 @@ ACT.setSize=async d=>{
   autoProgress(t);saveTour(t);toast(`${n}인 1조로 편성했습니다`);
 };
 ACT.startRep=d=>{const t=T(d);const r=t.rounds[+d.r];applyPending(t);const pool=qualLosers(t,r);if(!pool.length){toast('패자부활전 대상자가 없습니다');return;}r.rep={heats:makeGroups(pool,r.repSize||r.size||3).map(newHeat)};saveTour(t);};
-ACT.cancelRep=async d=>{const t=T(d);const r=t.rounds[+d.r];if(r.rep.heats.some(hasRes)&&!(await ask('패자부활전을 취소할까요? 입력된 결과가 삭제됩니다.','취소',true)))return;r.rep=null;saveTour(t);};
+ACT.cancelRep=async d=>{const t=T(d);const r=t.rounds[+d.r];if(r.rep.heats.some(hasRes)&&!(await ask('패자부활전을 취소할까요? 입력된 결과가 삭제됩니다.','취소',true)))return;const inQ=new Set(r.qual.heats.flatMap(h=>h.players));const ex=r.rep.heats.flatMap(h=>act(t,h)).filter(p=>!inQ.has(p));r.rep=null;ex.forEach(p=>{const hs=r.qual.heats;const last=hs[hs.length-1];if(last&&act(t,last).length<(r.size||3))last.players.push(p);else hs.push(newHeat([p]));});saveTour(t);};
 ACT.startMain=d=>{
   const t=T(d);const r=t.rounds[+d.r];applyPending(t);
   const pool=qualWinners(t,r).concat(r.rep?r.rep.heats.flatMap(x=>winners(t,x)):[]);
@@ -1702,13 +1702,14 @@ function curStage(t){
   if(t.type!=='tournament'||t.status!=='active')return null;
   if(t.finals){const f=t.finals;return f.stage1&&!f.upper?{k:'f1',heats:f.stage1.heats}:null;}
   const r=t.rounds[t.rounds.length-1];if(!r)return null;
-  if(!r.main)return {k:'qual',r,heats:r.qual.heats.concat(r.rep?r.rep.heats:[])};
+  if(!r.main)return r.rep?{k:'rep',r,heats:r.rep.heats}:{k:'qual',r,heats:r.qual.heats};
   if(!r.main.done){const st=r.main.stages[r.main.stages.length-1];return st?{k:'main',r,st,heats:st.heats}:null;}
   return null;
 }
 function reshuffleCur(t,extra){
   const c=curStage(t);if(!c)return false;extra=(extra||[]).filter(p=>isActive(t,p));
   if(c.k==='qual'){const r=c.r;const pool=r.qual.heats.flatMap(h=>act(t,h));extra.forEach(p=>{if(!pool.includes(p))pool.push(p);});r.qual={heats:makeGroups(pool,r.size||3).map(newHeat)};r.rep=null;return true;}
+  if(c.k==='rep'){const r=c.r;const pool=r.rep.heats.flatMap(h=>act(t,h));extra.forEach(p=>{if(!pool.includes(p))pool.push(p);});r.rep=pool.length?{heats:makeGroups(pool,r.repSize||r.size||3).map(newHeat)}:null;return true;}
   if(c.k==='f1'){const f=t.finals;const pool=f.stage1.heats.flatMap(h=>act(t,h));if(pool.length<=3){f.stage1=null;f.upper={size:f.size,N:null,stages:[{kind:'rank',heats:[newHeat(shuffle(pool))]}],done:false,result:[]};}else f.stage1={heats:makeGroups(pool,f.size).map(newHeat)};return true;}
   const ch=c.r.main;const pool=c.st.heats.flatMap(h=>act(t,h));ch.stages.pop();ch.done=false;ch.result=[];
   if(!pool.length){ch.done=true;return true;}
@@ -1721,7 +1722,7 @@ async function pmApplyAdd(t,ids){
   const m=pmMode(t);
   if(m==='now'&&!(await pmConfirmNow(t)))return false;
   ids.forEach(id=>addToTour(t,id));
-  if(m==='now'){const c=curStage(t);if(c&&c.k==='qual'){reshuffleCur(t,ids);toast('추가하고 현재 예선을 재편성했습니다');}else toast('현재 단계는 예선이 아니라 다음 라운드부터 편성됩니다');}
+  if(m==='now'){const c=curStage(t);if(c&&(c.k==='qual'||c.k==='rep')){reshuffleCur(t,ids);toast(c.k==='rep'?'추가하고 패자부활전(패자조)을 재편성했습니다':'추가하고 현재 예선을 재편성했습니다');}else toast('현재 단계는 예선·패자부활전이 아니라 다음 라운드부터 편성됩니다');}
   return true;
 }
 async function pmApplyRemove(t,ids){
@@ -2083,10 +2084,14 @@ function heatQueue(t){
   }
   return q;
 }
+function heatIds(t){try{if(t.type==='points'){const P=t.pts||{};return (P.heats||[]).map(h=>h.id).concat(P.final?[P.final.id]:[]);}return tHeats(t).map(x=>x.h.id);}catch(e){return [];}}
 function checkAlerts(){
   const W=watchList();if(!W.length)return;
+  S.heatSig=S.heatSig||{};
   Object.values(S.tours).forEach(t=>{
     if(t.status!=='active')return;
+    const ids=heatIds(t);const prev=S.heatSig[t.id];S.heatSig[t.id]=ids;
+    if(prev&&ids.some(i=>!prev.includes(i))){const key='nh|'+t.id+'|'+ids.filter(i=>!prev.includes(i)).join(',');if(!S.alerted[key]){S.alerted[key]=1;fireAlert('📋 새 조편성이 완료되었습니다',`${t.name} · 대진표를 확인하세요`,'next',t.id,t.id+'|newheats');}}
     const q=heatQueue(t);if(!q.length)return;
     W.forEach(pid=>{
       if(!t.people[pid]||!isActive(t,pid))return;
@@ -2144,7 +2149,7 @@ document.addEventListener('input',e=>{if(e.target.id==='wt-q'){const q=e.target.
 document.addEventListener('change',e=>{const w=e.target.dataset&&e.target.dataset.wid;if(w){e.target.closest('label').classList.toggle('sel',e.target.checked);wtSelRender();}});
 ACT.watchSave=async()=>{
   const ids=[...document.querySelectorAll('#wt-pick input[data-wid]')].filter(i=>i.checked).map(i=>i.dataset.wid);
-  setWatch(ids);S.alerted={};closeModal();
+  setWatch(ids);S.alerted={};S.heatSig={};closeModal();
   try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();audioCtx.resume();}catch(e){}
   if(ids.length&&typeof Notification!=='undefined'&&Notification.permission==='default'){try{await Notification.requestPermission();}catch(e){}}
   renderShell();
